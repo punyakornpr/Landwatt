@@ -1,7 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { navigate } from '../router';
 import { useApp } from '../state/AppState';
-import { PROVINCES_DATA, REGIONS_INFO } from '../data/provinces';
 import { convertToSqMeters, convertSqMetersToThai } from '../utils/engineeringCalculations';
 import { GOAL_OPTIONS, BUDGET_OPTIONS } from '../engine/recommend';
 import GoogleMapPicker from '../components/GoogleMapPicker';
@@ -57,7 +56,7 @@ export default function Wizard() {
         <div className="space-y-6">
           <div>
             <h1 className="text-2xl font-bold">ที่ดินของคุณอยู่ที่ไหน?</h1>
-            <p className="text-sm text-ink-soft mt-1">ปักหมุดบนแผนที่ หรือเลือกจังหวัดก็ได้ — ไม่ต้องรู้พิกัดเป๊ะ ๆ</p>
+            <p className="text-sm text-ink-soft mt-1">ปักหมุดบนแผนที่ หรือค้นหาชื่ออำเภอ/จังหวัดก็ได้ — ไม่ต้องรู้พิกัดเป๊ะ ๆ</p>
           </div>
 
           {/* Location */}
@@ -71,22 +70,6 @@ export default function Wizard() {
               currentAreaSqM={land.areaSqM}
               onApplyDrawnArea={(sqM) => updateLand({ areaSqM: sqM })}
             />
-            <div className="flex flex-col sm:flex-row sm:items-center gap-2 text-sm">
-              <span className="text-ink-faint">หรือเลือกจังหวัด:</span>
-              <select
-                className="input-field sm:max-w-xs"
-                value={land.provinceId || ''}
-                onChange={(e) => {
-                  const p = PROVINCES_DATA.find(x => x.id === e.target.value);
-                  if (p) updateLand({ provinceId: p.id, provinceData: p, detectedProvinceName: null, coordinates: { lat: p.lat, lng: p.lng } });
-                }}
-              >
-                <option value="" disabled>เลือกจังหวัด…</option>
-                {PROVINCES_DATA.map(p => (
-                  <option key={p.id} value={p.id}>{p.name} ({REGIONS_INFO[p.region]?.name})</option>
-                ))}
-              </select>
-            </div>
             {land.provinceData && (
               <Note type="ok">
                 เราได้ตำแหน่งประมาณนี้แล้ว: <strong>{land.detectedProvinceName || land.provinceData.name}</strong>

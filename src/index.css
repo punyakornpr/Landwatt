@@ -1,0 +1,124 @@
+@import 'leaflet/dist/leaflet.css';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /* LandWatt palette — Main: Trust Blue #2563EB
+     Supports: sky (info), emerald (success), orange (warning/CTA)
+     ค่าเป็น RGB channels เพื่อให้ Tailwind ผสม alpha ได้ */
+
+  :root {
+    --paper: 248 250 252;
+    --brand-50: 239 246 255;
+    --brand-100: 219 234 254;
+    --brand-200: 191 219 254;
+    --brand-300: 147 197 253;
+    --brand-400: 96 165 250;
+    --brand-500: 59 130 246;
+    --brand-600: 37 99 235;
+    --brand-700: 29 78 216;
+    --brand-800: 30 64 175;
+    --brand-900: 30 58 138;
+    --brand-950: 23 37 84;
+
+    --energy-50: 240 253 244; --energy-100: 220 252 231; --energy-200: 187 247 208;
+    --energy-300: 134 239 172; --energy-400: 74 222 128; --energy-500: 34 197 94;
+    --energy-600: 22 163 74; --energy-700: 21 128 61; --energy-800: 22 101 52;
+    --energy-900: 20 83 45; --energy-950: 5 46 22;
+
+    --volt-50: 255 247 237; --volt-100: 255 237 213; --volt-200: 254 215 170;
+    --volt-300: 253 186 116; --volt-400: 251 146 60; --volt-500: 249 115 22;
+    --volt-600: 234 88 12; --volt-700: 194 65 12; --volt-800: 154 52 18;
+    --volt-900: 124 45 18;
+
+    --electric-50: 240 249 255; --electric-100: 224 242 254; --electric-200: 186 230 253;
+    --electric-300: 125 211 252; --electric-400: 56 189 248; --electric-500: 14 165 233;
+    --electric-600: 2 132 199; --electric-700: 3 105 161; --electric-800: 7 89 133;
+    --electric-900: 12 74 110; --electric-950: 8 47 73;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-paper text-ink font-sans antialiased;
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-white border border-[#E7E5DD] rounded-2xl shadow-[0_1px_2px_rgba(32,37,43,0.04)];
+  }
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-brand-700 text-white font-medium px-5 py-3 text-sm transition hover:bg-brand-800 active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none;
+  }
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-white border border-[#DDDAD0] text-ink font-medium px-5 py-3 text-sm transition hover:border-brand-600 hover:text-brand-800 active:scale-[0.98];
+  }
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl text-ink-soft font-medium px-4 py-2.5 text-sm transition hover:bg-black/5;
+  }
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium;
+  }
+  .input-field {
+    @apply w-full rounded-xl border border-[#DDDAD0] bg-white px-4 py-3 text-sm text-ink outline-none transition focus:border-brand-600 focus:ring-2 focus:ring-brand-600/15;
+  }
+}
+
+/* Leaflet map theme */
+.leaflet-container {
+  font-family: inherit !important;
+  border-radius: 1rem;
+  width: 100% !important;
+  height: 100% !important;
+  background-color: #f4f4f1 !important;
+}
+
+.map-drawing-crosshair,
+.map-drawing-crosshair .leaflet-container,
+.map-drawing-crosshair .leaflet-pane,
+.map-drawing-crosshair .leaflet-grab,
+.map-drawing-crosshair .leaflet-interactive {
+  cursor: crosshair !important;
+}
+
+.boundary-corner-handle {
+  transition: transform 0.15s ease-out;
+  z-index: 1000 !important;
+}
+.boundary-corner-handle:hover {
+  transform: scale(1.35);
+}
+
+/* Minimal scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #d8d5cc;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #b8b4a8;
+}
+
+/* Print styles for report */
+@media print {
+  body {
+    background-color: white !important;
+    color: black !important;
+  }
+  header, footer, nav, button, .no-print {
+    display: none !important;
+  }
+  .print-page {
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+}

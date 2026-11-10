@@ -6,7 +6,7 @@ import {
   calculateBESSFarmSpecs,
   calculateFloatingSolarSpecs,
   calculateBiogasSpecs,
-} from '../utils/engineeringCalculations';
+} from '../utils/engineeringCalculations.js';
 
 export function getSpecs(projectId, land) {
   const safeLand = { ...land, provinceData: land.provinceData || {} };

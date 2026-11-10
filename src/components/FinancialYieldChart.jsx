@@ -41,15 +41,22 @@ export default function FinancialYieldChart({ project, specs, landData }) {
     }
   }
 
-  const annualMWh = parseFloat((specs.annualEnergyMWh || '1500').replace(/,/g, ''));
-  const monthlyWeights = [0.082, 0.091, 0.098, 0.102, 0.090, 0.081, 0.078, 0.074, 0.070, 0.075, 0.079, 0.080];
+  const annualMWh = parseFloat(String(specs.annualEnergyMWh ?? specs.annualEnergyDispensedMWh ?? 0).replace(/,/g, ''));
+  const isPV = !!specs.dcCapacityMWp;
+  const isEV = !!specs.annualEnergyDispensedMWh;
+  // PV: น้ำหนักตามฤดูกาลแดด (สมมติฐาน) · อื่น ๆ (biogas baseload / EV demand): กระจายเท่ากัน
+  const monthlyWeights = isPV
+    ? [0.082, 0.091, 0.098, 0.102, 0.090, 0.081, 0.078, 0.074, 0.070, 0.075, 0.079, 0.080]
+    : Array(12).fill(1 / 12);
   const months = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
+  const hasMonthly = annualMWh > 0;
 
   const monthlyData = months.map((m, idx) => ({
     month: m,
     yieldMWh: Math.round(annualMWh * monthlyWeights[idx]),
     revenueTHB: Math.round(annualMWh * monthlyWeights[idx] * 2167.9)
   }));
+  const monthlyLabel = isEV ? 'พลังงานที่จ่ายให้รถ EV (MWh/เดือน)' : 'พลังงานไฟฟ้าที่ผลิตได้ (MWh/เดือน)';
 
   return (
     <div className="bg-white border border-zinc-200 rounded-xl p-6 shadow-sm space-y-5">
@@ -59,7 +66,7 @@ export default function FinancialYieldChart({ project, specs, landData }) {
             การประเมินผลตอบแทนทางการเงิน (Techno-Economics)
           </h3>
           <p className="text-xs text-zinc-500 mt-0.5">
-            ประมาณการกระแสเงินสดสะสม 25 ปี และปริมาณผลิตไฟฟ้ารายเดือน (กระจายตามน้ำหนักคงที่สมมติฐาน — ไม่ใช่ข้อมูลวัดหรือจำลองรายเดือน)
+            ประมาณการกระแสเงินสดสะสม 25 ปี{hasMonthly ? ` และ${isEV ? 'พลังงานจ่าย' : 'ปริมาณผลิตไฟฟ้า'}รายเดือน (กระจายตามน้ำหนัก${isPV ? 'ฤดูกาลแดด' : 'เท่ากัน'}สมมติฐาน — ไม่ใช่ข้อมูลวัดหรือจำลองรายเดือน)` : ''}
           </p>
         </div>
 
@@ -76,17 +83,19 @@ export default function FinancialYieldChart({ project, specs, landData }) {
             <TrendingUp className="w-3.5 h-3.5 text-zinc-600" />
             <span>กระแสเงินสดสะสม (25 ปี)</span>
           </button>
-          <button
-            onClick={() => setChartTab('generation')}
-            className={`px-3 py-1 rounded-md font-medium transition flex items-center space-x-1.5 ${
-              chartTab === 'generation'
-                ? 'bg-white text-zinc-900 font-semibold shadow-sm'
-                : 'text-zinc-600 hover:text-zinc-900'
-            }`}
-          >
-            <BarChart3 className="w-3.5 h-3.5 text-zinc-600" />
-            <span>การผลิตไฟฟ้ารายเดือน</span>
-          </button>
+          {hasMonthly && (
+            <button
+              onClick={() => setChartTab('generation')}
+              className={`px-3 py-1 rounded-md font-medium transition flex items-center space-x-1.5 ${
+                chartTab === 'generation'
+                  ? 'bg-white text-zinc-900 font-semibold shadow-sm'
+                  : 'text-zinc-600 hover:text-zinc-900'
+              }`}
+            >
+              <BarChart3 className="w-3.5 h-3.5 text-zinc-600" />
+              <span>{isEV ? 'พลังงานจ่ายรายเดือน' : 'การผลิตไฟฟ้ารายเดือน'}</span>
+            </button>
+          )}
         </div>
       </div>
 
@@ -132,7 +141,7 @@ export default function FinancialYieldChart({ project, specs, landData }) {
       {/* Chart View */}
       <div className="w-full h-72 bg-zinc-50 p-3 rounded-lg border border-zinc-200">
         <ResponsiveContainer width="100%" height="100%">
-          {chartTab === 'cashflow' ? (
+          {chartTab === 'cashflow' || !hasMonthly ? (
             <LineChart data={cashflowData} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e4e4e7" />
               <XAxis dataKey="year" stroke="#71717a" fontSize={11} interval={3} />
@@ -163,7 +172,7 @@ export default function FinancialYieldChart({ project, specs, landData }) {
               />
               <Bar 
                 dataKey="yieldMWh" 
-                name="พลังงานไฟฟ้าที่ผลิตได้ (MWh/เดือน)" 
+                name={monthlyLabel} 
                 fill="#3b82f6" 
                 radius={[3, 3, 0, 0]} 
               />
@@ -172,9 +181,9 @@ export default function FinancialYieldChart({ project, specs, landData }) {
         </ResponsiveContainer>
       </div>
 
-      <div className="p-3 rounded-lg bg-zinc-50 border border-zinc-200 text-xs text-zinc-600 flex items-center justify-between">
-        <span>อิงตามอัตราค่าไฟ FiT ตามระเบียบ กกพ. 2.1679 บาท/kWh และอัตราเสื่อมแผง (Degradation) 0.4%/ปี</span>
-        <span className="text-zinc-900 font-semibold font-mono">คืนทุนปีที่ {specs.financials?.paybackYears}</span>
+      <div className="p-3 rounded-lg bg-zinc-50 border border-zinc-200 text-xs text-zinc-600 flex items-center justify-between gap-3">
+        <span>{specs.cashFlowModel || 'อิงตามโมเดลกระแสเงินสดของประเภทโครงการ'}</span>
+        <span className="text-zinc-900 font-semibold font-mono shrink-0">คืนทุนปีที่ {specs.financials?.paybackYears}</span>
       </div>
 
     </div>

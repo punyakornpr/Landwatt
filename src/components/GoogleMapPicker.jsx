@@ -6,6 +6,7 @@ import {
   Maximize2, Sparkles, Check, RefreshCw 
 } from 'lucide-react';
 import { PROVINCES_DATA, findClosestProvince, calculateDistanceKm } from '../data/provinces';
+import { TH_ADMIN } from '../data/districts';
 import { 
   calculatePolygonAreaSqM, 
   calculatePolygonPerimeterMeters, 
@@ -36,6 +37,11 @@ export default function GoogleMapPicker({
   const [isPinningGrid, setIsPinningGrid] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [detectedLocationName, setDetectedLocationName] = useState('นครราชสีมา');
+  const [searchResults, setSearchResults] = useState([]);
+  const [searchState, setSearchState] = useState(null); // null | 'loading' | 'error'
+  const [showDistrictPicker, setShowDistrictPicker] = useState(false);
+  const [pickProvince, setPickProvince] = useState('');
+  const [pickDistrict, setPickDistrict] = useState('');
   const [measuredDistanceM, setMeasuredDistanceM] = useState(gridDistanceMeters);
 
   const [isDrawingBoundary, setIsDrawingBoundary] = useState(false);
@@ -443,33 +449,140 @@ export default function GoogleMapPicker({
     }
   };
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    if (!searchQuery.trim()) return;
+  const flyToLocation = (lat, lng, zoom = 15, label = null) => {
+    if (!mapInstanceRef.current) return;
+    mapInstanceRef.current.flyTo([lat, lng], zoom, { duration: 1.0 });
+    if (landMarkerRef.current) landMarkerRef.current.setLatLng([lat, lng]);
+    handleLocationSelect(lat, lng);
+    if (label) setDetectedLocationName(label);
+    setSearchResults([]);
+    setSearchState(null);
+  };
 
-    const coordMatch = searchQuery.match(/^(-?\d+(\.\d+)?),\s*(-?\d+(\.\d+)?)$/);
+  // geocoding ผ่าน Nominatim (OSM) — ฟรี ไม่ต้อง API key; ใช้เฉพาะตอนชุดข้อมูล local ไม่ครอบคลุม
+  const geocodeNominatim = async (query) => {
+    const url = `https://nominatim.openstreetmap.org/search?format=jsonv2&countrycodes=th&accept-language=th&limit=6&q=${encodeURIComponent(query)}`;
+    const res = await fetch(url, { headers: { 'Accept-Language': 'th' } });
+    if (!res.ok) throw new Error('geocode failed');
+    return res.json();
+  };
+
+  const handleSearch = async (e) => {
+    e.preventDefault();
+    const q = searchQuery.trim();
+    if (!q) return;
+    setSearchResults([]);
+    setSearchState(null);
+
+    // 1) พิกัด lat,lng
+    const coordMatch = q.match(/^(-?\d+(\.\d+)?),\s*(-?\d+(\.\d+)?)$/);
     if (coordMatch) {
-      const lat = parseFloat(coordMatch[1]);
-      const lng = parseFloat(coordMatch[3]);
-      if (mapInstanceRef.current) {
-        mapInstanceRef.current.flyTo([lat, lng], 16);
-        if (landMarkerRef.current) landMarkerRef.current.setLatLng([lat, lng]);
-        handleLocationSelect(lat, lng);
-      }
+      flyToLocation(parseFloat(coordMatch[1]), parseFloat(coordMatch[3]), 16);
       return;
     }
 
-    const foundProv = PROVINCES_DATA.find(p => 
-      p.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-      p.id.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-
-    if (foundProv && foundProv.lat && foundProv.lng) {
-      if (mapInstanceRef.current) {
-        mapInstanceRef.current.flyTo([foundProv.lat, foundProv.lng], 15, { duration: 1.0 });
-        if (landMarkerRef.current) landMarkerRef.current.setLatLng([foundProv.lat, foundProv.lng]);
-        handleLocationSelect(foundProv.lat, foundProv.lng);
+    // 2) ชื่ออำเภอ/เขต/จังหวัดจากชุดข้อมูลในประเทศ (ครบ 77 จังหวัด)
+    const bare = q.replace(/^(อำเภอ|เขต|จังหวัด|ตำบล|แขวง)\s*/, '').trim();
+    if (bare.length > 0) {
+      const matches = [];
+      for (const p of TH_ADMIN) {
+        if (p.province.includes(bare)) {
+          matches.push({ label: `จังหวัด${p.province}`, lat: null, lng: null, province: p.province });
+        }
+        for (const d of p.districts) {
+          if (d.name === bare || d.name.includes(bare)) {
+            matches.push({ label: `${d.prefix}${d.name} จ.${p.province}`, lat: d.lat, lng: d.lng, province: p.province, district: d });
+          }
+        }
       }
+      if (matches.length === 1 && matches[0].lat) {
+        flyToLocation(matches[0].lat, matches[0].lng, 13, matches[0].label);
+        return;
+      }
+      if (matches.length > 0) {
+        // หลายผลลัพธ์/ไม่มีพิกัด → ให้เลือกจากรายการ (เด้ง geocode ตอนคลิกถ้าจำเป็น)
+        setSearchResults(matches.slice(0, 8).map(m => ({ ...m, source: 'local' })));
+        return;
+      }
+    }
+
+    // 3) จังหวัดในตาราง GHI เดิม (มีพิกัดพร้อม)
+    const foundProv = PROVINCES_DATA.find(p =>
+      p.name.toLowerCase().includes(bare.toLowerCase()) ||
+      p.id.toLowerCase().includes(bare.toLowerCase())
+    );
+    if (foundProv && foundProv.lat && foundProv.lng) {
+      flyToLocation(foundProv.lat, foundProv.lng, 11);
+      return;
+    }
+
+    // 4) ตำบล/ชื่อสถานที่อื่น → geocoding ออนไลน์
+    setSearchState('loading');
+    try {
+      const results = await geocodeNominatim(q);
+      if (results.length === 0) {
+        setSearchState('error');
+        return;
+      }
+      if (results.length === 1) {
+        const r = results[0];
+        flyToLocation(parseFloat(r.lat), parseFloat(r.lon), 13, r.display_name.split(',')[0]);
+      } else {
+        setSearchResults(results.map(r => ({
+          label: r.display_name,
+          lat: parseFloat(r.lat),
+          lng: parseFloat(r.lon),
+          source: 'osm'
+        })));
+        setSearchState(null);
+      }
+    } catch {
+      setSearchState('error');
+    }
+  };
+
+  const handlePickResult = async (item) => {
+    if (item.lat && item.lng) {
+      flyToLocation(item.lat, item.lng, item.district ? 13 : 11, item.label);
+      return;
+    }
+    // ผลลัพธ์ local ที่ไม่มีพิกัด (เขต กทม. บางเขต/ทั้งจังหวัด) → geocode ตอนคลิก
+    setSearchState('loading');
+    try {
+      const results = await geocodeNominatim(item.label.replace('จ.', 'จังหวัด'));
+      if (results.length > 0) {
+        flyToLocation(parseFloat(results[0].lat), parseFloat(results[0].lon), item.district ? 13 : 11, item.label);
+      } else {
+        setSearchState('error');
+      }
+    } catch {
+      setSearchState('error');
+    }
+  };
+
+  const confirmDistrictPick = async () => {
+    const prov = TH_ADMIN.find(p => p.province === pickProvince);
+    const dist = prov?.districts.find(d => `${d.prefix}${d.name}` === pickDistrict || d.name === pickDistrict);
+    if (!prov) return;
+    const label = dist ? `${dist.prefix}${dist.name} จ.${prov.province}` : `จังหวัด${prov.province}`;
+    if (dist?.lat) {
+      flyToLocation(dist.lat, dist.lng, 13, label);
+      setShowDistrictPicker(false);
+      return;
+    }
+    // ไม่มีพิกัดในชุดข้อมูล → geocode ชื่อเต็ม
+    setSearchState('loading');
+    try {
+      const query = dist ? `${dist.prefix}${dist.name} จังหวัด${prov.province}` : `จังหวัด${prov.province}`;
+      const results = await geocodeNominatim(query);
+      if (results.length > 0) {
+        flyToLocation(parseFloat(results[0].lat), parseFloat(results[0].lon), dist ? 13 : 11, label);
+        setShowDistrictPicker(false);
+      } else {
+        setSearchState('error');
+      }
+    } catch {
+      setSearchState('error');
     }
   };
 
@@ -483,23 +596,49 @@ export default function GoogleMapPicker({
       {/* Top Search & Layer Controls */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-2.5">
         
-        {/* Search */}
-        <form onSubmit={handleSearch} className="w-full sm:w-72 relative">
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="ค้นหาอำเภอ, จังหวัด หรือพิกัด..."
-            className="w-full bg-white border border-zinc-200 focus:border-zinc-900 rounded-lg pl-8 pr-16 py-1.5 text-xs text-zinc-900 placeholder-zinc-400 outline-none transition"
-          />
-          <Search className="w-3.5 h-3.5 text-zinc-400 absolute left-2.5 top-2 pointer-events-none" />
+        {/* Search + District Picker */}
+        <div className="flex items-center gap-1.5 w-full sm:w-auto">
+          <form onSubmit={handleSearch} className="w-full sm:w-72 relative">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => { setSearchQuery(e.target.value); setSearchResults([]); }}
+              placeholder="ค้นหาอำเภอ, ตำบล, จังหวัด หรือพิกัด..."
+              className="w-full bg-white border border-zinc-200 focus:border-zinc-900 rounded-lg pl-8 pr-16 py-1.5 text-xs text-zinc-900 placeholder-zinc-400 outline-none transition"
+            />
+            <Search className="w-3.5 h-3.5 text-zinc-400 absolute left-2.5 top-2 pointer-events-none" />
+            <button
+              type="submit"
+              className="absolute right-1 top-1 px-2.5 py-0.5 rounded bg-zinc-900 hover:bg-zinc-800 text-white text-[11px] font-medium transition"
+            >
+              ค้นหา
+            </button>
+            {searchResults.length > 0 && (
+              <div className="absolute left-0 right-0 top-full mt-1 z-[1100] bg-white border border-zinc-200 rounded-lg shadow-lg overflow-hidden">
+                {searchResults.map((r, i) => (
+                  <button
+                    key={i}
+                    type="button"
+                    onClick={() => handlePickResult(r)}
+                    className="w-full text-left px-3 py-2 text-xs text-zinc-800 hover:bg-zinc-50 border-b border-zinc-100 last:border-b-0 line-clamp-1"
+                  >
+                    {r.label}
+                  </button>
+                ))}
+              </div>
+            )}
+          </form>
           <button
-            type="submit"
-            className="absolute right-1 top-1 px-2.5 py-0.5 rounded bg-zinc-900 hover:bg-zinc-800 text-white text-[11px] font-medium transition"
+            type="button"
+            onClick={() => setShowDistrictPicker(v => !v)}
+            className={`shrink-0 px-2.5 py-1.5 rounded-lg border text-[11px] font-medium transition flex items-center space-x-1 ${
+              showDistrictPicker ? 'bg-zinc-900 text-white border-zinc-900' : 'bg-white text-zinc-700 border-zinc-200 hover:border-zinc-400'
+            }`}
           >
-            ค้นหา
+            <MapPin className="w-3.5 h-3.5" />
+            <span>เลือกอำเภอ</span>
           </button>
-        </form>
+        </div>
 
         {/* Map Layers */}
         <div className="flex items-center space-x-1 bg-white p-0.5 rounded-lg border border-zinc-200 text-xs shadow-sm self-end sm:self-auto">
@@ -533,6 +672,49 @@ export default function GoogleMapPicker({
         </div>
 
       </div>
+
+      {/* District Picker Panel */}
+      {showDistrictPicker && (
+        <div className="flex flex-wrap items-center gap-2 p-2.5 rounded-lg bg-white border border-zinc-200 text-xs">
+          <MapPin className="w-3.5 h-3.5 text-zinc-500" />
+          <select
+            value={pickProvince}
+            onChange={(e) => { setPickProvince(e.target.value); setPickDistrict(''); }}
+            className="bg-white border border-zinc-200 rounded-md px-2 py-1.5 text-xs text-zinc-800 max-w-[10rem]"
+          >
+            <option value="">เลือกจังหวัด</option>
+            {TH_ADMIN.map(p => <option key={p.province} value={p.province}>{p.province}</option>)}
+          </select>
+          <select
+            value={pickDistrict}
+            onChange={(e) => setPickDistrict(e.target.value)}
+            disabled={!pickProvince}
+            className="bg-white border border-zinc-200 rounded-md px-2 py-1.5 text-xs text-zinc-800 max-w-[12rem] disabled:opacity-50"
+          >
+            <option value="">{pickProvince ? 'ทั้งจังหวัด / เลือกอำเภอ' : 'เลือกจังหวัดก่อน'}</option>
+            {pickProvince && TH_ADMIN.find(p => p.province === pickProvince)?.districts.map(d => (
+              <option key={`${d.prefix}${d.name}`} value={`${d.prefix}${d.name}`}>{d.prefix}{d.name}</option>
+            ))}
+          </select>
+          <button
+            type="button"
+            onClick={confirmDistrictPick}
+            disabled={!pickProvince}
+            className="px-3 py-1.5 rounded-md bg-zinc-900 hover:bg-zinc-800 text-white text-[11px] font-medium transition disabled:opacity-40"
+          >
+            ไปที่ตำแหน่งนี้
+          </button>
+        </div>
+      )}
+
+      {/* Search status */}
+      {(searchState === 'loading' || searchState === 'error') && (
+        <p className={`text-[11px] px-1 ${searchState === 'error' ? 'text-red-600' : 'text-zinc-500'}`}>
+          {searchState === 'loading'
+            ? 'กำลังค้นหาตำแหน่ง…'
+            : 'ไม่พบตำแหน่ง — ลองพิมพ์ "อำเภอ + จังหวัด" หรือใช้ปุ่มเลือกอำเภอ'}
+        </p>
+      )}
 
       {/* Action Toolbar */}
       <div className="flex flex-wrap items-center justify-between gap-2 p-2 rounded-lg bg-white border border-zinc-200 text-xs">

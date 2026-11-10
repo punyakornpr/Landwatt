@@ -1,7 +1,7 @@
 // Recommendation Engine: คัดกรองเงื่อนไข → ให้คะแนนตามเกณฑ์ → อธิบายเหตุผล
 // คะแนนเป็นตัวชี้ "ความเหมาะสมในเบื้องต้นตามเกณฑ์ของระบบ" ไม่ใช่โอกาสสำเร็จหรือกำไร
 
-import { evaluateLandFeasibility } from '../utils/engineeringCalculations';
+import { evaluateLandFeasibility } from '../utils/engineeringCalculations.js';
 
 export const STATUS = {
   great:        { label: 'เหมาะมาก',       color: 'bg-energy-100 text-energy-800 border-energy-200', dot: 'bg-energy-500' },

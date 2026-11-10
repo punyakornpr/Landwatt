@@ -244,24 +244,9 @@ export function calculateSolarFarmSpecs(landData) {
   for (let y = 1; y <= 25; y++) {
     cashFlows.push(annualRevenue * Math.pow(1 - DEG, y - 1) - opexPerYear);
   }
-  // [F-26] ปีแรกที่ CCF ≥ 0
-  let cum = -totalCapex, paybackYear = null;
-  for (let y = 1; y <= 25 && paybackYear === null; y++) {
-    cum += cashFlows[y];
-    if (cum >= 0) paybackYear = y;
-  }
+  // [F-26]/[F-27]/[F-28] ทั้งหมดมาจาก cashFlows ชุดเดียวกับกราฟ/ตาราง
+  const cfFin = financeFromCashFlows(cashFlows);
   const netAnnualCashflow = annualRevenue - opexPerYear;
-  const simplePaybackYears = paybackYear !== null ? String(paybackYear) : 'ไม่คืนทุนภายใน 25 ปี';
-  // [F-26] interpolated payback ระหว่างสองปี (linear, สมมติเงินสดสม่ำเสมอในปี)
-  let paybackInterp = null;
-  if (paybackYear !== null && paybackYear > 0) {
-    const prevCcf = cashFlows.slice(0, paybackYear).reduce((a, b) => a + b, 0);
-    paybackInterp = (paybackYear - 1) + Math.abs(prevCcf) / cashFlows[paybackYear];
-  }
-  // [F-27]/[F-28] คำนวณจาก cashFlows เดียวกับกราฟเสมอ
-  const npvValue = npvFromCashFlows(cashFlows);
-  const irrValue = irrFromCashFlows(cashFlows);
-  const irrPercent = irrValue === null ? 'N/A' : irrValue.toFixed(1);
 
   // ตัวชี้วัดสิ่งแวดล้อม (ESG)
   // Grid Emission Factor ไทย ~0.4999 kgCO2/kWh
@@ -298,11 +283,12 @@ export function calculateSolarFarmSpecs(landData) {
       totalCapexMillionTHB: (totalCapex / 1000000).toFixed(2),
       annualRevenueMillionTHB: (annualRevenue / 1000000).toFixed(2),
       netAnnualCashflowMillionTHB: (netAnnualCashflow / 1000000).toFixed(2),
-      paybackYears: simplePaybackYears,
-      paybackInterpolated: paybackInterp !== null ? paybackInterp.toFixed(1) : '—',
-      irrPercent: irrPercent,
-      npv25YrMillionTHB: (npvValue / 1000000).toFixed(2)
+      paybackYears: cfFin.paybackYears,
+      paybackInterpolated: cfFin.paybackInterpolated,
+      irrPercent: cfFin.irrPercent,
+      npv25YrMillionTHB: cfFin.npv25YrMillionTHB
     },
+    cashFlowModel: 'CF_y = R_PV,1×(1−0.004)^(y−1) − OPEX — รายได้ไฟฟ้าเสื่อมตาม degradation แผง 0.4%/ปี',
     esg: {
       co2TonsYear: Math.round(co2AvoidedTonsPerYear).toLocaleString(),
       treesEquivalent: treeEquivalent.toLocaleString()
@@ -349,14 +335,7 @@ export function calculateAgrivoltaicsSpecs(landData) {
   for (let y = 1; y <= 25; y++) {
     cashFlows.push(powerRevenue * Math.pow(1 - AGRI_DEG, y - 1) + agriRevenue - opexPerYear);
   }
-  let cum = -totalCapex, paybackYear = null;
-  for (let y = 1; y <= 25 && paybackYear === null; y++) {
-    cum += cashFlows[y];
-    if (cum >= 0) paybackYear = y;
-  }
-  const paybackYears = paybackYear !== null ? String(paybackYear) : 'ไม่คืนทุนภายใน 25 ปี';
-  const npvValue = npvFromCashFlows(cashFlows);
-  const irrValue = irrFromCashFlows(cashFlows);
+  const cfFin = financeFromCashFlows(cashFlows);
 
   return {
     ...baseSolar,
@@ -386,10 +365,12 @@ export function calculateAgrivoltaicsSpecs(landData) {
       totalCapexMillionTHB: (totalCapex / 1000000).toFixed(2),
       annualRevenueMillionTHB: (totalAnnualRevenue / 1000000).toFixed(2),
       netAnnualCashflowMillionTHB: (netAnnualCashflow / 1000000).toFixed(2),
-      paybackYears,
-      irrPercent: irrValue === null ? 'N/A' : irrValue.toFixed(1),
-      npv25YrMillionTHB: (npvValue / 1000000).toFixed(2)
+      paybackYears: cfFin.paybackYears,
+      paybackInterpolated: cfFin.paybackInterpolated,
+      irrPercent: cfFin.irrPercent,
+      npv25YrMillionTHB: cfFin.npv25YrMillionTHB
     },
+    cashFlowModel: 'CF_y = R_PV,1×(1−0.004)^(y−1) + R_crop − OPEX — เสื่อมเฉพาะรายได้ไฟฟ้า รายได้พืชคงที่ (สมมติฐาน demo)',
     cashFlows,
   };
 }
@@ -446,7 +427,19 @@ export function calculateEVHubSpecs(landData) {
   const transformerAndCivil = 1800000 + (dcFastChargerCount * 150000);
   const totalCapex = chargersCost + canopyCost + bessCost + transformerAndCivil;
 
-  const paybackYears = (totalCapex / netAnnualCashflow).toFixed(1);
+  // [F-24] cash flow ตามธรรมชาติธุรกิจชาร์จ: utilization ramp ปี 1–5
+  // (ตลาด EV ค่อย ๆ โต — สมมติฐาน 60→100%) ไม่ใช่ degradation ฝั่งผลิต
+  // + สำรองเปลี่ยน power module ตู้ชาร์จปีที่ 10 (อายุใช้งาน ~10 ปี, ~25% ราคาตู้)
+  const UTIL_RAMP = [0.60, 0.70, 0.80, 0.90, 1.00];
+  const chargerMarginYear1 = annualKWhSold * marginPerKWh;
+  const opexFixed = 450000;
+  const cashFlows = [-totalCapex];
+  for (let y = 1; y <= 25; y++) {
+    const util = UTIL_RAMP[Math.min(y, UTIL_RAMP.length) - 1];
+    const moduleRefresh = (y === 10) ? chargersCost * 0.25 : 0;
+    cashFlows.push(chargerMarginYear1 * util + commercialRentalRevenue - opexFixed - moduleRefresh);
+  }
+  const cfFin = financeFromCashFlows(cashFlows);
 
   return {
     dcChargersCount: dcFastChargerCount,
@@ -457,13 +450,19 @@ export function calculateEVHubSpecs(landData) {
     transformerRating: `${transformerKVA} kVA, 22kV / 400V, 3-Phase, Oil-immersed`,
     dailyCarsServiced: dailyCars,
     annualEnergyDispensedMWh: Math.round(annualKWhSold / 1000),
+    utilizationRamp: UTIL_RAMP,
     financials: {
       totalCapexMillionTHB: (totalCapex / 1000000).toFixed(2),
       annualRevenueMillionTHB: (annualChargingRevenue / 1000000).toFixed(2),
+      netAnnualCashflowMillionTHB: (netAnnualCashflow / 1000000).toFixed(2),
       netAnnualProfitMillionTHB: (netAnnualCashflow / 1000000).toFixed(2),
-      paybackYears,
-      irrPercent: calculateIRR(totalCapex, annualChargingRevenue, annualElectricityCost + 450000, 15, 0).toFixed(1)
+      paybackYears: cfFin.paybackYears,
+      paybackInterpolated: cfFin.paybackInterpolated,
+      irrPercent: cfFin.irrPercent,
+      npv25YrMillionTHB: cfFin.npv25YrMillionTHB
     },
+    cashFlowModel: 'CF_y = M_charge×U_y + R_rent − OPEX − Refresh(ปี10) — U_y = utilization 60→100% ปีที่ 1–5 (สมมติฐานตลาด EV โต) ไม่ใช่ degradation',
+    cashFlows,
     electricalFeatures: [
       'ระบบบริหารจัดการกำลังไฟฟ้าอัจฉริยะ (Dynamic Load Management - DLM)',
       'ระบบตัดตอนป้องกันไฟดูด ไฟรั่ว Type B RCD และ Surge Protection Class I+II',
@@ -490,6 +489,17 @@ export function calculateBESSFarmSpecs(landData) {
   const opexPerYear = totalCapex * 0.02;
   const netAnnualCashflow = annualRevenue - opexPerYear;
 
+  // [F-24] cash flow ตามธรรมชาติ BESS: รายได้เสื่อมตาม capacity fade ของ cell LFP
+  // (~2%/ปี สมมติฐาน ต่างจาก degradation แผง PV) + augmentation ปีที่ 15
+  // (~35% ของ CAPEX เดิม เพื่อรักษา capacity — สมมติฐานประกาศไว้)
+  const BESS_FADE = 0.02;
+  const cashFlows = [-totalCapex];
+  for (let y = 1; y <= 25; y++) {
+    const augment = (y === 15) ? totalCapex * 0.35 : 0;
+    cashFlows.push(annualRevenue * Math.pow(1 - BESS_FADE, y - 1) - opexPerYear - augment);
+  }
+  const cfFin = financeFromCashFlows(cashFlows);
+
   return {
     containerCount,
     capacityMWh: capacityMWh.toFixed(1),
@@ -501,10 +511,15 @@ export function calculateBESSFarmSpecs(landData) {
     financials: {
       totalCapexMillionTHB: (totalCapex / 1000000).toFixed(2),
       annualRevenueMillionTHB: (annualRevenue / 1000000).toFixed(2),
+      netAnnualCashflowMillionTHB: (netAnnualCashflow / 1000000).toFixed(2),
       netAnnualProfitMillionTHB: (netAnnualCashflow / 1000000).toFixed(2),
-      paybackYears: (totalCapex / netAnnualCashflow).toFixed(1),
-      irrPercent: calculateIRR(totalCapex, annualRevenue, opexPerYear, 15, 0.015).toFixed(1)
-    }
+      paybackYears: cfFin.paybackYears,
+      paybackInterpolated: cfFin.paybackInterpolated,
+      irrPercent: cfFin.irrPercent,
+      npv25YrMillionTHB: cfFin.npv25YrMillionTHB
+    },
+    cashFlowModel: 'CF_y = R_cap×(1−0.02)^(y−1) − OPEX − Augmentation(ปี15 ~35% CAPEX) — fade 2%/ปี ตาม capacity fade ของ cell LFP ไม่ใช่ degradation แผง PV',
+    cashFlows,
   };
 }
 
@@ -518,6 +533,14 @@ export function calculateFloatingSolarSpecs(landData) {
   const opexPerYear = totalCapex * 0.016;
   const netAnnualCashflow = annualRevenue - opexPerYear;
 
+  // [F-24] cash flow ของ floating เอง — ห้ามใช้ของ solar base (CAPEX/รายได้ต่างกัน)
+  // degradation 0.4%/ปี เหมือน solar เพราะเป็นแผง PV เดียวกัน (มีเหตุผล ไม่ใช่ default สุ่ม)
+  const cashFlows = [-totalCapex];
+  for (let y = 1; y <= 25; y++) {
+    cashFlows.push(annualRevenue * Math.pow(1 - 0.004, y - 1) - opexPerYear);
+  }
+  const cfFin = financeFromCashFlows(cashFlows);
+
   // การระเหยของน้ำลดลงเฉลี่ย ~1,200 ลบ.ม./ไร่/ปี
   const waterSavedCubicMeters = Math.round((landData.areaSqM / 1600) * 1200);
 
@@ -530,9 +553,13 @@ export function calculateFloatingSolarSpecs(landData) {
       totalCapexMillionTHB: (totalCapex / 1000000).toFixed(2),
       annualRevenueMillionTHB: (annualRevenue / 1000000).toFixed(2),
       netAnnualCashflowMillionTHB: (netAnnualCashflow / 1000000).toFixed(2),
-      paybackYears: (totalCapex / netAnnualCashflow).toFixed(1),
-      irrPercent: calculateIRR(totalCapex, annualRevenue, opexPerYear, 25, 0.004).toFixed(1)
-    }
+      paybackYears: cfFin.paybackYears,
+      paybackInterpolated: cfFin.paybackInterpolated,
+      irrPercent: cfFin.irrPercent,
+      npv25YrMillionTHB: cfFin.npv25YrMillionTHB
+    },
+    cashFlowModel: 'CF_y = R_PV,1×(1−0.004)^(y−1) − OPEX — degradation แผง PV เดียวกับ solar แต่คำนวณจาก CAPEX/รายได้ของ floating เอง (ค่าใช้จ่ายทุ่นลอยสูงกว่า)',
+    cashFlows,
   };
 }
 
@@ -553,6 +580,17 @@ export function calculateBiogasSpecs(landData) {
   const opexPerYear = totalCapex * 0.07; // บำรุงรักษาเครื่องยนต์ก๊าซและวัตถุดิบ
   const netAnnualCashflow = annualRevenue - opexPerYear;
 
+  // [F-24] cash flow ตามธรรมชาติโรงไฟฟ้าฐาน: ผลิตคงที่ตลอดอายุ (ไม่มี degradation
+  // แบบแผง PV — เครื่องยนต์รักษา output ได้ตราบใดที่บำรุงรักษา) แต่มี major overhaul
+  // เครื่องยนต์ก๊าซทุก ~8 ปี (≈60,000 ชม.ทำงาน สมมติฐาน ~8% CAPEX/ครั้ง)
+  const OVERHAUL_YEARS = new Set([8, 16, 24]);
+  const cashFlows = [-totalCapex];
+  for (let y = 1; y <= 25; y++) {
+    const overhaul = OVERHAUL_YEARS.has(y) ? totalCapex * 0.08 : 0;
+    cashFlows.push(annualRevenue - opexPerYear - overhaul);
+  }
+  const cfFin = financeFromCashFlows(cashFlows);
+
   return {
     generatorCapacityKW,
     generatorCapacityMW,
@@ -563,10 +601,15 @@ export function calculateBiogasSpecs(landData) {
     financials: {
       totalCapexMillionTHB: (totalCapex / 1000000).toFixed(2),
       annualRevenueMillionTHB: (annualRevenue / 1000000).toFixed(2),
+      netAnnualCashflowMillionTHB: (netAnnualCashflow / 1000000).toFixed(2),
       netAnnualProfitMillionTHB: (netAnnualCashflow / 1000000).toFixed(2),
-      paybackYears: (totalCapex / netAnnualCashflow).toFixed(1),
-      irrPercent: calculateIRR(totalCapex, annualRevenue, opexPerYear, 20, 0.005).toFixed(1)
-    }
+      paybackYears: cfFin.paybackYears,
+      paybackInterpolated: cfFin.paybackInterpolated,
+      irrPercent: cfFin.irrPercent,
+      npv25YrMillionTHB: cfFin.npv25YrMillionTHB
+    },
+    cashFlowModel: 'CF_y = R_FiT − OPEX − Overhaul(ปี 8/16/24 ~8% CAPEX) — โรงไฟฟ้าฐานผลิตคงที่ ไม่มี degradation แบบ PV แต่เสียค่า overhaul เครื่องยนต์เป็นช่วง',
+    cashFlows,
   };
 }
 
@@ -600,30 +643,25 @@ function irrFromCashFlows(cashFlows) {
   return (lo + hi) / 2 * 100;
 }
 
-function calculateNPV(capex, netAnnualCashflow, years = 25, discountRate = 0.06) {
-  let npv = -capex;
-  for (let t = 1; t <= years; t++) {
-    npv += netAnnualCashflow / Math.pow(1 + discountRate, t);
+// [F-26/27/28] ตัวชี้วัดการเงินทั้งหมดจาก cash flow ชุดเดียว — แชร์กับกราฟ/ตารางเสมอ
+function financeFromCashFlows(cashFlows) {
+  let cum = cashFlows[0], paybackYear = null;
+  for (let y = 1; y < cashFlows.length && paybackYear === null; y++) {
+    cum += cashFlows[y];
+    if (cum >= 0) paybackYear = y;
   }
-  return npv / 1000000; // Return in Million THB
-}
-
-function calculateIRR(capex, revenue, opex, years = 25, degradation = 0.004) {
-  // Approximate internal rate of return using Newton-Raphson
-  let rate = 0.10;
-  for (let iter = 0; iter < 20; iter++) {
-    let npv = -capex;
-    let dNpv = 0;
-    for (let t = 1; t <= years; t++) {
-      const yearRevenue = revenue * Math.pow(1 - degradation, t - 1);
-      const cf = yearRevenue - opex;
-      npv += cf / Math.pow(1 + rate, t);
-      dNpv -= (t * cf) / Math.pow(1 + rate, t + 1);
-    }
-    if (Math.abs(npv) < 1000) break;
-    if (dNpv === 0) break;
-    rate = rate - npv / dNpv;
-    if (rate < -0.5 || rate > 2.0) { rate = 0.08; break; }
+  // interpolated payback (linear ระหว่างปี — สมมติเงินสดสม่ำเสมอในปี)
+  let paybackInterp = null;
+  if (paybackYear !== null && paybackYear > 0 && cashFlows[paybackYear] > 0) {
+    const prevCcf = cashFlows.slice(0, paybackYear).reduce((a, b) => a + b, 0);
+    paybackInterp = (paybackYear - 1) + Math.abs(prevCcf) / cashFlows[paybackYear];
   }
-  return Math.max(0, rate * 100);
+  const npvValue = npvFromCashFlows(cashFlows);
+  const irrValue = irrFromCashFlows(cashFlows);
+  return {
+    paybackYears: paybackYear !== null ? String(paybackYear) : 'ไม่คืนทุนภายใน 25 ปี',
+    paybackInterpolated: paybackInterp !== null ? paybackInterp.toFixed(1) : '—',
+    npv25YrMillionTHB: (npvValue / 1000000).toFixed(2),
+    irrPercent: irrValue === null ? 'N/A' : irrValue.toFixed(1),
+  };
 }

@@ -361,9 +361,9 @@ export default function EngineeringView({ id, specs, land, project, summary }) {
           </details>
         )}
         <p className="text-xs text-ink-faint">
-          [F-24] CF₀ = −CAPEX, CF_y = R_PV,1×(1−d)^(y−1) + R_crop + Savings − OPEX (เสื่อมเฉพาะไฟฟ้า, รายได้พืชคงที่) · [F-26] คืนทุน = ปีแรกที่ CCF ≥ 0{fin.paybackInterpolated && fin.paybackInterpolated !== '—' ? ` (interpolated ≈ ${fin.paybackInterpolated} ปี)` : ''} ·
+          [F-24] CF₀ = −CAPEX · {specs.cashFlowModel || 'CF_y = รายได้ − ต้นทุนรายปี ตามโมเดลของประเภทโครงการ'} · [F-26] คืนทุน = ปีแรกที่ CCF ≥ 0{fin.paybackInterpolated && fin.paybackInterpolated !== '—' ? ` (interpolated ≈ ${fin.paybackInterpolated} ปี)` : ''} ·
           [F-27] NPV ที่ 6% 25 ปี · [F-28] IRR หารากเชิงตัวเลข — unlevered pre-tax ไม่รวมภาษี/เงินกู้ ·
-          อัตรา FiT เป็นสถานการณ์ ไม่ใช่สิทธิรับซื้อไฟ
+          อัตรารายได้เป็นสถานการณ์ ไม่ใช่สิทธิ์ที่ยืนยัน
         </p>
       </Section>
 

@@ -1,7 +1,7 @@
 // LandWatt acceptance — ตรวจ F-01..F-14, F-24..F-28, F-03, SLD fields, Cash Flow,
 // เปลี่ยนพื้นที่ 2 กรณี, และ save/load + import ผ่าน localStorage mock
 import assert from 'node:assert/strict';
-import { calculateSolarFarmSpecs, calculateAgrivoltaicsSpecs, calculateEVHubSpecs } from '../src/utils/engineeringCalculations.js';
+import { calculateSolarFarmSpecs, calculateAgrivoltaicsSpecs, calculateEVHubSpecs, calculateBESSFarmSpecs, calculateFloatingSolarSpecs, calculateBiogasSpecs } from '../src/utils/engineeringCalculations.js';
 
 // ---- localStorage mock สำหรับ storage.js ----
 const store = {};
@@ -102,10 +102,117 @@ const s3 = calculateSolarFarmSpecs(L3);
 checkPVChain(s3, L3, 'solar@1470ex200'); checkCashFlows(s3, L3, 'solar@1470ex200');
 assert.equal(num(s3.areaCandidatePanelCount), Math.floor((1470 - 200) * 0.78 / 4), 'exclusion หักก่อน candidate');
 
-// ===== EV =====
+// ===== F-26/27/28 consistency สำหรับทุกประเภท — payback/NPV/IRR ต้องมาจาก cashFlows เดียวกัน =====
+function checkFinConsistency(specs, tag) {
+  const f = specs.financials, cf = specs.cashFlows;
+  assert.ok(cf && cf.length === 26, `${tag}: cashFlows[0..25]`);
+  assert.ok(f.npv25YrMillionTHB !== undefined && f.irrPercent !== undefined, `${tag}: NPV/IRR fields`);
+  near(cf[0], -num(f.totalCapexMillionTHB) * 1e6, 15000, `${tag}: CF0=−CAPEX`);
+  let ccf = 0, pb = null;
+  for (let y = 0; y <= 25; y++) { ccf += cf[y]; if (pb === null && ccf >= 0) pb = y; }
+  assert.equal(f.paybackYears, pb === null ? 'ไม่คืนทุนภายใน 25 ปี' : String(pb), `${tag}: payback=ปีแรก CCF≥0`);
+  const npv = cf.reduce((s, c, y) => s + c / Math.pow(1.06, y), 0);
+  near(npv / 1e6, num(f.npv25YrMillionTHB), 0.05, `${tag}: NPV จาก array เดียวกัน`);
+  const irr = num(f.irrPercent);
+  if (!Number.isNaN(irr)) {
+    const npvAtIrr = cf.reduce((s, c, y) => s + c / Math.pow(1 + irr / 100, y), 0);
+    // residual สูงสุดที่ยอม = |dNPV/dr| ณ จุด IRR × ข้อผิดพลาดการปัด (±0.1%)
+    const dNpv = cf.reduce((s, c, y) => s - y * c / Math.pow(1 + irr / 100, y + 1), 0);
+    const tol = Math.max(20000, Math.abs(dNpv) * 0.002);
+    assert.ok(Math.abs(npvAtIrr) < tol, `${tag}: IRR root residual=${npvAtIrr.toFixed(0)} (tol ${tol.toFixed(0)})`);
+  }
+  assert.ok(typeof specs.cashFlowModel === 'string' && specs.cashFlowModel.length > 10, `${tag}: cashFlowModel label`);
+}
+
+// ===== EV — utilization ramp ปี1–5 + charger refresh ปี10 (ไม่ใช่ degradation) =====
 const ev = calculateEVHubSpecs({ areaSqM: 5000, roadWidthMeters: 8, provinceData: { ghi: GHI } });
 const evAc = ev.dcChargersCount * 180 / 0.95;
 assert.ok(num(ev.transformerRating) * 0.98 >= evAc * 0.70 - (ev.bessKWh / 2) - 1, 'EV: tr×0.98 ≥ demand×0.7−BESS');
+{
+  const n = ev.dcChargersCount;
+  const capex = n * 1.1e6 + ev.solarCanopyKWp * 28000 + ev.bessKWh * 9500 + (1.8e6 + n * 150e3);
+  const annualKWh = ev.dailyCarsServiced * 40 * 365;
+  const margin = annualKWh * (7.5 - 4.3);
+  const RAMP = [0.60, 0.70, 0.80, 0.90, 1.00];
+  for (let y = 1; y <= 25; y++) {
+    const exp = margin * RAMP[Math.min(y, 5) - 1] + 420e3 - 450e3 - (y === 10 ? n * 1.1e6 * 0.25 : 0);
+    near(ev.cashFlows[y], exp, 1, `EV: CF${y} ramp/refresh`);
+  }
+  assert.ok(ev.cashFlows[1] < ev.cashFlows[5], 'EV: ramp → CF1<CF5');
+  assert.ok(ev.cashFlows[10] < ev.cashFlows[9], 'EV: refresh dip ปี10');
+  near(ev.cashFlows[6], ev.cashFlows[7], 1, 'EV: steady state หลัง ramp');
+}
+checkFinConsistency(ev, 'EV@5000');
+
+// ===== BESS — capacity fade 2%/ปี + augmentation ปี15 =====
+const bess = calculateBESSFarmSpecs({ areaSqM: 1600 });
+{
+  const cap = bess.containerCount * 3.72;
+  const capex = cap * 10.5e6, rev = cap * 1.8e6, opex = capex * 0.02;
+  for (let y = 1; y <= 25; y++) {
+    const exp = rev * Math.pow(0.98, y - 1) - opex - (y === 15 ? capex * 0.35 : 0);
+    near(bess.cashFlows[y], exp, 1, `BESS: CF${y} fade+augment`);
+  }
+  assert.ok(bess.cashFlows[2] < bess.cashFlows[1], 'BESS: fade → CF2<CF1');
+  assert.ok(bess.cashFlows[15] < bess.cashFlows[14] - capex * 0.3, 'BESS: augmentation dip ปี15');
+}
+checkFinConsistency(bess, 'BESS@1600');
+
+// ===== Biogas — ผลิตคงที่ + overhaul เครื่องยนต์ปี 8/16/24 =====
+const bio = calculateBiogasSpecs({ areaSqM: 1600 });
+{
+  const kW = bio.generatorCapacityKW;
+  const capex = kW * 65000;
+  const rev = Math.round(kW * 8760 * 0.85 / 1000) * 1000 * 3.13;
+  const opex = capex * 0.07;
+  for (let y = 1; y <= 25; y++) {
+    const exp = rev - opex - ([8, 16, 24].includes(y) ? capex * 0.08 : 0);
+    near(bio.cashFlows[y], exp, 1, `Biogas: CF${y} baseload+overhaul`);
+  }
+  assert.ok(bio.cashFlows[8] < bio.cashFlows[7], 'Biogas: overhaul dip ปี8');
+  near(bio.cashFlows[9], bio.cashFlows[10], 1, 'Biogas: ผลิตคงที่ระหว่าง overhaul');
+}
+checkFinConsistency(bio, 'Biogas@1600');
+
+// ===== Floating — ต้องใช้ CAPEX/รายได้ของตัวเอง ไม่ใช่ของ solar base =====
+const fl = calculateFloatingSolarSpecs(L1);
+{
+  const solarCapexM = num(s1.financials.totalCapexMillionTHB);
+  const capex = solarCapexM * 1.15 * 1e6;
+  const rev = Math.round(num(s1.annualEnergyMWh) * 1.08) * 1000 * 2.1679;
+  const opex = capex * 0.016;
+  near(fl.cashFlows[0], -capex, 1, 'Floating: CF0 = −CAPEX ของ floating เอง (×1.15)');
+  for (let y = 1; y <= 25; y++) {
+    near(fl.cashFlows[y], rev * Math.pow(0.996, y - 1) - opex, 1, `Floating: CF${y}`);
+  }
+  assert.ok(Math.abs(fl.cashFlows[0]) > Math.abs(s1.cashFlows[0]), 'Floating: CAPEX > solar base');
+}
+checkFinConsistency(fl, 'Floating@2072');
+
+// ===== ทุกประเภทต้องมี cashFlows ผ่าน getSpecs ด้วย =====
+const { getSpecs } = await import('../src/engine/specs.js');
+for (const pid of ['solar-farm', 'agrivoltaics', 'floating-solar', 'ev-charging-hub', 'grid-bess', 'biomass-biogas']) {
+  const sp = getSpecs(pid, pid === 'ev-charging-hub' ? { areaSqM: 5000, roadWidthMeters: 8, provinceData: { ghi: GHI } } : L1);
+  assert.ok(sp.cashFlows?.length === 26, `getSpecs(${pid}): cashFlows ครบ 26 จุด`);
+  assert.ok(sp.cashFlowModel, `getSpecs(${pid}): มี cashFlowModel`);
+}
+
+// ===== TH_ADMIN (ชุดอำเภอสำหรับค้นหา/เลือกอำเภอ) =====
+const { TH_ADMIN } = await import('../src/data/districts.js');
+assert.equal(TH_ADMIN.length, 77, 'ครบ 77 จังหวัด');
+const allDists = TH_ADMIN.flatMap(p => p.districts.map(d => ({ ...d, province: p.province })));
+assert.equal(allDists.length, 930, 'ครบ 930 อำเภอ/เขต');
+for (const d of allDists) {
+  assert.ok(d.name && d.prefix, `district มีชื่อ+prefix: ${d.name}`);
+  if (d.lat != null) {
+    assert.ok(d.lat > 5 && d.lat < 21 && d.lng > 97 && d.lng < 106, `พิกัดอยู่ในไทย: ${d.name} (${d.lat},${d.lng})`);
+  }
+}
+// จำลอง local match ของ handleSearch: "สีคิ้ว" ต้องเจออำเภอสีคิ้ว จ.นครราชสีมา พร้อมพิกัด
+const sikhiu = allDists.filter(d => d.name === 'สีคิ้ว' || d.name.includes('สีคิ้ว'));
+assert.ok(sikhiu.length >= 1 && sikhiu.some(d => d.province === 'นครราชสีมา' && d.lat), 'ค้น "สีคิ้ว" เจอพร้อมพิกัด');
+const withCoords = allDists.filter(d => d.lat != null).length;
+assert.ok(withCoords > 800, `อำเภอมีพิกัด ${withCoords}/930 (ควร > 800)`);
 
 // ===== Save/Load + import/export =====
 saveProjects([]);

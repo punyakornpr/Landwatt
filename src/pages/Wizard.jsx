@@ -65,7 +65,7 @@ export default function Wizard() {
             <GoogleMapPicker
               coordinates={land.coordinates}
               onCoordinatesChange={(c) => updateLand({ coordinates: c })}
-              onProvinceAutoSelect={(prov) => updateLand({ provinceId: prov.id, provinceData: prov })}
+              onProvinceAutoSelect={(prov, actualName) => updateLand({ provinceId: prov.id, provinceData: prov, detectedProvinceName: actualName })}
               gridDistanceMeters={land.gridDistanceMeters}
               onGridDistanceChange={(d) => updateLand({ gridDistanceMeters: d, gridUnknown: false })}
               currentAreaSqM={land.areaSqM}
@@ -78,7 +78,7 @@ export default function Wizard() {
                 value={land.provinceId || ''}
                 onChange={(e) => {
                   const p = PROVINCES_DATA.find(x => x.id === e.target.value);
-                  if (p) updateLand({ provinceId: p.id, provinceData: p, coordinates: { lat: p.lat, lng: p.lng } });
+                  if (p) updateLand({ provinceId: p.id, provinceData: p, detectedProvinceName: null, coordinates: { lat: p.lat, lng: p.lng } });
                 }}
               >
                 <option value="" disabled>เลือกจังหวัด…</option>
@@ -89,7 +89,10 @@ export default function Wizard() {
             </div>
             {land.provinceData && (
               <Note type="ok">
-                เราได้ตำแหน่งประมาณนี้แล้ว: <strong>{land.provinceData.name}</strong> —
+                เราได้ตำแหน่งประมาณนี้แล้ว: <strong>{land.detectedProvinceName || land.provinceData.name}</strong>
+                {land.detectedProvinceName && land.detectedProvinceName !== land.provinceData.name.split(' ')[0].split('/')[0] && (
+                  <span className="text-ink-faint"> (ข้อมูลแดด/กริดอ้างอิงจาก{land.provinceData.name}เพราะยังไม่มีข้อมูลเฉพาะจังหวัดนี้)</span>
+                )} —
                 พื้นที่นี้มีแดดเฉลี่ย {land.provinceData.ghi} kWh/ตร.ม./วัน และอยู่ในเขต{land.provinceData.grid === 'MEA' ? 'การไฟฟ้านครหลวง' : 'การไฟฟ้าส่วนภูมิภาค'}
               </Note>
             )}

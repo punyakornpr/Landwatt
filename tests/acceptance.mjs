@@ -213,6 +213,13 @@ const sikhiu = allDists.filter(d => d.name === 'สีคิ้ว' || d.name.in
 assert.ok(sikhiu.length >= 1 && sikhiu.some(d => d.province === 'นครราชสีมา' && d.lat), 'ค้น "สีคิ้ว" เจอพร้อมพิกัด');
 const withCoords = allDists.filter(d => d.lat != null).length;
 assert.ok(withCoords > 800, `อำเภอมีพิกัด ${withCoords}/930 (ควร > 800)`);
+// findActualProvince: จุดในปากช่อง จ.นครราชสีมา (ใกล้ชายแดนสระบุรี) ต้องได้ นครราชสีมา ไม่ใช่สระบุรี
+const { findActualProvince } = await import('../src/data/districts.js');
+const pakchong = TH_ADMIN.find(p => p.province === 'นครราชสีมา').districts.find(d => d.name === 'ปากช่อง');
+const act = findActualProvince(pakchong.lat, pakchong.lng);
+assert.equal(act.province, 'นครราชสีมา', `ปากช่อง → ${act.province} (ต้องเป็นนครราชสีมา)`);
+const act2 = findActualProvince(19.2, 100.9); // ท่าวังผา จ.น่าน — จังหวัดที่ไม่มีในตาราง GHI
+assert.equal(act2.province, 'น่าน', `น่าน → ${act2.province}`);
 
 // ===== Save/Load + import/export =====
 saveProjects([]);

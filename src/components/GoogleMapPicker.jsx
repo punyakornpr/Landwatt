@@ -6,7 +6,7 @@ import {
   Maximize2, Sparkles, Check, RefreshCw 
 } from 'lucide-react';
 import { PROVINCES_DATA, findClosestProvince, calculateDistanceKm } from '../data/provinces';
-import { TH_ADMIN } from '../data/districts';
+import { TH_ADMIN, findActualProvince } from '../data/districts';
 import { 
   calculatePolygonAreaSqM, 
   calculatePolygonPerimeterMeters, 
@@ -216,8 +216,8 @@ export default function GoogleMapPicker({
         mapInstanceRef.current.flyTo([coordinates.lat, coordinates.lng], 16, { duration: 1.0 });
         setCurrentCoords(coordinates);
 
-        const { province } = findClosestProvince(coordinates.lat, coordinates.lng);
-        setDetectedLocationName(province.name);
+        const actual = findActualProvince(coordinates.lat, coordinates.lng);
+        setDetectedLocationName(actual ? actual.province : findClosestProvince(coordinates.lat, coordinates.lng).province.name);
       }
     }
   }, [coordinates]);
@@ -232,10 +232,18 @@ export default function GoogleMapPicker({
       onCoordinatesChange({ lat, lng });
     }
 
+    // จังหวัดจริงจากอำเภอที่ใกล้ที่สุด (แม่นกว่า centroid จังหวัด — กันชายแดน/จว.ที่ไม่มีในตาราง)
+    const actual = findActualProvince(lat, lng);
+    const actualName = actual ? actual.province : null;
+    // ข้อมูล GHI: ถ้าจังหวัดจริงมีในตารางใช้อันนั้น (ชื่อตรง) ไม่งั้นใช้จังหวัดที่ใกล้สุด
+    const ghiMatch = actualName
+      ? PROVINCES_DATA.find(p => p.name.split(' ')[0].split('/')[0] === actualName)
+      : null;
     const { province } = findClosestProvince(lat, lng);
-    setDetectedLocationName(province.name);
+    const dataProv = ghiMatch || province;
+    setDetectedLocationName(actualName || dataProv.name);
     if (onProvinceAutoSelect) {
-      onProvinceAutoSelect(province);
+      onProvinceAutoSelect(dataProv, actualName || dataProv.name);
     }
 
     if (gridCoords && mapInstanceRef.current) {
@@ -889,7 +897,7 @@ export default function GoogleMapPicker({
         <div>
           <span className="text-zinc-400 block text-[11px]">พื้นที่และเขตสายส่ง</span>
           <span className="text-zinc-800 font-medium text-xs mt-0.5 block">
-            จ. {detectedLocationName}
+            {/(อำเภอ|เขต)/.test(detectedLocationName) ? detectedLocationName : `จ. ${detectedLocationName}`}
           </span>
         </div>
 

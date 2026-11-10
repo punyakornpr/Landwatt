@@ -6,7 +6,7 @@ import {
   Maximize2, Sparkles, Check, RefreshCw 
 } from 'lucide-react';
 import { PROVINCES_DATA, findClosestProvince, calculateDistanceKm } from '../data/provinces';
-import { TH_ADMIN, findActualProvince } from '../data/districts';
+import { TH_ADMIN, findActualProvince, searchAdmin } from '../data/districts';
 import { 
   calculatePolygonAreaSqM, 
   calculatePolygonPerimeterMeters, 
@@ -492,24 +492,14 @@ export default function GoogleMapPicker({
     // 2) ชื่ออำเภอ/เขต/จังหวัดจากชุดข้อมูลในประเทศ (ครบ 77 จังหวัด)
     const bare = q.replace(/^(อำเภอ|เขต|จังหวัด|ตำบล|แขวง)\s*/, '').trim();
     if (bare.length > 0) {
-      const matches = [];
-      for (const p of TH_ADMIN) {
-        if (p.province.includes(bare)) {
-          matches.push({ label: `จังหวัด${p.province}`, lat: null, lng: null, province: p.province });
-        }
-        for (const d of p.districts) {
-          if (d.name === bare || d.name.includes(bare)) {
-            matches.push({ label: `${d.prefix}${d.name} จ.${p.province}`, lat: d.lat, lng: d.lng, province: p.province, district: d });
-          }
-        }
-      }
+      const matches = searchAdmin(bare);
       if (matches.length === 1 && matches[0].lat) {
         flyToLocation(matches[0].lat, matches[0].lng, 13, matches[0].label);
         return;
       }
       if (matches.length > 0) {
         // หลายผลลัพธ์/ไม่มีพิกัด → ให้เลือกจากรายการ (เด้ง geocode ตอนคลิกถ้าจำเป็น)
-        setSearchResults(matches.slice(0, 8).map(m => ({ ...m, source: 'local' })));
+        setSearchResults(matches.slice(0, 10).map(m => ({ ...m, source: 'local' })));
         return;
       }
     }
@@ -610,7 +600,17 @@ export default function GoogleMapPicker({
             <input
               type="text"
               value={searchQuery}
-              onChange={(e) => { setSearchQuery(e.target.value); setSearchResults([]); }}
+              onChange={(e) => {
+                const v = e.target.value;
+                setSearchQuery(v);
+                // live suggestion ระหว่างพิมพ์ — ข้ามถ้าเป็นการพิมพ์พิกัด
+                const b = v.replace(/^(อำเภอ|เขต|จังหวัด|ตำบล|แขวง)\s*/, '').trim();
+                setSearchResults(
+                  b.length > 0 && !/^[\d\s.,-]+$/.test(v)
+                    ? searchAdmin(b).slice(0, 10).map(m => ({ ...m, source: 'local' }))
+                    : []
+                );
+              }}
               placeholder="ค้นหาอำเภอ, ตำบล, จังหวัด หรือพิกัด..."
               className="w-full bg-white border border-zinc-200 focus:border-zinc-900 rounded-lg pl-8 pr-16 py-1.5 text-xs text-zinc-900 placeholder-zinc-400 outline-none transition"
             />

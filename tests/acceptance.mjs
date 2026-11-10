@@ -214,7 +214,15 @@ assert.ok(sikhiu.length >= 1 && sikhiu.some(d => d.province === 'นครรา
 const withCoords = allDists.filter(d => d.lat != null).length;
 assert.ok(withCoords > 800, `อำเภอมีพิกัด ${withCoords}/930 (ควร > 800)`);
 // findActualProvince: จุดในปากช่อง จ.นครราชสีมา (ใกล้ชายแดนสระบุรี) ต้องได้ นครราชสีมา ไม่ใช่สระบุรี
-const { findActualProvince } = await import('../src/data/districts.js');
+const { findActualProvince, searchAdmin } = await import('../src/data/districts.js');
+const sikhiuS = searchAdmin('สีคิ้ว');
+assert.ok(sikhiuS[0]?.district?.name === 'สีคิ้ว' && sikhiuS[0].province === 'นครราชสีมา', `searchAdmin('สีคิ้ว') → ${sikhiuS[0]?.label}`);
+const pakS = searchAdmin('ปาก');
+assert.ok(pakS.length >= 5, `searchAdmin('ปาก') เจอ ${pakS.length} ผล`);
+assert.ok(pakS[0].district.name.startsWith('ปาก'), 'ผลแรกควรขึ้นต้นด้วยคำค้น');
+assert.ok(searchAdmin('ข').length > 50, 'คำสั้นควรเจอผลเยอะ (live suggestion)');
+const bkk = searchAdmin('กรุงเทพ');
+assert.ok(bkk[0].label === 'จังหวัดกรุงเทพมหานคร', 'จังหวัดต้องมาก่อนอำเภอ');
 const pakchong = TH_ADMIN.find(p => p.province === 'นครราชสีมา').districts.find(d => d.name === 'ปากช่อง');
 const act = findActualProvince(pakchong.lat, pakchong.lng);
 assert.equal(act.province, 'นครราชสีมา', `ปากช่อง → ${act.province} (ต้องเป็นนครราชสีมา)`);

@@ -16,3 +16,20 @@ export function findActualProvince(lat, lng) {
   }
   return best;
 }
+
+// ค้นหาจังหวัด/อำเภอจากข้อความ (ใช้ทั้ง live suggestion และ submit)
+// เรียง: จังหวัดที่ตรง → อำเภอที่ขึ้นต้นด้วยคำ → อำเภอที่มีคำอยู่กลาง
+export function searchAdmin(bare) {
+  const provs = [], first = [], rest = [];
+  for (const p of TH_ADMIN) {
+    if (p.province.includes(bare)) {
+      provs.push({ label: `จังหวัด${p.province}`, lat: null, lng: null, province: p.province });
+    }
+    for (const d of p.districts) {
+      if (!d.name.includes(bare)) continue;
+      const item = { label: `${d.prefix}${d.name} จ.${p.province}`, lat: d.lat, lng: d.lng, province: p.province, district: d };
+      (d.name.startsWith(bare) ? first : rest).push(item);
+    }
+  }
+  return [...provs, ...first, ...rest];
+}

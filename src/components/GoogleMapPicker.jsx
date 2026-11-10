@@ -644,7 +644,7 @@ export default function GoogleMapPicker({
             }`}
           >
             <MapPin className="w-3.5 h-3.5" />
-            <span>เลือกอำเภอ</span>
+            <span>เลือกจังหวัด</span>
           </button>
         </div>
 

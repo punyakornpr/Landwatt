@@ -37,6 +37,7 @@ export function AppStateProvider({ children }) {
         goals: draft.goals,
         compareIds: draft.compareIds,
         chosenPlanId: draft.chosenPlanId,
+        engineVersion: 'v6.1',
       };
       setProjects(list => [p, ...list]);
       return p;

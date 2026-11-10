@@ -80,6 +80,7 @@ export default function MyProjects() {
                     </div>
                     <div className="text-[11px] text-ink-faint mt-0.5">
                       บันทึกเมื่อ {new Date(p.createdAt).toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' })}
+                      {!p.engineVersion && <div className="text-[10px] text-volt-800 mt-0.5">สร้างด้วยเวอร์ชันเก่า — จะคำนวณใหม่จากข้อมูลเดิมตอนเปิด</div>}
                     </div>
                   </div>
                 </div>

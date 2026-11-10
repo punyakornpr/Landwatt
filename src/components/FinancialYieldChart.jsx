@@ -11,19 +11,33 @@ export default function FinancialYieldChart({ project, specs, landData }) {
   const annualRev = parseFloat(specs.financials?.annualRevenueMillionTHB || 2);
   const netCashflow = parseFloat(specs.financials?.netAnnualCashflowMillionTHB || specs.financials?.netAnnualProfitMillionTHB || 1.8);
 
+  // ใช้ cashFlows[] ชุดเดียวกับ engine/NPV/IRR/ตาราง — ห้าม degrade net ซ้ำเอง
   const cashflowData = [];
-  let cumulative = -capex;
-  for (let yr = 0; yr <= 25; yr++) {
-    if (yr === 0) {
-      cashflowData.push({ year: `ปี 0`, net: -capex, cumulative: parseFloat(cumulative.toFixed(2)) });
-    } else {
-      const degradedCashflow = netCashflow * Math.pow(1 - 0.004, yr - 1);
-      cumulative += degradedCashflow;
+  if (specs.cashFlows?.length > 1) {
+    let cumulative = 0;
+    specs.cashFlows.forEach((cf, yr) => {
+      cumulative += cf;
       cashflowData.push({
         year: `ปี ${yr}`,
-        net: parseFloat(degradedCashflow.toFixed(2)),
-        cumulative: parseFloat(cumulative.toFixed(2))
+        net: parseFloat((cf / 1e6).toFixed(2)),
+        cumulative: parseFloat((cumulative / 1e6).toFixed(2))
       });
+    });
+  } else {
+    // fallback สำหรับประเภทที่ยังไม่มี cashFlows (EV/BESS/biogas)
+    let cumulative = -capex;
+    for (let yr = 0; yr <= 25; yr++) {
+      if (yr === 0) {
+        cashflowData.push({ year: `ปี 0`, net: -capex, cumulative: parseFloat(cumulative.toFixed(2)) });
+      } else {
+        const degradedCashflow = netCashflow * Math.pow(1 - 0.004, yr - 1);
+        cumulative += degradedCashflow;
+        cashflowData.push({
+          year: `ปี ${yr}`,
+          net: parseFloat(degradedCashflow.toFixed(2)),
+          cumulative: parseFloat(cumulative.toFixed(2))
+        });
+      }
     }
   }
 
@@ -45,7 +59,7 @@ export default function FinancialYieldChart({ project, specs, landData }) {
             การประเมินผลตอบแทนทางการเงิน (Techno-Economics)
           </h3>
           <p className="text-xs text-zinc-500 mt-0.5">
-            ประมาณการกระแสเงินสดสะสม 25 ปี และปริมาณผลิตไฟฟ้ารายเดือน
+            ประมาณการกระแสเงินสดสะสม 25 ปี และปริมาณผลิตไฟฟ้ารายเดือน (กระจายตามน้ำหนักคงที่สมมติฐาน — ไม่ใช่ข้อมูลวัดหรือจำลองรายเดือน)
           </p>
         </div>
 

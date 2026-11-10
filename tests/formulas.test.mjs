@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import { calculateSolarFarmSpecs, calculateEVHubSpecs, calculateAgrivoltaicsSpecs } from '../src/utils/engineeringCalculations.js';
 import { recommendProjects } from '../src/engine/recommend.js';
 import { DEFAULT_LAND, DEFAULT_GOALS } from '../src/engine/storage.js';
@@ -54,7 +55,58 @@ near(parseFloat(ag.dcCapacityMWp), 0.1116, 0.001); // display rounding
 near(parseFloat(ag.actualDcAcRatio), ag.stringDesign.installedPanelCount * 620 / 1000 / (ag.inverterCount * 300), 0.001);
 near(parseFloat(ag.acCapacityMW) * 1000, ag.inverterCount * 300, 1e-9);
 
+// T01–T15: golden fixture 2072 m² agrivoltaics — ตามเอกสาร v6 §11.1
+const gold = calculateAgrivoltaicsSpecs({ areaSqM: 2072, excludedAreaSqM: 0, provinceData: { ghi: 5.28 } });
+near(2072 / 1600, 1.2950, 1e-4);                                        // T01
+near((2072 - 0) * 0.78, 1616.16, 0.01);                                 // T02
+assert.equal(gold.areaCandidatePanelCount, '404');                        // T03 ⌊1616.16/4⌋
+assert.equal(gold.stringDesign.installedPanelCount, 280);               // T04 ⌊20×0.7⌋=14 สตริง
+assert.equal(gold.stringDesign.stringCount, 14);
+assert.equal(gold.stringDesign.stringCount * gold.stringDesign.stringSize, 280); // T05
+near(gold.stringDesign.installedPanelCount * 620 / 1000, 173.6, 1e-9);  // T06 exact
+assert.equal(gold.dcCapacityKWp, 174);                                  // T06 display = Math.round
+near(parseFloat(gold.dcCapacityMWp), 0.1736, 0.001);                    // T07
+assert.equal(gold.inverterCount, 1);
+near(parseFloat(gold.acCapacityMW) * 1000, 300, 1e-9);                  // T08
+near(parseFloat(gold.actualDcAcRatio), 0.5787, 0.001);                  // T09
+near(parseFloat(gold.stringDesign.vocCold), 46.895, 0.01);              // T10
+near(20 * parseFloat(gold.stringDesign.vocCold), 937.9, 0.3);
+near(parseFloat(gold.stringDesign.vmpHot), 34.0995, 0.01);              // T11
+near(20 * parseFloat(gold.stringDesign.vmpHot), 681.99, 0.3);
+near(parseFloat(gold.annualEnergyMWh.replace(/,/g, '')), 267.65, 1.0);  // T12 (ปัด)
+near(parseFloat(gold.financials.totalCapexMillionTHB), 4.34, 0.01);     // T13
+near(parseFloat(gold.dualIncome.powerRevenueMillionTHB) * 1e6, 580237, 500); // T14
+// T15-status: UI-level (ตรวจในการ์ดเอง) — F-01/F-04=calc, F-02=assumed, F-05=warn, F-07=warn
+
+// 11.2: เปลี่ยนพื้นที่ต้องไม่ hardcode — 2394 m² candidate ≠ 404
+const bigger = calculateSolarFarmSpecs({ areaSqM: 2394, excludedAreaSqM: 0, provinceData: { ghi: 5.28 } });
+assert.ok(parseInt(bigger.areaCandidatePanelCount) !== 404, 'candidate ต้องเปลี่ยนตามพื้นที่');
+assert.equal(bigger.stringDesign.installedPanelCount, bigger.stringDesign.stringCount * bigger.stringDesign.stringSize);
+// exclusion ลด usable ไม่ติดลบ
+const excl = calculateSolarFarmSpecs({ areaSqM: 2072, excludedAreaSqM: 100, provinceData: { ghi: 5.28 } });
+assert.equal(parseInt(excl.areaCandidatePanelCount), Math.floor(((2072 - 100) * 0.78) / 4));
+// 11.5: agri CF — เสื่อมเฉพาะไฟฟ้า ส่วนพืชคงที่ → CF2−CF1 = −0.004×PV_rev เท่านั้น
+const cfDiff = gold.cashFlows[1] - gold.cashFlows[2];
+assert.ok(cfDiff > 0 && cfDiff < 5000, `degradation ไฟฟ้าเท่านั้น: diff ${cfDiff.toFixed(0)}`);
+assert.equal(gold.cashFlows[0], -parseFloat(gold.financials.totalCapexMillionTHB) * 1e6);
+
 // F-20: deterministic results + tie-break
 assert.deepEqual(recommendProjects(land, DEFAULT_GOALS), recommendProjects(land, DEFAULT_GOALS));
+
+// 11.4/T15: source-level UI checks — ทุกการ์ดมี status, accordion มี aria, ชื่อเป็นคำถามไทย
+const evSrc = readFileSync(new URL('../src/components/EngineeringView.jsx', import.meta.url), 'utf8');
+const fidCalls = [...evSrc.matchAll(/fid="(F-[0-9A-Z]+)"/g)].map(m => m[1]);
+assert.ok(fidCalls.length >= 9, `พบการ์ด ${fidCalls.length} ใบ`);
+for (const fid of fidCalls) {
+  const at = evSrc.indexOf(`fid="${fid}"`);
+  const slice = evSrc.slice(at, at + 300);
+  assert.ok(slice.includes('status='), `${fid} ขาด status prop`);
+}
+assert.ok(evSrc.includes('aria-expanded'), 'ต้องมี aria-expanded บนปุ่มขยาย');
+assert.ok(evSrc.includes('aria-controls'), 'ต้องมี aria-controls');
+assert.ok(evSrc.includes('มีกำลังติดตั้งรวมเท่าไร'), 'F-04 ต้องเป็นหัวข้อคำถามกำลังติดตั้ง');
+// กราฟต้องใช้ cashFlows เดียวกับ engine (11.5)
+const chartSrc = readFileSync(new URL('../src/components/FinancialYieldChart.jsx', import.meta.url), 'utf8');
+assert.ok(chartSrc.includes('specs.cashFlows'), 'กราฟต้องอ่าน specs.cashFlows ไม่คำนวณแยก');
 
 console.log('ALL FORMULA TESTS PASS');

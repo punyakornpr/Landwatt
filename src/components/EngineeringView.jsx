@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import SingleLineDiagram from './SingleLineDiagram';
 import FinancialYieldChart from './FinancialYieldChart';
 import { Note, fmtTHB } from './ui';
@@ -27,50 +27,78 @@ function KV({ k, v, src }) {
   );
 }
 
-// Formula Card 9 ขั้นตาม spec — ทุกช่อง optional, ขาดอะไรแสดงว่าขาด ไม่เดาค่า
-function Trace({ fid, name, purpose, formula, vars, provenance, sub, steps, result, check, deps, note }) {
+// สถานะการ์ดตาม spec v4 — ไม่ใช้สีอย่างเดียว มีข้อความกำกับเสมอ
+// ป้ายสถานะตาม taxonomy v6 §3.4 — มีข้อความกำกับเสมอ ไม่ใช้สีอย่างเดียว
+const STATUS = {
+  calc: ['คำนวณแล้ว', 'bg-energy-100 text-energy-800'],
+  pass: ['ผ่านเกณฑ์ที่ตรวจได้เบื้องต้น', 'bg-energy-100 text-energy-800'],
+  assumed: ['ประมาณการ/ใช้สมมติฐาน', 'bg-electric-100 text-electric-800'],
+  warn: ['ต้องตรวจสอบเพิ่มเติม', 'bg-volt-100 text-volt-800'],
+  unverified: ['ต้องตรวจสอบเพิ่มเติม', 'bg-[#EDECE5] text-ink-soft'],
+  fail: ['ไม่ผ่านเกณฑ์ที่ตรวจ', 'bg-volt-100 text-volt-800'],
+};
+
+// Formula Card 9 ขั้น — compact default: fid+ชื่อ+สถานะ+สูตร+แทนค่า+ผล+ข้อควรระวัง; รายละเอียดหลังปุ่ม aria-expanded
+let traceSeq = 0;
+function Trace({ fid, name, status, purpose, formula, vars, provenance, sub, steps, result, check, deps, note }) {
+  const [open, setOpen] = useState(false);
+  const panelId = `trace-${fid}-${useState(() => ++traceSeq)[0]}`;
+  const [statusLabel, statusCls] = STATUS[status] || STATUS.unverified;
   return (
     <div className="rounded-xl border border-[#E7E5DD] p-4 space-y-2">
-      {/* 1. ชื่อ/วัตถุประสงค์ */}
+      {/* 1. ชื่อ/วัตถุประสงค์ + สถานะ */}
       <div className="flex items-baseline gap-2 flex-wrap">
         <span className="text-[10px] font-mono font-bold bg-brand-700 text-white rounded px-1.5 py-0.5">{fid}</span>
         <span className="text-sm font-semibold">{name}</span>
+        <span className={`text-[10px] rounded-full px-2 py-0.5 ml-auto ${statusCls}`}>{statusLabel}</span>
       </div>
       {purpose && <div className="text-[11px] text-ink-faint">วัตถุประสงค์: {purpose}</div>}
-      {/* 2. สูตรทั่วไป */}
+      {/* 2. สูตรทั่วไป + 5. แทนค่า + 7. คำตอบ (เห็นทันที) */}
       <div className="font-mono text-xs text-ink-soft bg-paper rounded-lg px-3 py-2">{formula}</div>
-      {/* 3. ความหมายตัวแปร */}
-      {vars?.length > 0 && (
-        <table className="text-[11px] font-mono w-full">
-          <tbody>
-            {vars.map(([sym, meaning, unit, val, src], i) => (
-              <tr key={i} className="border-b border-[#F1EFE8] last:border-0">
-                <td className="py-0.5 pr-2 font-semibold w-16">{sym}</td>
-                <td className="py-0.5 pr-2 text-ink-soft">{meaning}{unit ? ` (${unit})` : ''}</td>
-                <td className="py-0.5 pr-2 text-right w-24">{val}</td>
-                <td className="py-0.5 w-28">{src && <Src t={src} />}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
-      {/* 4. ที่มาของค่า */}
-      {provenance && <div className="text-[11px] text-ink-faint">ที่มา: {provenance}</div>}
-      {/* 5. แทนค่า */}
       <div className="font-mono text-xs whitespace-pre-line">{sub}</div>
-      {/* 6. วิธีคำนวณทีละขั้น */}
-      {steps?.length > 0 && (
-        <ol className="font-mono text-xs space-y-0.5 list-decimal list-inside">
-          {steps.map((s, i) => <li key={i}>{s}</li>)}
-        </ol>
-      )}
-      {/* 7. คำตอบ */}
       <div className="font-mono text-sm font-bold text-brand-800">{result}</div>
-      {/* 8. ตรวจเงื่อนไข/ข้อจำกัด */}
-      {check && <div className="text-[11px] rounded-lg bg-energy-50 border border-energy-100 px-3 py-2">ตรวจเงื่อนไข: {check}</div>}
-      {/* 9. เชื่อมโยง */}
-      {deps && <div className="text-[11px] text-ink-faint">ใช้ต่อใน: {deps}</div>}
-      {note && <div className="text-[11px] text-ink-faint">{note}</div>}
+      {/* ข้อควรระวัง/ข้อจำกัดต้องเห็นแม้ยังไม่กางรายละเอียด */}
+      {note && <div className="text-[11px] text-volt-800">{note}</div>}
+      {/* รายละเอียด — ปุ่มควบคุม aria-expanded จริง */}
+      {(vars?.length || provenance || steps?.length || check || deps) && (
+        <div>
+          <button type="button" aria-expanded={open} aria-controls={panelId} onClick={() => setOpen(o => !o)}
+            className="text-[11px] font-medium text-brand-700 py-1 underline underline-offset-2">
+            {open ? 'ซ่อนวิธีคิดและแหล่งข้อมูล' : 'ดูวิธีคิดและแหล่งข้อมูล'}
+          </button>
+          {open && (
+          <div id={panelId} className="pt-2 space-y-2">
+            {/* 3. ความหมายตัวแปร */}
+            {vars?.length > 0 && (
+              <table className="text-[11px] font-mono w-full">
+                <tbody>
+                  {vars.map(([sym, meaning, unit, val, src], i) => (
+                    <tr key={i} className="border-b border-[#F1EFE8] last:border-0">
+                      <td className="py-0.5 pr-2 font-semibold w-16">{sym}</td>
+                      <td className="py-0.5 pr-2 text-ink-soft">{meaning}{unit ? ` (${unit})` : ''}</td>
+                      <td className="py-0.5 pr-2 text-right w-24">{val}</td>
+                      <td className="py-0.5 w-28">{src && <Src t={src} />}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+            {/* 4. ที่มาของค่า */}
+            {provenance && <div className="text-[11px] text-ink-faint">ที่มา: {provenance}</div>}
+            {/* 6. วิธีคำนวณทีละขั้น */}
+            {steps?.length > 0 && (
+              <ol className="font-mono text-xs space-y-0.5 list-decimal list-inside">
+                {steps.map((s, i) => <li key={i}>{s}</li>)}
+              </ol>
+            )}
+            {/* 8. ตรวจเงื่อนไข/ข้อจำกัด */}
+            {check && <div className="text-[11px] rounded-lg bg-energy-50 border border-energy-100 px-3 py-2">ตรวจเงื่อนไข: {check}</div>}
+            {/* 9. เชื่อมโยง */}
+            {deps && <div className="text-[11px] text-ink-faint">ใช้ต่อใน: {deps}</div>}
+          </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
@@ -117,12 +145,12 @@ export default function EngineeringView({ id, specs, land, project, summary }) {
 
       {/* B. Land calc */}
       <Section title="B. การคำนวณพื้นที่" sub="การแปลงหน่วยและพื้นที่ใช้งานสุทธิ">
-        <Trace fid="F-01" name="พื้นที่รวม (ไร่)"
+        <Trace fid="F-01" status="calc" name="ที่ดินทั้งหมดกี่ไร่?"
           formula="A = 1600R + 400N + 4W  (ตร.ม.) ;  R_total = A/1600"
           sub={`${(land.areaSqM || 0).toLocaleString()} / 1600`}
           result={`= ${areaRai.toFixed(4)} ไร่`}
           note="พื้นที่จากการวาดแปลง/กรอก — ไม่ใช่รังวัดกรรมสิทธิ์" />
-        <Trace fid="F-02" name="พื้นที่ใช้งานสุทธิ"
+        <Trace fid="F-02" status="assumed" name="เอาไปติดตั้งได้จริงกี่ตารางเมตร?"
           formula="A_usable = (A_total − A_excluded) × 0.78  (สัดส่วนหักระยะร่น/ถนน/ลานอุปกรณ์)"
           sub={`(${ (land.areaSqM||0).toLocaleString() } − ${(specs.excludedAreaSqM||0).toLocaleString()}) × 0.78`}
           result={`= ${(((land.areaSqM||0) - (specs.excludedAreaSqM||0)) * 0.78).toLocaleString(undefined,{maximumFractionDigits:0})} ตร.ม.`}
@@ -132,7 +160,25 @@ export default function EngineeringView({ id, specs, land, project, summary }) {
       {/* C. Solar PV */}
       {isPV && sd && (
         <Section title="C. การคำนวณโซลาร์เซลล์ (PV)" sub="จำนวนแผง สตริง อินเวอร์เตอร์ และผลผลิต — จาก Demo Catalog เดียวกันทั้งหมด">
-          <Trace fid="F-04" name="กำลังติดตั้ง DC"
+          <Trace fid="F-03" status="assumed" name={`ทำไมพื้นที่นี้เลือกติดตั้ง ${sd.installedPanelCount.toLocaleString()} แผง?`}
+            purpose="คัดเลือกจำนวนแผงจากพื้นที่ → ติดตั้งจริง"
+            formula="N_candidate = ⌊A_usable / 4.0⌋ ;  N_installed = ⌊N_used × f_layout⌋ เต็มสตริง"
+            vars={[
+              ['A_usable', 'พื้นที่ใช้งานสุทธิ', 'ตร.ม.', (((land.areaSqM||0) - (specs.excludedAreaSqM||0)) * 0.78).toLocaleString(undefined,{maximumFractionDigits:0}), 'calc'],
+              ['A_panel', 'พื้นที่จัดวางต่อแผง', 'ตร.ม./แผง', '4.0', 'assumed'],
+              ['N_cand', 'จำนวนแผงตามพื้นที่', 'แผง', String(specs.areaCandidatePanelCount || '—'), 'calc'],
+            ]}
+            provenance="4.0 ตร.ม./แผง เป็นสมมติฐาน density heuristic รวมช่องว่าง/โครงสร้าง — ไม่ใช่ผังจริงบนแปลง"
+            sub={id === 'agrivoltaics'
+              ? `candidate ${specs.areaCandidatePanelCount} แผง → ${specs.baseStringCount} สตริง → × 0.70 (พื้นที่เกษตร) = ${sd.stringCount} สตริง → ${sd.stringCount} × ${sd.stringSize} = ${sd.installedPanelCount} แผง`
+              : `candidate ${specs.areaCandidatePanelCount} แผง → ⌊${specs.areaCandidatePanelCount} / ${sd.stringSize}⌋ = ${sd.stringCount} สตริง → ${sd.stringCount} × ${sd.stringSize} = ${sd.installedPanelCount} แผง`}
+            result={`ติดตั้งจริง ${sd.installedPanelCount.toLocaleString()} แผง (${sd.stringCount.toLocaleString()} สตริง)`}
+            check={id === 'agrivoltaics'
+              ? `ข้อจำกัดที่กำกับ: ตัวคูณพื้นที่เกษตร 0.70 (สมมติฐานออกแบบ ยังไม่ได้ยืนยันชนิดพืช/แสงจริง) — ไม่ใช่ผลการวิเคราะห์พืช`
+              : `ข้อจำกัดที่กำกับ: ติดตั้งเฉพาะแผงเต็มสตริง (สตริงละ ${sd.stringSize}) — เหลือ ${sd.leftoverPanels} แผงจัดสตริงไม่ลงตัว`}
+            deps="F-04 (P_DC), F-05 (string voltage), SLD, CAPEX"
+            note="ยังไม่ใช่ผลการจัดวางจริงบนแปลง polygon — ต้องสำรวจผัง/ร่มเงาจริง" />
+          <Trace fid="F-04" status="calc" name="แผงทั้งหมดมีกำลังติดตั้งรวมเท่าไร?"
             purpose="หาพิกัด DC รวมของแผงที่ติดตั้งจริงเต็มสตริง"
             formula="P_DC = N_installed × P_module / 1000"
             vars={[
@@ -148,7 +194,11 @@ export default function EngineeringView({ id, specs, land, project, summary }) {
             result={`= ${(sd.installedPanelCount * 620 / 1000).toLocaleString()} kWp (${(sd.installedPanelCount * 620 / 1e6).toFixed(4)} MWp)`}
             check={`candidate จากพื้นที่ ${specs.areaCandidatePanelCount || '—'} แผง → เหลือติดตั้งเต็มสตริง ${sd.installedPanelCount.toLocaleString()} แผง (ไม่นับแผงค้าง ${sd.leftoverPanels} แผง)`}
             deps="F-07 (DC/AC), F-09A (ผลผลิต), CAPEX, SLD, การ์ดสรุป — ใช้ค่าดิบเดียวกัน" />
-          <Trace fid="F-05" name="ตรวจแรงดันสตริงเมื่ออุณหภูมิเปลี่ยน"
+        </Section>
+      )}
+      {isPV && sd && (
+        <Section title="D. การจัดสตริงและตรวจแรงดัน (F-05)" sub="เฉพาะเงื่อนไขที่ตรวจได้จากข้อมูล — ยังไม่ครบทุกเงื่อนไข">
+          <Trace fid="F-05" status="warn" name="แรงดันต่อ String อยู่ในช่วงที่อินเวอร์เตอร์รองรับหรือไม่?"
             purpose="ยืนยันว่าแรงดันสตริงไม่เกินพิกัดอินเวอร์เตอร์และอยู่ในช่วง MPPT"
             vars={[
               ['V_oc,STC', 'แรงดันเปิดวงจร STC', 'V', '45.2', 'demo'],
@@ -158,37 +208,48 @@ export default function EngineeringView({ id, specs, land, project, summary }) {
               ['N_s', 'แผงต่อสตริง', 'แผง', String(sd.stringSize), 'calc'],
             ]}
             provenance="T_min=10°C, T_max=60°C เป็นสมมติฐานออกแบบ · datasheet เป็น Demo Catalog"
-            sub={`V_oc(10°C) = 45.2 × [1 − 0.0025×15] = ${sd.vocCold} V → ${sd.stringSize}×${sd.vocCold} = ${(sd.stringSize * parseFloat(sd.vocCold)).toFixed(0)} V ≤ ${sd.vdcMax} V
-V_mp(60°C) = 38.1 × [1 − 0.0030×35] = ${sd.vmpHot} V → ${sd.stringSize}×${sd.vmpHot} = ${(sd.stringSize * parseFloat(sd.vmpHot)).toFixed(0)} V ∈ [${sd.mpptMin}, ${sd.mpptMax}] V`}
+            sub={`เย็น: 45.2 × [1 + (−0.0025) × (10 − 25)] = ${sd.vocCold} V/แผง → ${sd.stringSize} × ${sd.vocCold} = ${(sd.stringSize * parseFloat(sd.vocCold)).toFixed(1)} V ≤ ${sd.vdcMax} V
+ร้อน: 38.1 × [1 + (−0.0030) × (60 − 25)] = ${sd.vmpHot} V/แผง → ${sd.stringSize} × ${sd.vmpHot} = ${(sd.stringSize * parseFloat(sd.vmpHot)).toFixed(1)} V ∈ [${sd.mpptMin}, ${sd.mpptMax}] V`}
             steps={[
-              `V_oc(10°C) = 45.2×[1−0.0025×(25−10)] = ${sd.vocCold} V/แผง`,
-              `แรงดันสตริงสูงสุด = ${sd.stringSize} × ${sd.vocCold} = ${(sd.stringSize * parseFloat(sd.vocCold)).toFixed(0)} V`,
-              `V_mp(60°C) = 38.1×[1−0.0030×(60−25)] = ${sd.vmpHot} V/แผง`,
-              `แรงดันสตริงทำงาน = ${sd.stringSize} × ${sd.vmpHot} = ${(sd.stringSize * parseFloat(sd.vmpHot)).toFixed(0)} V`,
+              `[เย็น อากาศเย็นแรงดันเปิดวงจรสูงขึ้น] V_oc(10°C) = 45.2 × [1 + (−0.0025) × (−15)]`,
+              `= 45.2 × [1 + 0.0375] = 45.2 × 1.0375 = ${sd.vocCold} V/แผง`,
+              `แรงดันสตริงสูงสุด = ${sd.stringSize} × ${sd.vocCold} = ${(sd.stringSize * parseFloat(sd.vocCold)).toFixed(1)} V`,
+              `[ร้อน เซลล์ร้อนแรงดันทำงานลดลง] V_mp(60°C) = 38.1 × [1 + (−0.0030) × 35]`,
+              `= 38.1 × [1 − 0.105] = 38.1 × 0.895 = ${sd.vmpHot} V/แผง`,
+              `แรงดันสตริงทำงาน = ${sd.stringSize} × ${sd.vmpHot} = ${(sd.stringSize * parseFloat(sd.vmpHot)).toFixed(1)} V`,
             ]}
-            result={`ผ่านเงื่อนไข — ${sd.stringCount.toLocaleString()} สตริง × ${sd.stringSize} แผง, ไม่เหลือแผงค้าง ${sd.leftoverPanels} แผง`}
+            result={`ผ่านการตรวจแรงดันเบื้องต้น (สมมติ) — ${sd.stringCount.toLocaleString()} สตริง × ${sd.stringSize} แผง, ไม่เหลือแผงค้าง ${sd.leftoverPanels} แผง`}
             check={`${(sd.stringSize * parseFloat(sd.vocCold)).toFixed(0)} V ≤ ${sd.vdcMax} V (V_DC,max) ✓ และ ${(sd.stringSize * parseFloat(sd.vmpHot)).toFixed(0)} V ∈ [${sd.mpptMin}, ${sd.mpptMax}] V (MPPT) ✓`}
             deps="F-03 (ขนาดสตริง), F-06 (อินเวอร์เตอร์), SLD DC box"
-            note="⚠ ยังตรวจไม่ครบ: Isc/Imp, กระแส MPPT input, Vmp ที่อุณหภูมิต่ำ — ขาด datasheet จริง ห้ามถือว่าออกแบบผ่านแล้ว" />
-          <Trace fid="F-06" name="พิกัด AC อินเวอร์เตอร์ (nameplate)"
+            note="ยังไม่ผ่านการรับรองการจับคู่อุปกรณ์: ต้องตรวจ Isc/Imp, กระแส MPPT input, Vmp ที่อุณหภูมิต่ำ และ datasheet จริงก่อน — ผ่านเฉพาะเกณฑ์แรงดันที่แสดง" />
+        </Section>
+      )}
+      {isPV && sd && (
+        <Section title="E. อินเวอร์เตอร์และสัดส่วน DC/AC (F-06, F-07)" sub="พิกัด nameplate จริงหลังปัดจำนวนตัว">
+          <Trace fid="F-06" status="calc" name="อินเวอร์เตอร์มีกำลังพิกัดรวมเท่าไร?"
             formula="P_AC,rated = N_inv × P_inv,rated"
             sub={`${specs.inverterCount} × 300`}
             result={`= ${acKw.toLocaleString()} kWac (${(acKw / 1000).toFixed(3)} MWac)`}
             note="เป็น nameplate รวมของอินเวอร์เตอร์ ไม่ใช่กำลังที่ต้องการหรือ export limit" />
-          <Trace fid="F-07" name="อัตราส่วน DC/AC"
+          <Trace fid="F-07" status="warn" name="สัดส่วนกำลังแผงต่ออินเวอร์เตอร์เป็นเท่าไร?"
             formula="R = P_DC / P_AC,rated"
             sub={`${dcKwp.toLocaleString()} / ${acKw.toLocaleString()}`}
             result={`= ${specs.actualDcAcRatio}`}
-            note="ค่าออกแบบเป้าหมาย ~1.25 — ค่าจริงหลังปัดจำนวนอินเวอร์เตอร์อาจต่างออกไป" />
+            deps="ตรวจสอบการเลือกอินเวอร์เตอร์ — ไม่ใช่ข้อพิสูจน์ความเหมาะสม"
+            note="ค่าออกแบบเป้าหมาย ~1.25 — ค่าจริงหลังปัดจำนวนอินเวอร์เตอร์อาจต่างออกไป ต้องเปรียบเทียบตัวเลือกอุปกรณ์เพิ่ม" />
+        </Section>
+      )}
+      {isPV && sd && (
+        <Section title="F. ผลผลิตรายปีและหม้อแปลง (F-09A, F-14)" sub="ค่าประมาณการเบื้องต้น — ไม่ใช่ข้อมูลวัดจริง">
           {specs.annualEnergyMWh && (
-            <Trace fid="F-09A" name="ผลิตไฟฟ้ารายปี (เส้นทาง specific yield)"
+            <Trace fid="F-09A" status="assumed" name="ระบบคาดว่าจะผลิตไฟได้ปีละเท่าไร?"
               formula="E_year = P_DC × Y_specific ;  Y_specific ≈ GHI × 365 × PR (ประมาณการ)"
               sub={`${dcKwp.toLocaleString()} kWp × (${land.provinceData?.ghi || 5.1} × 365 × 0.80)`}
               result={`≈ ${specs.annualEnergyMWh} MWh/ปี`}
               note="ค่าประมาณรวม loss แล้ว (PR=0.80) — ไม่หัก loss ซ้ำ และไม่ใช่การจำลองรายชั่วโมง" />
           )}
           {specs.transformerRating && (
-            <Trace fid="F-14" name="หม้อแปลงเบื้องต้น"
+            <Trace fid="F-14" status="assumed" name="ต้องใช้หม้อแปลงพิกัดประมาณเท่าไร?"
               formula="S_required = P_AC / PF ; เลือกพิกัดมาตรฐาน"
               sub={`${acKw.toLocaleString()} / 0.95 = ${(acKw / 0.95).toFixed(0)} kVA`}
               result={`→ ${specs.transformerRating}`}
@@ -199,18 +260,18 @@ V_mp(60°C) = 38.1 × [1 − 0.0030×35] = ${sd.vmpHot} V → ${sd.stringSize}×
 
       {/* D. EV */}
       {isEV && (
-        <Section title="D. การคำนวณสถานีชาร์จ (EV)" sub="แยกพิกัด DC output จาก AC input ชัดเจน">
-          <Trace fid="F-12" name="โหลด AC ของเครื่องชาร์จ DC"
+        <Section title="EV. การคำนวณสถานีชาร์จ" sub="แยกพิกัด DC output จาก AC input ชัดเจน">
+          <Trace fid="F-12" status="calc" name="ตู้ชาร์จกินไฟจริงกี่ kW?"
             formula="P_AC,in = Σ P_DC,out / η_charger"
             sub={`${specs.dcChargersCount} × 180 / 0.95`}
             result={`= ${(specs.dcChargersCount * 180 / 0.95).toFixed(1)} kW AC (connected)`}
             note="พิกัด 180 kW เป็น DC output — หาร efficiency เพื่อได้โหลดฝั่งไฟฟ้า" />
-          <Trace fid="F-13" name="ดีมานด์สูงสุดและกระแส 3 เฟส"
+          <Trace fid="F-13" status="assumed" name="ดีมานด์สูงสุดและกระแสเท่าไร?"
             formula="P_demand = P_connected × DF ;  I = P/(√3·V_LL·PF)"
             sub={`${(specs.dcChargersCount * 180 / 0.95).toFixed(1)} × 0.70 → I = P/(√3×400×0.98)`}
             result={`≈ ${(specs.dcChargersCount * 180 / 0.95 * 0.7).toFixed(1)} kW, ${(specs.dcChargersCount * 180 / 0.95 * 0.7 * 1000 / (Math.sqrt(3) * 400 * 0.98)).toFixed(0)} A`}
             note="DF 0.70 เป็นสมมติฐาน power management — ยังไม่มี load profile จริง" />
-          <Trace fid="F-14" name="หม้อแปลงเบื้องต้น"
+          <Trace fid="F-14" status="assumed" name="หม้อแปลงเบื้องต้น"
             formula="S_required = (P_demand − BESS assist) / PF ; เลือกพิกัดมาตรฐาน"
             sub={`(${(specs.dcChargersCount * 180 / 0.95 * 0.7).toFixed(1)} − ${(specs.bessKWh || 0) / 2}) / 0.98`}
             result={`→ ${specs.transformerRating}`}
@@ -220,7 +281,7 @@ V_mp(60°C) = 38.1 × [1 − 0.0030×35] = ${sd.vmpHot} V → ${sd.stringSize}×
 
       {/* E. BESS / other — ขอบเขตตามจริง */}
       {(isBESS || isBio) && (
-        <Section title="E. ขอบเขตการคำนวณของโครงการนี้" sub="ระบุตรง ๆ ว่าอะไรคำนวณได้และอะไรยังไม่ได้">
+        <Section title="ขอบเขต. การคำนวณของโครงการนี้" sub="ระบุตรง ๆ ว่าอะไรคำนวณได้และอะไรยังไม่ได้">
           {isBESS && (
             <div className="text-sm space-y-2">
               <div>ขนาดพลังงาน: {specs.capacityMWh || '—'} MWh · {specs.containerCount || '—'} ตู้คอนเทนเนอร์</div>
@@ -237,13 +298,13 @@ V_mp(60°C) = 38.1 × [1 − 0.0030×35] = ${sd.vmpHot} V → ${sd.stringSize}×
       )}
 
       {/* F. SLD */}
-      <Section title="F. อุปกรณ์และแผนผังระบบ (SLD)" sub="วาดจากค่าชุดเดียวกับตารางข้างบน — แบบร่างเชิงแนวคิด ไม่ใช่แบบก่อสร้าง">
+      <Section title="G. อุปกรณ์และแผนผังระบบ (SLD)" sub="วาดจากค่าชุดเดียวกับตารางข้างบน — แบบร่างเชิงแนวคิด ไม่ใช่แบบก่อสร้าง">
         <SingleLineDiagram project={project} specs={specs} landData={land} />
         <p className="text-xs text-ink-faint">แผนผังเส้นเดียวนี้เป็น preliminary concept — protection/metering/utility interface ยังไม่ผ่านการตรวจสอบจริง</p>
       </Section>
 
       {/* G. Financial engineering */}
-      <Section title="G. การคำนวณทางการเงิน" sub="กระแสเงินสดชุดเดียวกับกราฟและการ์ดสรุป">
+      <Section title="H. การคำนวณทางการเงิน" sub="กระแสเงินสดชุดเดียวกับกราฟและการ์ดสรุป">
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
           <KV k="CAPEX" v={fin.totalCapexMillionTHB ? `${fin.totalCapexMillionTHB} ล้าน฿` : '—'} src="calc" />
           <KV k="รายได้รวม/ปี" v={fin.annualRevenueMillionTHB ? `${fin.annualRevenueMillionTHB} ล้าน฿` : '—'} src="calc" />
@@ -307,7 +368,7 @@ V_mp(60°C) = 38.1 × [1 − 0.0030×35] = ${sd.vmpHot} V → ${sd.stringSize}×
       </Section>
 
       {/* H. Spec grid */}
-      <Section title="H. ตารางสเปกรวม" sub="ค่าเดียวกันทุกจุด — ใช้ตรวจเทียบกับส่วนอื่นได้">
+      <Section title="I. ตารางสเปกรวม" sub="ค่าเดียวกันทุกจุด — ใช้ตรวจเทียบกับส่วนอื่นได้">
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs font-mono">
           <KV k="P_DC (nameplate)" v={specs.dcCapacityKWp ? `${specs.dcCapacityKWp} kWp` : specs.dcCapacityMWp ? `${specs.dcCapacityMWp} MWp` : '—'} src="calc" />
           <KV k="P_AC (inverter nameplate)" v={specs.acCapacityMW ? `${specs.acCapacityMW} MWac` : specs.pcsInverter || '—'} src="calc" />

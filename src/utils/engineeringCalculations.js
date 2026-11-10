@@ -370,6 +370,8 @@ export function calculateAgrivoltaicsSpecs(landData) {
     mvCurrentAmp: agriMvCurrentA,
     moduleCount: agriInstalledPanels.toLocaleString(),
     areaCandidatePanelCount: baseSolar.areaCandidatePanelCount,
+    baseStringCount: sd.stringCount, // จำนวนสตริงก่อนหักพื้นที่เกษตร — ใช้อธิบายใน F-03
+    panelSpacingFactor: 0.70, // สมมติฐานการจัดวาง agrivoltaics (ยังไม่ยืนยันพืชจริง)
     stringDesign: { ...sd, stringCount: agriStringCount, installedPanelCount: agriInstalledPanels, leftoverPanels: 0 },
     annualEnergyMWh: annualEnergyMWh.toLocaleString(),
     capexPerMWpMillionTHB: (capexPerMWp / 1000000).toFixed(1),

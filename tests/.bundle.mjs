@@ -1,5 +1,6 @@
 // tests/formulas.test.mjs
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 
 // src/utils/engineeringCalculations.js
 function evaluateLandFeasibility(landData) {
@@ -242,6 +243,10 @@ function calculateAgrivoltaicsSpecs(landData) {
     mvCurrentAmp: agriMvCurrentA,
     moduleCount: agriInstalledPanels.toLocaleString(),
     areaCandidatePanelCount: baseSolar.areaCandidatePanelCount,
+    baseStringCount: sd.stringCount,
+    // จำนวนสตริงก่อนหักพื้นที่เกษตร — ใช้อธิบายใน F-03
+    panelSpacingFactor: 0.7,
+    // สมมติฐานการจัดวาง agrivoltaics (ยังไม่ยืนยันพืชจริง)
     stringDesign: { ...sd, stringCount: agriStringCount, installedPanelCount: agriInstalledPanels, leftoverPanels: 0 },
     annualEnergyMWh: annualEnergyMWh.toLocaleString(),
     capexPerMWpMillionTHB: (capexPerMWp / 1e6).toFixed(1),
@@ -610,5 +615,46 @@ assert.equal(ag.stringDesign.installedPanelCount, 180);
 near(parseFloat(ag.dcCapacityMWp), 0.1116, 1e-3);
 near(parseFloat(ag.actualDcAcRatio), ag.stringDesign.installedPanelCount * 620 / 1e3 / (ag.inverterCount * 300), 1e-3);
 near(parseFloat(ag.acCapacityMW) * 1e3, ag.inverterCount * 300, 1e-9);
+var gold = calculateAgrivoltaicsSpecs({ areaSqM: 2072, excludedAreaSqM: 0, provinceData: { ghi: 5.28 } });
+near(2072 / 1600, 1.295, 1e-4);
+near((2072 - 0) * 0.78, 1616.16, 0.01);
+assert.equal(gold.areaCandidatePanelCount, "404");
+assert.equal(gold.stringDesign.installedPanelCount, 280);
+assert.equal(gold.stringDesign.stringCount, 14);
+assert.equal(gold.stringDesign.stringCount * gold.stringDesign.stringSize, 280);
+near(gold.stringDesign.installedPanelCount * 620 / 1e3, 173.6, 1e-9);
+assert.equal(gold.dcCapacityKWp, 174);
+near(parseFloat(gold.dcCapacityMWp), 0.1736, 1e-3);
+assert.equal(gold.inverterCount, 1);
+near(parseFloat(gold.acCapacityMW) * 1e3, 300, 1e-9);
+near(parseFloat(gold.actualDcAcRatio), 0.5787, 1e-3);
+near(parseFloat(gold.stringDesign.vocCold), 46.895, 0.01);
+near(20 * parseFloat(gold.stringDesign.vocCold), 937.9, 0.3);
+near(parseFloat(gold.stringDesign.vmpHot), 34.0995, 0.01);
+near(20 * parseFloat(gold.stringDesign.vmpHot), 681.99, 0.3);
+near(parseFloat(gold.annualEnergyMWh.replace(/,/g, "")), 267.65, 1);
+near(parseFloat(gold.financials.totalCapexMillionTHB), 4.34, 0.01);
+near(parseFloat(gold.dualIncome.powerRevenueMillionTHB) * 1e6, 580237, 500);
+var bigger = calculateSolarFarmSpecs({ areaSqM: 2394, excludedAreaSqM: 0, provinceData: { ghi: 5.28 } });
+assert.ok(parseInt(bigger.areaCandidatePanelCount) !== 404, "candidate \u0E15\u0E49\u0E2D\u0E07\u0E40\u0E1B\u0E25\u0E35\u0E48\u0E22\u0E19\u0E15\u0E32\u0E21\u0E1E\u0E37\u0E49\u0E19\u0E17\u0E35\u0E48");
+assert.equal(bigger.stringDesign.installedPanelCount, bigger.stringDesign.stringCount * bigger.stringDesign.stringSize);
+var excl = calculateSolarFarmSpecs({ areaSqM: 2072, excludedAreaSqM: 100, provinceData: { ghi: 5.28 } });
+assert.equal(parseInt(excl.areaCandidatePanelCount), Math.floor((2072 - 100) * 0.78 / 4));
+var cfDiff = gold.cashFlows[1] - gold.cashFlows[2];
+assert.ok(cfDiff > 0 && cfDiff < 5e3, `degradation \u0E44\u0E1F\u0E1F\u0E49\u0E32\u0E40\u0E17\u0E48\u0E32\u0E19\u0E31\u0E49\u0E19: diff ${cfDiff.toFixed(0)}`);
+assert.equal(gold.cashFlows[0], -parseFloat(gold.financials.totalCapexMillionTHB) * 1e6);
 assert.deepEqual(recommendProjects(land, DEFAULT_GOALS), recommendProjects(land, DEFAULT_GOALS));
+var evSrc = readFileSync(new URL("../src/components/EngineeringView.jsx", import.meta.url), "utf8");
+var fidCalls = [...evSrc.matchAll(/fid="(F-[0-9A-Z]+)"/g)].map((m) => m[1]);
+assert.ok(fidCalls.length >= 9, `\u0E1E\u0E1A\u0E01\u0E32\u0E23\u0E4C\u0E14 ${fidCalls.length} \u0E43\u0E1A`);
+for (const fid of fidCalls) {
+  const at = evSrc.indexOf(`fid="${fid}"`);
+  const slice = evSrc.slice(at, at + 300);
+  assert.ok(slice.includes("status="), `${fid} \u0E02\u0E32\u0E14 status prop`);
+}
+assert.ok(evSrc.includes("aria-expanded"), "\u0E15\u0E49\u0E2D\u0E07\u0E21\u0E35 aria-expanded \u0E1A\u0E19\u0E1B\u0E38\u0E48\u0E21\u0E02\u0E22\u0E32\u0E22");
+assert.ok(evSrc.includes("aria-controls"), "\u0E15\u0E49\u0E2D\u0E07\u0E21\u0E35 aria-controls");
+assert.ok(evSrc.includes("\u0E21\u0E35\u0E01\u0E33\u0E25\u0E31\u0E07\u0E15\u0E34\u0E14\u0E15\u0E31\u0E49\u0E07\u0E23\u0E27\u0E21\u0E40\u0E17\u0E48\u0E32\u0E44\u0E23"), "F-04 \u0E15\u0E49\u0E2D\u0E07\u0E40\u0E1B\u0E47\u0E19\u0E2B\u0E31\u0E27\u0E02\u0E49\u0E2D\u0E04\u0E33\u0E16\u0E32\u0E21\u0E01\u0E33\u0E25\u0E31\u0E07\u0E15\u0E34\u0E14\u0E15\u0E31\u0E49\u0E07");
+var chartSrc = readFileSync(new URL("../src/components/FinancialYieldChart.jsx", import.meta.url), "utf8");
+assert.ok(chartSrc.includes("specs.cashFlows"), "\u0E01\u0E23\u0E32\u0E1F\u0E15\u0E49\u0E2D\u0E07\u0E2D\u0E48\u0E32\u0E19 specs.cashFlows \u0E44\u0E21\u0E48\u0E04\u0E33\u0E19\u0E27\u0E13\u0E41\u0E22\u0E01");
 console.log("ALL FORMULA TESTS PASS");

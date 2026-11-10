@@ -27,16 +27,49 @@ function KV({ k, v, src }) {
   );
 }
 
-function Trace({ fid, name, formula, sub, result, note }) {
+// Formula Card 9 ขั้นตาม spec — ทุกช่อง optional, ขาดอะไรแสดงว่าขาด ไม่เดาค่า
+function Trace({ fid, name, purpose, formula, vars, provenance, sub, steps, result, check, deps, note }) {
   return (
-    <div className="rounded-xl border border-[#E7E5DD] p-4 space-y-1.5">
-      <div className="flex items-baseline gap-2">
+    <div className="rounded-xl border border-[#E7E5DD] p-4 space-y-2">
+      {/* 1. ชื่อ/วัตถุประสงค์ */}
+      <div className="flex items-baseline gap-2 flex-wrap">
         <span className="text-[10px] font-mono font-bold bg-brand-700 text-white rounded px-1.5 py-0.5">{fid}</span>
         <span className="text-sm font-semibold">{name}</span>
       </div>
-      <div className="font-mono text-xs text-ink-soft">{formula}</div>
-      <div className="font-mono text-xs">{sub}</div>
+      {purpose && <div className="text-[11px] text-ink-faint">วัตถุประสงค์: {purpose}</div>}
+      {/* 2. สูตรทั่วไป */}
+      <div className="font-mono text-xs text-ink-soft bg-paper rounded-lg px-3 py-2">{formula}</div>
+      {/* 3. ความหมายตัวแปร */}
+      {vars?.length > 0 && (
+        <table className="text-[11px] font-mono w-full">
+          <tbody>
+            {vars.map(([sym, meaning, unit, val, src], i) => (
+              <tr key={i} className="border-b border-[#F1EFE8] last:border-0">
+                <td className="py-0.5 pr-2 font-semibold w-16">{sym}</td>
+                <td className="py-0.5 pr-2 text-ink-soft">{meaning}{unit ? ` (${unit})` : ''}</td>
+                <td className="py-0.5 pr-2 text-right w-24">{val}</td>
+                <td className="py-0.5 w-28">{src && <Src t={src} />}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+      {/* 4. ที่มาของค่า */}
+      {provenance && <div className="text-[11px] text-ink-faint">ที่มา: {provenance}</div>}
+      {/* 5. แทนค่า */}
+      <div className="font-mono text-xs whitespace-pre-line">{sub}</div>
+      {/* 6. วิธีคำนวณทีละขั้น */}
+      {steps?.length > 0 && (
+        <ol className="font-mono text-xs space-y-0.5 list-decimal list-inside">
+          {steps.map((s, i) => <li key={i}>{s}</li>)}
+        </ol>
+      )}
+      {/* 7. คำตอบ */}
       <div className="font-mono text-sm font-bold text-brand-800">{result}</div>
+      {/* 8. ตรวจเงื่อนไข/ข้อจำกัด */}
+      {check && <div className="text-[11px] rounded-lg bg-energy-50 border border-energy-100 px-3 py-2">ตรวจเงื่อนไข: {check}</div>}
+      {/* 9. เชื่อมโยง */}
+      {deps && <div className="text-[11px] text-ink-faint">ใช้ต่อใน: {deps}</div>}
       {note && <div className="text-[11px] text-ink-faint">{note}</div>}
     </div>
   );
@@ -100,16 +133,43 @@ export default function EngineeringView({ id, specs, land, project, summary }) {
       {isPV && sd && (
         <Section title="C. การคำนวณโซลาร์เซลล์ (PV)" sub="จำนวนแผง สตริง อินเวอร์เตอร์ และผลผลิต — จาก Demo Catalog เดียวกันทั้งหมด">
           <Trace fid="F-04" name="กำลังติดตั้ง DC"
+            purpose="หาพิกัด DC รวมของแผงที่ติดตั้งจริงเต็มสตริง"
             formula="P_DC = N_installed × P_module / 1000"
-            sub={`${sd.installedPanelCount.toLocaleString()} × 620 / 1000`}
-            result={`= ${(sd.installedPanelCount * 620 / 1000).toLocaleString()} kWp (${(sd.installedPanelCount * 620 / 1e6).toFixed(3)} MWp)`}
-            note={`candidate จากพื้นที่ ${specs.areaCandidatePanelCount || '—'} แผง → เต็มสตริง ${sd.installedPanelCount.toLocaleString()} แผง`} />
+            vars={[
+              ['N_installed', 'จำนวนแผงที่ติดตั้งจริง', 'แผง', sd.installedPanelCount.toLocaleString(), 'calc'],
+              ['P_module', 'พิกัดแผง STC', 'Wp', '620', 'demo'],
+            ]}
+            provenance="N_installed มาจาก F-03/F-05 (ติดตั้งเฉพาะเต็มสตริง) · P_module จาก Demo Catalog ไม่ใช่ datasheet จริง"
+            sub={`P_DC = ${sd.installedPanelCount.toLocaleString()} × 620 / 1000`}
+            steps={[
+              `${sd.installedPanelCount.toLocaleString()} × 620 = ${(sd.installedPanelCount * 620).toLocaleString()} W`,
+              `${(sd.installedPanelCount * 620).toLocaleString()} / 1000 = ${(sd.installedPanelCount * 620 / 1000).toLocaleString()} kW`,
+            ]}
+            result={`= ${(sd.installedPanelCount * 620 / 1000).toLocaleString()} kWp (${(sd.installedPanelCount * 620 / 1e6).toFixed(4)} MWp)`}
+            check={`candidate จากพื้นที่ ${specs.areaCandidatePanelCount || '—'} แผง → เหลือติดตั้งเต็มสตริง ${sd.installedPanelCount.toLocaleString()} แผง (ไม่นับแผงค้าง ${sd.leftoverPanels} แผง)`}
+            deps="F-07 (DC/AC), F-09A (ผลผลิต), CAPEX, SLD, การ์ดสรุป — ใช้ค่าดิบเดียวกัน" />
           <Trace fid="F-05" name="ตรวจแรงดันสตริงเมื่ออุณหภูมิเปลี่ยน"
-            formula="V_oc(T) = Voc_STC × [1 + β(T−25)] ; ตรวจ V_string ≤ V_DC,max และอยู่ในช่วง MPPT"
+            purpose="ยืนยันว่าแรงดันสตริงไม่เกินพิกัดอินเวอร์เตอร์และอยู่ในช่วง MPPT"
+            vars={[
+              ['V_oc,STC', 'แรงดันเปิดวงจร STC', 'V', '45.2', 'demo'],
+              ['β_voc', 'สัมประสิทธิ์อุณหภูมิ Voc', '/°C', '−0.0025', 'demo'],
+              ['V_mp,STC', 'แรงดัน MPP STC', 'V', '38.1', 'demo'],
+              ['β_vmp', 'สัมประสิทธิ์อุณหภูมิ Vmp', '/°C', '−0.0030', 'demo'],
+              ['N_s', 'แผงต่อสตริง', 'แผง', String(sd.stringSize), 'calc'],
+            ]}
+            provenance="T_min=10°C, T_max=60°C เป็นสมมติฐานออกแบบ · datasheet เป็น Demo Catalog"
             sub={`V_oc(10°C) = 45.2 × [1 − 0.0025×15] = ${sd.vocCold} V → ${sd.stringSize}×${sd.vocCold} = ${(sd.stringSize * parseFloat(sd.vocCold)).toFixed(0)} V ≤ ${sd.vdcMax} V
 V_mp(60°C) = 38.1 × [1 − 0.0030×35] = ${sd.vmpHot} V → ${sd.stringSize}×${sd.vmpHot} = ${(sd.stringSize * parseFloat(sd.vmpHot)).toFixed(0)} V ∈ [${sd.mpptMin}, ${sd.mpptMax}] V`}
+            steps={[
+              `V_oc(10°C) = 45.2×[1−0.0025×(25−10)] = ${sd.vocCold} V/แผง`,
+              `แรงดันสตริงสูงสุด = ${sd.stringSize} × ${sd.vocCold} = ${(sd.stringSize * parseFloat(sd.vocCold)).toFixed(0)} V`,
+              `V_mp(60°C) = 38.1×[1−0.0030×(60−25)] = ${sd.vmpHot} V/แผง`,
+              `แรงดันสตริงทำงาน = ${sd.stringSize} × ${sd.vmpHot} = ${(sd.stringSize * parseFloat(sd.vmpHot)).toFixed(0)} V`,
+            ]}
             result={`ผ่านเงื่อนไข — ${sd.stringCount.toLocaleString()} สตริง × ${sd.stringSize} แผง, ไม่เหลือแผงค้าง ${sd.leftoverPanels} แผง`}
-            note="linear approximation ตาม datasheet — ยังไม่ได้ตรวจกระแส Isc/MPPT input current (ข้อมูล demo ไม่พอ)" />
+            check={`${(sd.stringSize * parseFloat(sd.vocCold)).toFixed(0)} V ≤ ${sd.vdcMax} V (V_DC,max) ✓ และ ${(sd.stringSize * parseFloat(sd.vmpHot)).toFixed(0)} V ∈ [${sd.mpptMin}, ${sd.mpptMax}] V (MPPT) ✓`}
+            deps="F-03 (ขนาดสตริง), F-06 (อินเวอร์เตอร์), SLD DC box"
+            note="⚠ ยังตรวจไม่ครบ: Isc/Imp, กระแส MPPT input, Vmp ที่อุณหภูมิต่ำ — ขาด datasheet จริง ห้ามถือว่าออกแบบผ่านแล้ว" />
           <Trace fid="F-06" name="พิกัด AC อินเวอร์เตอร์ (nameplate)"
             formula="P_AC,rated = N_inv × P_inv,rated"
             sub={`${specs.inverterCount} × 300`}

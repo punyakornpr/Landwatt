@@ -13,17 +13,20 @@ import geoGrid from '../assets/geo-grid.svg';
 
 export function PageBackdrop() {
   return (
-    <div aria-hidden="true" className="absolute inset-0 pointer-events-none">
-      <div className="absolute inset-0" style={{ background: 'linear-gradient(#F3F7FC, #FFFFFF 60%)' }} />
+    <div aria-hidden="true" className="absolute inset-0 pointer-events-none overflow-hidden">
+      <div className="absolute inset-0" style={{ background: 'linear-gradient(#EDF3FA, #F7FAFD 35%, #FFFFFF 85%)' }} />
       <div className="absolute inset-0" style={{
         backgroundImage: `url(${geoGrid})`,
         backgroundRepeat: 'repeat',
         backgroundSize: '60px 52px',
-        opacity: 0.55,
-        maskImage: 'linear-gradient(to bottom, black 55%, transparent 95%)',
-        WebkitMaskImage: 'linear-gradient(to bottom, black 55%, transparent 95%)',
+        opacity: 0.5,
       }} />
-      <div className="absolute inset-x-0 top-0 h-[300px]" style={{ background: 'linear-gradient(rgba(37,99,235,0.08), transparent)' }} />
+      <div className="absolute inset-0" style={{
+        background:
+          'radial-gradient(65% 45% at 8% -8%, rgba(37,99,235,0.15), transparent 70%),' +
+          'radial-gradient(55% 40% at 96% 4%, rgba(14,165,233,0.13), transparent 70%),' +
+          'radial-gradient(60% 45% at 50% 110%, rgba(37,99,235,0.10), transparent 70%)',
+      }} />
     </div>
   );
 }

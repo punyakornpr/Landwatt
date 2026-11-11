@@ -32,10 +32,16 @@
     <stop offset="0" stop-color="#3b5fa8"/>
     <stop offset="1" stop-color="#1a3572"/>
   </linearGradient>
+  <linearGradient id="mist" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#ffffff" stop-opacity="0"/>
+    <stop offset="0.5" stop-color="#ffffff" stop-opacity="0.4"/>
+    <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+  </linearGradient>
 
   <!-- panel table: small (far) -->
   <g id="pvA">
     <polygon points="10,0 180,0 170,78 0,78" fill="url(#pcell)" stroke="#12285e" stroke-width="2"/>
+    <polygon points="34,4 74,4 44,74 14,74" fill="#ffffff" opacity="0.15"/>
     <line x1="10" y1="0" x2="180" y2="0" stroke="#c7dcf7" stroke-width="2"/>
     <line x1="67" y1="0" x2="57" y2="78" stroke="#8ba8dd" stroke-width="1.5" opacity="0.75"/>
     <line x1="123" y1="0" x2="114" y2="78" stroke="#8ba8dd" stroke-width="1.5" opacity="0.75"/>
@@ -47,6 +53,7 @@
   <!-- panel table: medium -->
   <g id="pvB">
     <polygon points="13,0 218,0 205,115 0,115" fill="url(#pcell)" stroke="#12285e" stroke-width="2.5"/>
+    <polygon points="42,6 88,6 54,109 18,109" fill="#ffffff" opacity="0.15"/>
     <line x1="13" y1="0" x2="218" y2="0" stroke="#c7dcf7" stroke-width="2.5"/>
     <line x1="82" y1="0" x2="68" y2="115" stroke="#8ba8dd" stroke-width="2" opacity="0.75"/>
     <line x1="150" y1="0" x2="137" y2="115" stroke="#8ba8dd" stroke-width="2" opacity="0.75"/>
@@ -58,6 +65,7 @@
   <!-- panel table: large (near) -->
   <g id="pvC">
     <polygon points="17,0 262,0 245,155 0,155" fill="url(#pcell)" stroke="#12285e" stroke-width="3"/>
+    <polygon points="52,8 108,8 62,147 20,147" fill="#ffffff" opacity="0.15"/>
     <line x1="17" y1="0" x2="262" y2="0" stroke="#c7dcf7" stroke-width="3"/>
     <line x1="99" y1="0" x2="82" y2="155" stroke="#8ba8dd" stroke-width="2.5" opacity="0.75"/>
     <line x1="180" y1="0" x2="163" y2="155" stroke="#8ba8dd" stroke-width="2.5" opacity="0.75"/>
@@ -96,6 +104,19 @@
     <ellipse cx="1420" cy="688" rx="75" ry="22"/>
   </g>
 </g>
+<!-- soft shading under clouds -->
+<g fill="#d7e7f6" opacity="0.7">
+  <ellipse cx="300" cy="215" rx="160" ry="16"/>
+  <ellipse cx="890" cy="462" rx="120" ry="12"/>
+  <ellipse cx="170" cy="672" rx="100" ry="10"/>
+</g>
+
+<!-- god rays from the sun -->
+<g fill="#ffffff" opacity="0.09">
+  <polygon points="1370,330 780,1180 980,1180"/>
+  <polygon points="1370,330 1130,1180 1310,1180"/>
+  <polygon points="1370,330 1490,1180 1660,1180"/>
+</g>
 
 <!-- birds -->
 <g stroke="#5a7ba6" stroke-width="3" fill="none" opacity="0.55" stroke-linecap="round">
@@ -108,7 +129,11 @@
 
 <!-- hills -->
 <path d="M0 980 Q 300 860 640 940 T 1600 900 L1600 1180 L0 1180 Z" fill="url(#hillA)"/>
+<path d="M0 980 Q 300 860 640 940 T 1600 900" fill="none" stroke="#dcf1dd" stroke-width="7" opacity="0.55" stroke-linecap="round"/>
 <path d="M0 1080 Q 400 980 820 1060 T 1600 1040 L1600 1300 L0 1300 Z" fill="url(#hillB)"/>
+<path d="M0 1080 Q 400 980 820 1060 T 1600 1040" fill="none" stroke="#cdf0cd" stroke-width="7" opacity="0.5" stroke-linecap="round"/>
+<!-- valley mist between hills and meadow -->
+<rect y="1000" width="1600" height="180" fill="url(#mist)"/>
 
 <!-- wind turbines on the far ridge -->
 <g>
@@ -158,6 +183,13 @@
 
 <!-- meadow -->
 <path d="M0 1180 Q 500 1120 900 1180 T 1600 1160 L1600 2400 L0 2400 Z" fill="url(#meadow)"/>
+<!-- mowed grass bands -->
+<g fill="#b9e6bf" opacity="0.22">
+  <path d="M0 1300 L1600 1220 L1600 1300 L0 1380 Z"/>
+  <path d="M0 1560 L1600 1480 L1600 1560 L0 1640 Z"/>
+  <path d="M0 1830 L1600 1750 L1600 1830 L0 1910 Z"/>
+  <path d="M0 2120 L1600 2040 L1600 2120 L0 2200 Z"/>
+</g>
 
 <!-- winding path -->
 <path d="M430 1180
@@ -262,6 +294,14 @@
     <line x1="544" y1="2326" x2="544" y2="2338"/><line x1="784" y1="2265" x2="784" y2="2277"/>
     <line x1="1124" y1="2285" x2="1124" y2="2297"/><line x1="304" y1="2314" x2="304" y2="2326"/>
   </g>
+</g>
+
+<!-- sparkles -->
+<g fill="#ffffff" opacity="0.85">
+  <path transform="translate(1290,1740) scale(1.4)" d="M0,-10 L2.5,-2.5 L10,0 L2.5,2.5 L0,10 L-2.5,2.5 L-10,0 L-2.5,-2.5 Z"/>
+  <path transform="translate(1180,1500)" d="M0,-10 L2.5,-2.5 L10,0 L2.5,2.5 L0,10 L-2.5,2.5 L-10,0 L-2.5,-2.5 Z"/>
+  <path transform="translate(760,1360) scale(0.8)" d="M0,-10 L2.5,-2.5 L10,0 L2.5,2.5 L0,10 L-2.5,2.5 L-10,0 L-2.5,-2.5 Z"/>
+  <path transform="translate(1120,320) scale(1.2)" d="M0,-10 L2.5,-2.5 L10,0 L2.5,2.5 L0,10 L-2.5,2.5 L-10,0 L-2.5,-2.5 Z"/>
 </g>
 
 <!-- butterflies -->

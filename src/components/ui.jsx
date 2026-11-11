@@ -9,6 +9,24 @@ import {
 import { STATUS, PROJECT_FRIENDLY } from '../engine/recommend';
 import { useApp } from '../state/AppState';
 import { useT } from '../i18n';
+import geoGrid from '../assets/geo-grid.svg';
+
+export function PageBackdrop() {
+  return (
+    <div aria-hidden="true" className="absolute inset-0 pointer-events-none">
+      <div className="absolute inset-0" style={{ background: 'linear-gradient(#F3F7FC, #FFFFFF 60%)' }} />
+      <div className="absolute inset-0" style={{
+        backgroundImage: `url(${geoGrid})`,
+        backgroundRepeat: 'repeat',
+        backgroundSize: '60px 52px',
+        opacity: 0.55,
+        maskImage: 'linear-gradient(to bottom, black 55%, transparent 95%)',
+        WebkitMaskImage: 'linear-gradient(to bottom, black 55%, transparent 95%)',
+      }} />
+      <div className="absolute inset-x-0 top-0 h-[300px]" style={{ background: 'linear-gradient(rgba(37,99,235,0.08), transparent)' }} />
+    </div>
+  );
+}
 
 export const ICONS = {
   Sun, Sprout, Zap, BatteryCharging, Waves, Flame,

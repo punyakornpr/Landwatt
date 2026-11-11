@@ -4,8 +4,7 @@ import { useApp } from '../state/AppState';
 import { convertToSqMeters, convertSqMetersToThai } from '../utils/engineeringCalculations';
 import { GOAL_OPTIONS, BUDGET_OPTIONS } from '../engine/recommend';
 import GoogleMapPicker from '../components/GoogleMapPicker';
-import geoGrid from '../assets/geo-grid.svg';
-import { StepProgress, OptionCard, Collapsible, Note, ICONS } from '../components/ui';
+import { StepProgress, OptionCard, Collapsible, Note, ICONS, PageBackdrop } from '../components/ui';
 import { useT } from '../i18n';
 import {
   Ruler, Mountain, ArrowLeft, ArrowRight, Check,
@@ -53,22 +52,7 @@ export default function Wizard() {
 
   return (
     <div className="relative">
-      <div aria-hidden="true" className="absolute inset-0 pointer-events-none">
-        <div className="absolute inset-0" style={{
-          background: 'linear-gradient(#F3F7FC, #FFFFFF 60%)',
-        }} />
-        <div className="absolute inset-0" style={{
-          backgroundImage: `url(${geoGrid})`,
-          backgroundRepeat: 'repeat',
-          backgroundSize: '60px 52px',
-          opacity: 0.55,
-          maskImage: 'linear-gradient(to bottom, black 55%, transparent 95%)',
-          WebkitMaskImage: 'linear-gradient(to bottom, black 55%, transparent 95%)',
-        }} />
-        <div className="absolute inset-x-0 top-0 h-[300px]" style={{
-          background: 'linear-gradient(rgba(37,99,235,0.08), transparent)',
-        }} />
-      </div>
+      <PageBackdrop />
       <div className="relative max-w-3xl mx-auto px-4 sm:px-6 py-8">
       <div className="mb-8">
         <StepProgress steps={JOURNEY_STEPS.map(t)} current={step} />

@@ -3,7 +3,7 @@ import { navigate } from '../router';
 import { useApp } from '../state/AppState';
 import { recommendProjects, dataConfidence, projectFriendly, budgetCaution, BUDGET_MAX_THB, BUDGET_OPTIONS } from '../engine/recommend';
 import { getSpecs } from '../engine/specs';
-import { StepProgress, StatusBadge, ProjectIcon, Note, Collapsible, fmtTHB, DisclaimerStrip } from '../components/ui';
+import { StepProgress, StatusBadge, ProjectIcon, Note, Collapsible, fmtTHB, DisclaimerStrip, PageBackdrop } from '../components/ui';
 import ProjectArt from '../components/ProjectArt';
 import { useT } from '../i18n';
 import {
@@ -67,7 +67,9 @@ export default function Results() {
     : ({ open: 'flat/open land', agri: 'farmland', roadside: 'roadside/commercial lot', urban: 'in-town/community lot', pond: 'has a pond', slope: 'sloped land', flat: 'flat/open land' }[land.landKind || land.landType] || 'unspecified');
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
+    <div className="relative">
+      <PageBackdrop />
+      <div className="relative max-w-4xl mx-auto px-4 sm:px-6 py-8">
       <div className="mb-8">
         <StepProgress steps={JOURNEY_STEPS.map(t)} current={2} />
       </div>
@@ -245,6 +247,7 @@ export default function Results() {
 
       <div className="mt-8">
         <DisclaimerStrip />
+      </div>
       </div>
     </div>
   );

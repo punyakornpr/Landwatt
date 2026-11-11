@@ -10,8 +10,11 @@ export const STATUS = {
   no:           { label: 'Not recommended', color: 'bg-zinc-100 text-zinc-500 border-zinc-200', dot: 'bg-zinc-400' },
 };
 
-const BUDGET_MAX_THB = {
-  'under-500k': 500000,
+export const BUDGET_MAX_THB = {
+  'under-50k': 50000,
+  '50-150k': 150000,
+  '150-500k': 500000,
+  'under-500k': 500000, // legacy id from older saves — same cap as 150-500k
   '0.5-2m': 2000000,
   '2-5m': 5000000,
   '5-10m': 10000000,
@@ -216,7 +219,9 @@ export const GOAL_OPTIONS = [
 ];
 
 export const BUDGET_OPTIONS = [
-  { id: 'under-500k', label: 'Under 500,000 THB' },
+  { id: 'under-50k', label: 'Under 50,000 THB' },
+  { id: '50-150k', label: '50,000 – 150,000 THB' },
+  { id: '150-500k', label: '150,000 – 500,000 THB' },
   { id: '0.5-2m', label: '500,000 – 2 million THB' },
   { id: '2-5m', label: '2 – 5 million THB' },
   { id: '5-10m', label: '5 – 10 million THB' },

@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { navigate } from '../router';
 import { useApp } from '../state/AppState';
-import { recommendProjects, dataConfidence, PROJECT_FRIENDLY, budgetCaution } from '../engine/recommend';
+import { recommendProjects, dataConfidence, PROJECT_FRIENDLY, budgetCaution, BUDGET_MAX_THB } from '../engine/recommend';
 import { getSpecs } from '../engine/specs';
 import { StepProgress, StatusBadge, ProjectIcon, Note, Collapsible, fmtTHB, DisclaimerStrip } from '../components/ui';
 import {
@@ -29,11 +29,12 @@ export default function Results() {
   const top = results.slice(0, 3);
   const rest = results.slice(3);
 
+  const budgetMax = BUDGET_MAX_THB[goals?.budget];
   const specsCache = useMemo(() => {
     const m = {};
-    results.forEach(r => { try { m[r.id] = getSpecs(r.id, land); } catch { m[r.id] = null; } });
+    results.forEach(r => { try { m[r.id] = getSpecs(r.id, land, budgetMax); } catch { m[r.id] = null; } });
     return m;
-  }, [results, land]);
+  }, [results, land, budgetMax]);
 
   if (analyzing) {
     return (
@@ -156,6 +157,11 @@ export default function Results() {
                       <span className="text-ink-faint">not estimable yet</span>
                     )}
                     <span className="text-xs text-ink-faint ml-1">(estimate, not a real price)</span>
+                    {specs?.budgetFit?.resized && (
+                      <span className="block text-xs text-brand-700 mt-0.5">
+                        Sized to fit your budget — uses ~{specs.budgetFit.usedAreaRai} rai of your {(land.areaSqM / 1600).toFixed(2)}-rai plot
+                      </span>
+                    )}
                   </div>
                 </div>
               </div>

@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { navigate } from '../router';
 import { useApp } from '../state/AppState';
-import { recommendProjects, PROJECT_FRIENDLY } from '../engine/recommend';
+import { recommendProjects, PROJECT_FRIENDLY, BUDGET_MAX_THB } from '../engine/recommend';
 import { getSpecs, friendlySummary } from '../engine/specs';
 import { StatusBadge, ProjectIcon, Note, fmtTHB, DisclaimerStrip, PageHead } from '../components/ui';
 import { ArrowLeft, ArrowRight, X } from 'lucide-react';
@@ -10,7 +10,7 @@ export default function Compare() {
   const { land, goals, compareIds, toggleCompare, setChosenPlan } = useApp();
   const results = useMemo(() => recommendProjects(land, goals), [land, goals]);
   const plans = compareIds.map(id => {
-    const specs = getSpecs(id, land);
+    const specs = getSpecs(id, land, BUDGET_MAX_THB[goals?.budget]);
     return { id, rec: results.find(r => r.id === id), specs, summary: friendlySummary(id, specs, land) };
   }).filter(p => p.rec);
 

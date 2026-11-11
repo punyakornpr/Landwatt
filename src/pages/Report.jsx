@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { navigate } from '../router';
 import { useApp } from '../state/AppState';
-import { recommendProjects, PROJECT_FRIENDLY } from '../engine/recommend';
+import { recommendProjects, PROJECT_FRIENDLY, BUDGET_MAX_THB } from '../engine/recommend';
 import { getSpecs, friendlySummary, realityChecklist } from '../engine/specs';
 import { EE_PROJECTS } from '../data/eeProjects';
 import { fmtTHB } from '../components/ui';
@@ -15,7 +15,7 @@ export default function Report({ projectId }) {
   const id = projectId || chosenPlanId || 'solar-farm';
   const project = EE_PROJECTS.find(p => p.id === id) || EE_PROJECTS[0];
   const meta = PROJECT_FRIENDLY[id];
-  const specs = useMemo(() => getSpecs(id, land), [id, land]);
+  const specs = useMemo(() => getSpecs(id, land, BUDGET_MAX_THB[goals?.budget]), [id, land, goals]);
   const summary = useMemo(() => friendlySummary(id, specs, land), [id, specs, land]);
   const rec = useMemo(() => recommendProjects(land, goals).find(r => r.id === id), [land, goals, id]);
   const checklist = realityChecklist(id);

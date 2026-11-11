@@ -197,6 +197,32 @@ for (const pid of ['solar-farm', 'agrivoltaics', 'floating-solar', 'ev-charging-
   assert.ok(sp.cashFlowModel, `getSpecs(${pid}): มี cashFlowModel`);
 }
 
+// ===== budget-fit: getSpecs(id, land, maxTHB) ต้อง resize ให้อยู่ในงบ =====
+const fitSolar = getSpecs('solar-farm', L1, 500000);
+assert.ok(fitSolar.budgetFit?.resized, 'งบ 500k: solar ต้องถูก resize');
+assert.ok(parseFloat(fitSolar.financials.totalCapexMillionTHB) * 1e6 <= 500000,
+  `solar resized CAPEX ≤ 500k (ได้ ${fitSolar.financials.totalCapexMillionTHB}M)`);
+assert.ok(parseFloat(fitSolar.financials.totalCapexMillionTHB) > 0, 'resized solar CAPEX ต้องไม่เป็น 0 (≥1 string)');
+assert.ok(fitSolar.cashFlows?.length === 26, 'resized solar ยังมี cashFlows ครบ 26 จุด');
+const fitBess = getSpecs('grid-bess', L1, 500000);
+assert.ok(fitBess.budgetFit?.resized && fitBess.budgetFit.stillOverBudget, 'BESS min size ยังเกินงบ 500k ต้อง flag stillOverBudget');
+const noFit = getSpecs('solar-farm', L1, 20000000);
+assert.ok(!noFit.budgetFit, 'งบพอ → ไม่ resize');
+
+// ===== budget tiers: ทุก option ต้องมี max ครอบ และ tier เล็กต้อง flag over-budget ตามจริง =====
+const { BUDGET_OPTIONS, BUDGET_MAX_THB } = await import('../src/engine/recommend.js');
+for (const b of BUDGET_OPTIONS) {
+  assert.ok(b.id in BUDGET_MAX_THB, `BUDGET_OPTIONS '${b.id}' ต้องมีใน BUDGET_MAX_THB`);
+}
+const s50k = getSpecs('solar-farm', L1, BUDGET_MAX_THB['under-50k']);
+assert.ok(s50k.budgetFit?.stillOverBudget, 'งบ <50k: solar min (1 string ~267k) ต้อง over-budget');
+const s150k = getSpecs('solar-farm', L1, BUDGET_MAX_THB['50-150k']);
+assert.ok(s150k.budgetFit?.stillOverBudget, 'งบ 50–150k: solar min ~267k ต้อง over-budget');
+const sLegacy = getSpecs('solar-farm', L1, BUDGET_MAX_THB['under-500k']);
+assert.ok(sLegacy.budgetFit?.resized && !sLegacy.budgetFit.stillOverBudget, 'legacy id under-500k ยัง resize ได้');
+const sBess2m = getSpecs('grid-bess', L1, BUDGET_MAX_THB['0.5-2m']);
+assert.ok(sBess2m.budgetFit?.stillOverBudget, 'งบ ≤2M: BESS min 39M ต้อง over-budget');
+
 // ===== TH_ADMIN (ชุดอำเภอสำหรับค้นหา/เลือกอำเภอ) =====
 const { TH_ADMIN } = await import('../src/data/districts.js');
 assert.equal(TH_ADMIN.length, 77, 'ครบ 77 จังหวัด');

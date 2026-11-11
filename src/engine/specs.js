@@ -8,8 +8,7 @@ import {
   calculateBiogasSpecs,
 } from '../utils/engineeringCalculations.js';
 
-export function getSpecs(projectId, land) {
-  const safeLand = { ...land, provinceData: land.provinceData || {} };
+function computeSpecs(projectId, safeLand) {
   switch (projectId) {
     case 'solar-farm': return calculateSolarFarmSpecs(safeLand);
     case 'agrivoltaics': return calculateAgrivoltaicsSpecs(safeLand);
@@ -19,6 +18,28 @@ export function getSpecs(projectId, land) {
     case 'biomass-biogas': return calculateBiogasSpecs(safeLand);
     default: return calculateSolarFarmSpecs(safeLand);
   }
+}
+
+export function getSpecs(projectId, land, budgetMaxTHB = null) {
+  const safeLand = { ...land, provinceData: land.provinceData || {} };
+  const specs = computeSpecs(projectId, safeLand);
+  if (!budgetMaxTHB || !isFinite(budgetMaxTHB)) return specs;
+  const capex = parseFloat(specs?.financials?.totalCapexMillionTHB) * 1e6;
+  if (!capex || capex <= budgetMaxTHB) return specs;
+  // All designs size from land area — shrink the working area until the build fits the budget.
+  // 0.92 margin absorbs discrete steps (whole strings/containers);
+  // 120 m² floor ≈ one full PV string — below that installed capacity drops to 0.
+  const resized = { ...safeLand, areaSqM: Math.max(120, safeLand.areaSqM * (budgetMaxTHB / capex) * 0.92) };
+  const specs2 = computeSpecs(projectId, resized);
+  if (!specs2?.financials) return specs;
+  specs2.budgetFit = {
+    resized: true,
+    usedAreaSqM: Math.round(resized.areaSqM),
+    usedAreaRai: (resized.areaSqM / 1600).toFixed(2),
+    originalCapexMillionTHB: (capex / 1e6).toFixed(2),
+    stillOverBudget: parseFloat(specs2.financials.totalCapexMillionTHB) * 1e6 > budgetMaxTHB,
+  };
+  return specs2;
 }
 
 const M = (v) => parseFloat(String(v).replace(/,/g, '')) || 0;
@@ -33,7 +54,8 @@ function capexRange(fin) {
 export function friendlySummary(projectId, specs, land) {
   const fin = specs.financials || {};
   const capex = capexRange(fin);
-  const areaRai = land.areaSqM / 1600;
+  const areaRai = (specs.budgetFit?.resized ? specs.budgetFit.usedAreaSqM : land.areaSqM) / 1600;
+  const plotShare = specs.budgetFit?.resized ? 'Part of the plot' : 'Most of the plot';
   const payback = fin.paybackYears && M(fin.paybackYears) > 0 && M(fin.paybackYears) < 60
     ? `${fin.paybackYears} yrs` : 'Cannot estimate yet';
 
@@ -42,11 +64,11 @@ export function friendlySummary(projectId, specs, land) {
     case 'solar-farm':
     case 'agrivoltaics':
     case 'floating-solar':
-      areaUsed = `Most of the plot (~${(areaRai * 0.78).toFixed(1)} rai usable)`;
+      areaUsed = `${plotShare} (~${(areaRai * 0.78).toFixed(1)} rai usable)`;
       benefit = `Generates about ${specs.annualEnergyMWh} MWh/yr — equal to ~${Math.round(M(specs.annualEnergyMWh) * 1000 / 3000).toLocaleString()} homes`;
       break;
     case 'ev-charging-hub':
-      areaUsed = `Most of the plot (chargers + parking + rest area)`;
+      areaUsed = `${plotShare} (chargers + parking + rest area)`;
       benefit = `Serves ~${specs.dailyCarsServiced} cars/day or sells ~${specs.annualEnergyDispensedMWh} MWh/yr`;
       break;
     case 'grid-bess':

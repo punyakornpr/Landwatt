@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { navigate } from '../router';
 import { useApp } from '../state/AppState';
-import { recommendProjects, PROJECT_FRIENDLY } from '../engine/recommend';
+import { recommendProjects, PROJECT_FRIENDLY, BUDGET_MAX_THB } from '../engine/recommend';
 import { getSpecs, friendlySummary, realityChecklist } from '../engine/specs';
 import { EE_PROJECTS } from '../data/eeProjects';
 import SiteLayoutCanvas from '../components/SiteLayoutCanvas';
@@ -25,7 +25,8 @@ export default function PlanDetail({ projectId }) {
   const [saved, setSaved] = useState(false);
   const [mode, setMode] = useState('general'); // default = general user view
 
-  const specs = useMemo(() => getSpecs(id, land), [id, land]);
+  const budgetMax = BUDGET_MAX_THB[goals?.budget];
+  const specs = useMemo(() => getSpecs(id, land, budgetMax), [id, land, budgetMax]);
   const summary = useMemo(() => friendlySummary(id, specs, land), [id, specs, land]);
   const rec = useMemo(() => recommendProjects(land, goals).find(r => r.id === id), [land, goals, id]);
   const checklist = realityChecklist(id);
@@ -135,6 +136,16 @@ export default function PlanDetail({ projectId }) {
           </div>
         ))}
       </div>
+
+      {specs.budgetFit?.resized && (
+        <div className="mb-8">
+          <Note type={specs.budgetFit.stillOverBudget ? 'warn' : 'info'}>
+            {specs.budgetFit.stillOverBudget
+              ? `Even the smallest buildable size (~${fmtTHB(specs.financials.totalCapexMillionTHB * 1e6)}) is above your budget — a larger budget or different option may be needed`
+              : `Sized to fit your budget — uses ~${specs.budgetFit.usedAreaRai} rai of your ${(land.areaSqM / 1600).toFixed(2)}-rai plot (full-plot build would cost ~฿${specs.budgetFit.originalCapexMillionTHB}M)`}
+          </Note>
+        </div>
+      )}
 
       <div className="space-y-8">
         {/* Layout */}

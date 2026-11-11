@@ -9,8 +9,9 @@ import { useT } from '../i18n';
 import SiteLayoutCanvas from '../components/SiteLayoutCanvas';
 import FinancialYieldChart from '../components/FinancialYieldChart';
 import EngineeringView from '../components/EngineeringView';
+import ProjectArt from '../components/ProjectArt';
 import {
-  StepProgress, StatusBadge, ProjectIcon, Note, Collapsible, fmtTHB, DisclaimerStrip,
+  StepProgress, StatusBadge, Note, Collapsible, fmtTHB, DisclaimerStrip,
 } from '../components/ui';
 import {
   ArrowLeft, Banknote, Ruler, Zap, Clock, GitCompareArrows,
@@ -139,8 +140,8 @@ export default function PlanDetail({ projectId }) {
       {/* Header */}
       <div className="card p-6 mb-6">
         <div className="flex flex-col sm:flex-row gap-4">
-          <ProjectIcon id={id} size="lg" active />
-          <div className="flex-1">
+          <ProjectArt id={id} className="w-full sm:w-56 aspect-[120/84] self-start sm:order-2" />
+          <div className="flex-1 sm:order-1">
             <div className="flex flex-wrap items-center gap-2">
               <h1 className="text-xl sm:text-2xl font-bold">{meta.name}</h1>
               {rec && <StatusBadge status={rec.status} />}

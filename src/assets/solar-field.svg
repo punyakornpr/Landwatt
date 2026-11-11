@@ -97,6 +97,15 @@
   </g>
 </g>
 
+<!-- birds -->
+<g stroke="#5a7ba6" stroke-width="3" fill="none" opacity="0.55" stroke-linecap="round">
+  <path d="M600 230 q10 -12 20 0 q10 -12 20 0"/>
+  <path d="M690 195 q8 -10 16 0 q8 -10 16 0"/>
+  <path d="M1160 500 q9 -11 18 0 q9 -11 18 0"/>
+  <path d="M300 480 q8 -10 16 0 q8 -10 16 0"/>
+  <path d="M760 560 q7 -9 14 0 q7 -9 14 0" opacity="0.7"/>
+</g>
+
 <!-- hills -->
 <path d="M0 980 Q 300 860 640 940 T 1600 900 L1600 1180 L0 1180 Z" fill="url(#hillA)"/>
 <path d="M0 1080 Q 400 980 820 1060 T 1600 1040 L1600 1300 L0 1300 Z" fill="url(#hillB)"/>
@@ -138,6 +147,15 @@
   </g>
 </g>
 
+<!-- power pylon on the left hill -->
+<g stroke="#8fa3bd" stroke-width="3" fill="none" opacity="0.65" stroke-linecap="round">
+  <path d="M138 1005 L150 880 L162 1005"/>
+  <line x1="132" y1="932" x2="168" y2="932"/>
+  <line x1="136" y1="962" x2="164" y2="962"/>
+  <path d="M168 932 Q 300 985 430 915" stroke-width="2" opacity="0.7"/>
+  <path d="M132 932 Q 60 975 0 950" stroke-width="2" opacity="0.7"/>
+</g>
+
 <!-- meadow -->
 <path d="M0 1180 Q 500 1120 900 1180 T 1600 1160 L1600 2400 L0 2400 Z" fill="url(#meadow)"/>
 
@@ -152,6 +170,43 @@
          C 720 1440, 660 1320, 690 1230
          C 700 1200, 640 1180, 560 1176
          Z" fill="#f0e6c8" opacity="0.95"/>
+
+<!-- trees -->
+<g>
+  <g transform="translate(330,1360)">
+    <rect x="-6" y="40" width="12" height="46" rx="4" fill="#8a6d5a"/>
+    <circle cx="0" cy="18" r="38" fill="#5fae74"/>
+    <circle cx="-26" cy="34" r="24" fill="#5fae74"/>
+    <circle cx="24" cy="34" r="26" fill="#5fae74"/>
+    <circle cx="-8" cy="2" r="20" fill="#6fbe85"/>
+  </g>
+  <g transform="translate(1540,1230) scale(0.8)">
+    <rect x="-6" y="40" width="12" height="46" rx="4" fill="#8a6d5a"/>
+    <circle cx="0" cy="18" r="38" fill="#5fae74"/>
+    <circle cx="-26" cy="34" r="24" fill="#5fae74"/>
+    <circle cx="24" cy="34" r="26" fill="#5fae74"/>
+    <circle cx="-8" cy="2" r="20" fill="#6fbe85"/>
+  </g>
+  <g transform="translate(90,1700) scale(0.65)">
+    <rect x="-6" y="40" width="12" height="46" rx="4" fill="#8a6d5a"/>
+    <circle cx="0" cy="18" r="38" fill="#5fae74"/>
+    <circle cx="-26" cy="34" r="24" fill="#5fae74"/>
+    <circle cx="24" cy="34" r="26" fill="#5fae74"/>
+    <circle cx="-8" cy="2" r="20" fill="#6fbe85"/>
+  </g>
+</g>
+
+<!-- little car on the path -->
+<g transform="translate(470,1450) rotate(-6)">
+  <rect x="0" y="14" width="86" height="26" rx="12" fill="#e26d5a"/>
+  <rect x="18" y="0" width="46" height="22" rx="10" fill="#e26d5a"/>
+  <rect x="24" y="4" width="15" height="14" rx="4" fill="#cfe4f5"/>
+  <rect x="44" y="4" width="15" height="14" rx="4" fill="#cfe4f5"/>
+  <circle cx="20" cy="40" r="9" fill="#3a4660"/>
+  <circle cx="66" cy="40" r="9" fill="#3a4660"/>
+  <circle cx="20" cy="40" r="4" fill="#9db8d8"/>
+  <circle cx="66" cy="40" r="4" fill="#9db8d8"/>
+</g>
 
 <!-- solar farm block on the meadow -->
 <g>
@@ -169,6 +224,14 @@
   <use href="#pvC" x="1515" y="1690"/>
 </g>
 
+<!-- inverter cabinet beside the array -->
+<g transform="translate(540,1740)">
+  <rect x="0" y="0" width="40" height="56" rx="5" fill="#c3ccd6" stroke="#8fa3bd" stroke-width="2.5"/>
+  <line x1="20" y1="6" x2="20" y2="50" stroke="#8fa3bd" stroke-width="2"/>
+  <circle cx="28" cy="28" r="3" fill="#8fa3bd"/>
+  <ellipse cx="20" cy="60" rx="30" ry="7" fill="#1c4d33" opacity="0.2"/>
+</g>
+
 <!-- bushes -->
 <g fill="#5fae74">
   <ellipse cx="500" cy="2060" rx="55" ry="40"/>
@@ -178,6 +241,41 @@
 <g fill="#4d9c63" opacity="0.8">
   <ellipse cx="530" cy="2090" rx="28" ry="20"/>
   <ellipse cx="1200" cy="2210" rx="34" ry="24"/>
+</g>
+
+<!-- wildflowers scattered on the meadow -->
+<g opacity="0.9">
+  <g fill="#f9e08e">
+    <circle cx="700" cy="2085" r="5"/><circle cx="712" cy="2092" r="4"/><circle cx="706" cy="2076" r="3.5"/>
+    <circle cx="980" cy="2185" r="5"/><circle cx="992" cy="2192" r="4"/>
+    <circle cx="540" cy="2320" r="5"/><circle cx="552" cy="2328" r="4"/><circle cx="534" cy="2332" r="3.5"/>
+    <circle cx="1240" cy="2130" r="4.5"/><circle cx="1252" cy="2138" r="3.5"/>
+  </g>
+  <g fill="#ffffff">
+    <circle cx="780" cy="2260" r="4.5"/><circle cx="792" cy="2268" r="3.5"/>
+    <circle cx="1120" cy="2280" r="4.5"/><circle cx="1132" cy="2288" r="3.5"/>
+    <circle cx="300" cy="2310" r="4"/><circle cx="312" cy="2318" r="3"/>
+    <circle cx="860" cy="2060" r="4"/><circle cx="872" cy="2068" r="3"/>
+  </g>
+  <g stroke="#4d9c63" stroke-width="2.5" stroke-linecap="round" opacity="0.7">
+    <line x1="706" y1="2090" x2="706" y2="2102"/><line x1="984" y1="2190" x2="984" y2="2202"/>
+    <line x1="544" y1="2326" x2="544" y2="2338"/><line x1="784" y1="2265" x2="784" y2="2277"/>
+    <line x1="1124" y1="2285" x2="1124" y2="2297"/><line x1="304" y1="2314" x2="304" y2="2326"/>
+  </g>
+</g>
+
+<!-- butterflies -->
+<g opacity="0.85">
+  <g transform="translate(760,2030)">
+    <ellipse cx="-6" cy="0" rx="7" ry="10" transform="rotate(-20)" fill="#f2a0c0"/>
+    <ellipse cx="6" cy="0" rx="7" ry="10" transform="rotate(20)" fill="#f2a0c0"/>
+    <line x1="0" y1="-8" x2="0" y2="8" stroke="#7a5e4d" stroke-width="2"/>
+  </g>
+  <g transform="translate(1020,2100) scale(0.8)">
+    <ellipse cx="-6" cy="0" rx="7" ry="10" transform="rotate(-20)" fill="#a0c8f2"/>
+    <ellipse cx="6" cy="0" rx="7" ry="10" transform="rotate(20)" fill="#a0c8f2"/>
+    <line x1="0" y1="-8" x2="0" y2="8" stroke="#7a5e4d" stroke-width="2"/>
+  </g>
 </g>
 
 <!-- cottage upper-left with people -->
@@ -191,6 +289,9 @@
   <rect x="86" y="128" width="40" height="102" rx="4" fill="#7a5e4d"/>
   <circle cx="118" cy="180" r="3.5" fill="#fdf6ea"/>
   <rect x="-6" y="228" width="222" height="9" fill="#eae0cc"/>
+  <!-- roof flag -->
+  <line x1="105" y1="-12" x2="105" y2="-36" stroke="#7a5e4d" stroke-width="4" stroke-linecap="round"/>
+  <polygon points="105,-36 138,-28 105,-18" fill="#e26d5a"/>
   <!-- people in front -->
   <g transform="translate(228,118)">
     <!-- adult 1 -->

@@ -136,6 +136,37 @@
   <ellipse cx="1200" cy="2210" rx="34" ry="24"/>
 </g>
 
+<!-- cottage bottom-left with people -->
+<g transform="translate(70,1960)">
+  <ellipse cx="140" cy="252" rx="170" ry="14" fill="#1c4d33" opacity="0.15"/>
+  <rect x="0" y="80" width="210" height="150" fill="#fdf6ea"/>
+  <polygon points="-18,82 105,-12 228,82" fill="#8a6d5a"/>
+  <polygon points="105,-12 228,82 212,82 105,4" fill="#7a5e4d"/>
+  <rect x="20" y="118" width="42" height="48" rx="4" fill="#a8c4e2"/>
+  <rect x="148" y="118" width="42" height="48" rx="4" fill="#a8c4e2"/>
+  <rect x="86" y="128" width="40" height="102" rx="4" fill="#7a5e4d"/>
+  <circle cx="118" cy="180" r="3.5" fill="#fdf6ea"/>
+  <rect x="-6" y="228" width="222" height="9" fill="#eae0cc"/>
+  <!-- people in front -->
+  <g transform="translate(228,118)">
+    <!-- adult 1 -->
+    <circle cx="0" cy="0" r="14" fill="#e8b58d"/>
+    <path d="M-16 16 Q0 8 16 16 L14 72 Q0 78 -14 72 Z" fill="#3b5fa8"/>
+    <line x1="-8" y1="72" x2="-8" y2="106" stroke="#3a4660" stroke-width="7" stroke-linecap="round"/>
+    <line x1="8" y1="72" x2="8" y2="106" stroke="#3a4660" stroke-width="7" stroke-linecap="round"/>
+    <!-- adult 2 -->
+    <circle cx="46" cy="4" r="13" fill="#e8b58d"/>
+    <path d="M32 20 Q46 12 60 20 L66 78 Q46 86 26 78 Z" fill="#d9854f"/>
+    <line x1="38" y1="78" x2="38" y2="108" stroke="#7a5e4d" stroke-width="6" stroke-linecap="round"/>
+    <line x1="54" y1="78" x2="54" y2="108" stroke="#7a5e4d" stroke-width="6" stroke-linecap="round"/>
+    <!-- child -->
+    <circle cx="84" cy="42" r="10" fill="#e8b58d"/>
+    <path d="M74 56 Q84 50 94 56 L92 90 Q84 94 76 90 Z" fill="#5fae74"/>
+    <line x1="79" y1="90" x2="79" y2="110" stroke="#3a4660" stroke-width="5" stroke-linecap="round"/>
+    <line x1="89" y1="90" x2="89" y2="110" stroke="#3a4660" stroke-width="5" stroke-linecap="round"/>
+  </g>
+</g>
+
 <!-- house bottom-right -->
 <g transform="translate(1280,2030)">
   <rect x="0" y="90" width="230" height="170" fill="#f7f1e6"/>

@@ -100,7 +100,7 @@ export default function SiteLayoutCanvas({ project, specs, landData }) {
     const innerH = plotH - (setbackPx * 2) - 20;
 
     // 3. Draw Equipment Layout based on Project
-    if (project.id === 'solar-farm' || project.id === 'agrivoltaics' || project.id === 'floating-solar' || project.id === 'small-solar') {
+    if (project.id === 'solar-farm' || project.id === 'agrivoltaics' || project.id === 'floating-solar' || project.id === 'small-solar' || project.id === 'solar-utility-kit') {
       const rowCount = 7;
       const rowHeight = 16;
       const rowSpacing = (innerH - 60) / rowCount;

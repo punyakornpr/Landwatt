@@ -2,6 +2,7 @@
 import {
   calculateSolarFarmSpecs,
   calculateSmallSolarSpecs,
+  calculateSolarKitSpecs,
   calculateAgrivoltaicsSpecs,
   calculateEVHubSpecs,
   calculateBESSFarmSpecs,
@@ -13,6 +14,7 @@ function computeSpecs(projectId, safeLand) {
   switch (projectId) {
     case 'solar-farm': return calculateSolarFarmSpecs(safeLand);
     case 'small-solar': return calculateSmallSolarSpecs(safeLand);
+    case 'solar-utility-kit': return calculateSolarKitSpecs(safeLand);
     case 'agrivoltaics': return calculateAgrivoltaicsSpecs(safeLand);
     case 'ev-charging-hub': return calculateEVHubSpecs(safeLand);
     case 'grid-bess': return calculateBESSFarmSpecs(safeLand);
@@ -26,26 +28,31 @@ export function getSpecs(projectId, land, budgetMaxTHB = null) {
   const safeLand = { ...land, provinceData: land.provinceData || {} };
   const specs = computeSpecs(projectId, safeLand);
   if (!budgetMaxTHB || !isFinite(budgetMaxTHB)) return specs;
-  const capex = parseFloat(specs?.financials?.totalCapexMillionTHB) * 1e6;
+  const rawCapex = (f) => f?.totalCapexTHB ?? parseFloat(f?.totalCapexMillionTHB) * 1e6;
+  const capex = rawCapex(specs?.financials);
   if (!capex || capex <= budgetMaxTHB) return specs;
   // All designs size from land area — shrink the working area until the build fits the budget.
-  // Iterate (≤8 passes): quantization and size caps make CAPEX non-proportional, so one
-  // linear guess can overshoot. 0.92 margin per pass; floor ≈ one smallest string
-  // per design — below it installed capacity drops to 0 (120 m²: 20×620W, 34 m²: 6×620W).
-  const minAreaSqM = projectId === 'small-solar' ? 34 : 120;
-  let areaSqM = safeLand.areaSqM, specs2 = specs, capex2 = capex;
-  for (let i = 0; i < 8 && capex2 > budgetMaxTHB; i++) {
-    areaSqM = Math.max(minAreaSqM, areaSqM * (budgetMaxTHB / capex2) * 0.92);
+  // Iterate (≤16 passes): quantization and size caps make CAPEX non-proportional, so one
+  // linear guess can overshoot. 0.92 margin per pass; floor ≈ the smallest area that
+  // still yields a nonzero build per design (agrivoltaics drops 30% of base strings,
+  // so it needs ≥2 base strings ≈ 220 m²).
+  const minAreaSqM = { 'small-solar': 34, 'agrivoltaics': 220, 'solar-utility-kit': 15 }[projectId] || 120;
+  let areaSqM = safeLand.areaSqM, specs2 = specs, capex2 = capex, prevCapex = Infinity;
+  for (let i = 0; i < 16 && capex2 > budgetMaxTHB; i++) {
+    // Stuck at a size cap → CAPEX flat → budget ratio shrinks too slowly; halve instead.
+    const ratio = capex2 === prevCapex ? 0.5 : (budgetMaxTHB / capex2) * 0.92;
+    prevCapex = capex2;
+    areaSqM = Math.max(minAreaSqM, areaSqM * ratio);
     specs2 = computeSpecs(projectId, { ...safeLand, areaSqM });
     if (!specs2?.financials) return specs;
-    capex2 = parseFloat(specs2.financials.totalCapexMillionTHB) * 1e6;
+    capex2 = rawCapex(specs2.financials);
   }
   specs2.budgetFit = {
     resized: true,
     usedAreaSqM: Math.round(areaSqM),
     usedAreaRai: (areaSqM / 1600).toFixed(2),
     originalCapexMillionTHB: (capex / 1e6).toFixed(2),
-    stillOverBudget: capex2 > budgetMaxTHB,
+    stillOverBudget: !(capex2 > 0) || capex2 > budgetMaxTHB,
   };
   return specs2;
 }
@@ -79,6 +86,10 @@ export function friendlySummary(projectId, specs, land) {
       areaUsed = `~${((specs.stringDesign?.installedPanelCount || 0) * 4 / 1600).toFixed(2)} rai (rooftop or a land corner)`;
       benefit = `Offsets your own power bill — generates ~${specs.annualEnergyMWh} MWh/yr`;
       break;
+    case 'solar-utility-kit':
+      areaUsed = `~${((specs.kitUnits || 1) * 12 / 1600).toFixed(2)} rai (a small frame or roof)`;
+      benefit = `Powers lights/fans/a small pump — ~${specs.dailyUsableKWh} kWh usable per day`;
+      break;
     case 'ev-charging-hub':
       areaUsed = `${plotShare} (chargers + parking + rest area)`;
       benefit = `Serves ~${specs.dailyCarsServiced} cars/day or sells ~${specs.annualEnergyDispensedMWh} MWh/yr`;
@@ -107,6 +118,7 @@ export function realityChecklist(projectId) {
   const per = {
     'solar-farm': ['Check zoning / land-use rules with the local authority', 'Apply for construction / land-grading permits under local law'],
     'small-solar': ['Check the roof/structure can bear panel weight and has no daytime shading', 'Ask the utility (PEA/MEA) about small-system connection rules and metering'],
+    'solar-utility-kit': ['List the loads it must run (lights, fans, pump) — that sets the kit size', 'Keep the battery shaded and ventilated; plan a replacement around year 10'],
     'ev-charging-hub': ['Survey real traffic and nearby competitors', 'Apply to install charging under utility standards'],
     'agrivoltaics': ['Trial shade-tolerant crops on a small patch first', 'Check rules for combining farmland with structures'],
     'grid-bess': ['Secure a service buyer / clear contract before investing', 'Verify battery safety standards with regulators'],

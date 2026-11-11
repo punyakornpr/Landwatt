@@ -26,8 +26,6 @@ export default function Results() {
 
   const results = useMemo(() => recommendProjects(land, goals), [land, goals]);
   const confidence = dataConfidence(land);
-  const top = results.slice(0, 3);
-  const rest = results.slice(3);
 
   const budgetMax = BUDGET_MAX_THB[goals?.budget];
   const specsCache = useMemo(() => {
@@ -35,6 +33,21 @@ export default function Results() {
     results.forEach(r => { try { m[r.id] = getSpecs(r.id, land, budgetMax); } catch { m[r.id] = null; } });
     return m;
   }, [results, land, budgetMax]);
+
+  // Re-rank + adjust score: a plan unbuildable even at its smallest size gets a
+  // score penalty — it may suit the land, but not the stated budget.
+  const ranked = useMemo(() => {
+    const over = id => !!specsCache[id]?.budgetFit?.stillOverBudget;
+    const order = { great: 0, worth: 1, insufficient: 2, no: 3 };
+    return results.map(r => {
+      const ob = over(r.id);
+      return { ...r, overBudget: ob,
+        score: ob ? Math.max(10, r.score - 45) : r.score,
+        status: ob && r.status === 'great' ? 'worth' : r.status };
+    }).sort((a, b) => order[a.status] - order[b.status] || a.overBudget - b.overBudget || b.score - a.score || a.id.localeCompare(b.id));
+  }, [results, specsCache]);
+  const top = ranked.slice(0, 3);
+  const rest = ranked.slice(3);
 
   if (analyzing) {
     return (
@@ -129,6 +142,7 @@ export default function Results() {
                         <li>Electrical readiness (sun / grid distance / utility zone)</li>
                         <li>Road access and usage demand</li>
                         <li>Fit with your goals and budget</li>
+                        {r.overBudget && <li className="text-volt-800 font-medium">Score reduced: even the smallest buildable size exceeds your stated budget</li>}
                       </ul>
                       <p>Scores adjust to what you enter and change when you edit</p>
                     </div>

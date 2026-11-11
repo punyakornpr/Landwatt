@@ -176,5 +176,30 @@ export const EE_PROJECTS = [
       'MCB + Type-B RCD and Class II surge protection on the LV board',
       'Aluminium rail mounting on roof or light ground frame — no piling needed'
     ]
+  },
+  {
+    id: 'solar-utility-kit',
+    title: 'Off-Grid Solar Utility Kit',
+    shortTitle: 'Solar Kit (off-grid)',
+    category: 'renewable',
+    icon: 'BatteryCharging',
+    accentColor: 'amber',
+    tagline: 'Panels + battery + inverter in one small kit — light and a pump where there is no power line',
+    suitableAreaMinRai: 0.01,
+    preferredZoning: ['green', 'yellow', 'light_green', 'rural'],
+    standards: ['EIT low-voltage wiring practices', 'Manufacturer install manuals (no utility notification needed — no grid tie)'],
+    description: 'A standalone power kit: 1–8 units of a 620W panel + 1.2 kWh LiFePO4 battery feeding an all-in-one off-grid inverter (1.5–3 kW). It runs lights, fans, phone charging and small DC/AC pumps without any utility connection — ideal for remote plots far from a power line or for the smallest budgets, and expandable unit-by-unit later',
+    keyBenefits: [
+      'Cheapest real entry — a single unit starts around 35,000 THB',
+      'No grid connection, no paperwork — works far from any power line',
+      'Modular: add panel+battery units one at a time as budget allows',
+      'Doubles as backup power during outages'
+    ],
+    technicalHighlights: [
+      '620W panels in standalone units (~12 m² each incl. frame)',
+      'LiFePO4 battery 1.2 kWh per unit — ~10-year cycle life',
+      'All-in-one off-grid inverter 1.5–3 kW with built-in MPPT charger',
+      'DC fuse, battery breaker and Class II surge protection'
+    ]
   }
 ];

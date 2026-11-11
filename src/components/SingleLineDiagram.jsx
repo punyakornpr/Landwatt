@@ -8,6 +8,7 @@ export default function SingleLineDiagram({ project, specs, landData }) {
   const isBESS = project.id === 'grid-bess';
   const isBiogas = project.id === 'biomass-biogas';
   const isSmallSolar = project.id === 'small-solar';
+  const isKit = project.id === 'solar-utility-kit';
   const isSolar = !isEV && !isBESS && !isBiogas;
 
   const gridVoltage = landData.provinceData?.grid === 'MEA' ? '24 kV' : '22 kV';
@@ -166,13 +167,13 @@ export default function SingleLineDiagram({ project, specs, landData }) {
               ⚡
             </div>
             <span className="text-[11px] font-mono font-bold">
-              {isSmallSolar ? 'MAIN DB' : 'TRANSFORMER'}
+              {isKit ? 'BATTERY' : isSmallSolar ? 'MAIN DB' : 'TRANSFORMER'}
             </span>
             <span className="text-[10px] mt-0.5 opacity-80">
-              {isSmallSolar ? 'Existing LV board' : `${specs.transformerKVA || 1000} kVA`}
+              {isKit ? `${specs.bessKWh || 1.2} kWh LiFePO4` : isSmallSolar ? 'Existing LV board' : `${specs.transformerKVA || 1000} kVA`}
             </span>
             <span className="text-[9px] mt-0.5 font-mono opacity-60">
-              {isSmallSolar ? '230/400V' : `0.4 / ${gridVoltage} Dyn11`}
+              {isKit ? 'Storage for night' : isSmallSolar ? '230/400V' : `0.4 / ${gridVoltage} Dyn11`}
             </span>
           </div>
 
@@ -195,13 +196,13 @@ export default function SingleLineDiagram({ project, specs, landData }) {
               50/51
             </div>
             <span className="text-[11px] font-mono font-bold">
-              {isSmallSolar ? 'MCB / RCD' : 'RMU & RELAYS'}
+              {isKit ? 'FUSE / SPD' : isSmallSolar ? 'MCB / RCD' : 'RMU & RELAYS'}
             </span>
             <span className="text-[10px] mt-0.5 opacity-80">
-              {isSmallSolar ? 'Type-B RCD + SPD II' : 'VCB 24kV 25kA'}
+              {isKit ? 'DC fuse + batt breaker' : isSmallSolar ? 'Type-B RCD + SPD II' : 'VCB 24kV 25kA'}
             </span>
             <span className="text-[9px] mt-0.5 font-mono opacity-60">
-              {isSmallSolar ? 'LV protection' : '50/51 | 51N | 27/59 | 81'}
+              {isKit || isSmallSolar ? 'LV protection' : '50/51 | 51N | 27/59 | 81'}
             </span>
           </div>
 
@@ -224,13 +225,13 @@ export default function SingleLineDiagram({ project, specs, landData }) {
               GRID
             </div>
             <span className="text-[11px] font-mono font-bold">
-              {gridName} PCC
+              {isKit ? 'LOADS' : `${gridName} PCC`}
             </span>
             <span className="text-[10px] mt-0.5 opacity-80">
-              Bi-directional meter
+              {isKit ? 'Lights / fans / pump' : 'Bi-directional meter'}
             </span>
             <span className="text-[9px] mt-0.5 font-mono opacity-60">
-              {isSmallSolar ? '230/400V' : `${gridVoltage} 3-Phase`}
+              {isKit || isSmallSolar ? '230/400V' : `${gridVoltage} 3-Phase`}
             </span>
           </div>
 

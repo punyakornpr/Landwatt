@@ -191,7 +191,7 @@ checkFinConsistency(fl, 'Floating@2072');
 
 // ===== ทุกประเภทต้องมี cashFlows ผ่าน getSpecs ด้วย =====
 const { getSpecs } = await import('../src/engine/specs.js');
-for (const pid of ['solar-farm', 'small-solar', 'agrivoltaics', 'floating-solar', 'ev-charging-hub', 'grid-bess', 'biomass-biogas']) {
+for (const pid of ['solar-farm', 'small-solar', 'solar-utility-kit', 'agrivoltaics', 'floating-solar', 'ev-charging-hub', 'grid-bess', 'biomass-biogas']) {
   const sp = getSpecs(pid, pid === 'ev-charging-hub' ? { areaSqM: 5000, roadWidthMeters: 8, provinceData: { ghi: GHI } } : L1);
   assert.ok(sp.cashFlows?.length === 26, `getSpecs(${pid}): cashFlows ครบ 26 จุด`);
   assert.ok(sp.cashFlowModel, `getSpecs(${pid}): มี cashFlowModel`);
@@ -235,6 +235,17 @@ const smFull = getSpecs('small-solar', L1);
 assert.ok(smFull.cashFlows?.length === 26 && smFull.cashFlowModel, 'small-solar: cashFlows ครบ + มี model');
 assert.ok(smFull.stringDesign.nsMin <= smFull.stringDesign.stringSize && smFull.stringDesign.stringSize <= smFull.stringDesign.nsMax,
   'small-solar string อยู่ในช่วงแรงดัน MPPT/Vmax');
+// solar-utility-kit: ตัวเดียวที่ fit งบ <50k ได้จริง (~36k ต่อชุด)
+const kit50 = getSpecs('solar-utility-kit', L1, BUDGET_MAX_THB['under-50k']);
+assert.ok(kit50.budgetFit?.resized && !kit50.budgetFit.stillOverBudget, 'solar-utility-kit ต้อง fit งบ <50k');
+assert.ok(parseFloat(kit50.financials.totalCapexMillionTHB) * 1e6 <= 50000 &&
+  parseFloat(kit50.financials.totalCapexMillionTHB) > 0, `kit CAPEX ≤ 50k (ได้ ${kit50.financials.totalCapexMillionTHB}M)`);
+assert.ok(kit50.kitUnits >= 1 && kit50.cashFlows.length === 26, 'kit: ≥1 unit + cashFlows ครบ');
+// agrivoltaics ต้องไม่ขึ้น ฿0 (stringCount×0.70 ต้องได้ ≥1 string เสมอที่ floor)
+for (const [pid, max] of [['agrivoltaics', 50000], ['agrivoltaics', 150000], ['agrivoltaics', 500000], ['solar-farm', 50000], ['floating-solar', 50000]]) {
+  const s = getSpecs(pid, { ...L1, landType: pid === 'floating-solar' ? 'pond' : 'agri', hasWaterBody: pid === 'floating-solar' }, max);
+  assert.ok(parseFloat(s.financials.totalCapexMillionTHB) > 0, `${pid} @${max}: CAPEX ต้องไม่เป็น 0`);
+}
 
 // ===== TH_ADMIN (ชุดอำเภอสำหรับค้นหา/เลือกอำเภอ) =====
 const { TH_ADMIN } = await import('../src/data/districts.js');

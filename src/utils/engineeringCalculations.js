@@ -113,6 +113,16 @@ export function evaluateLandFeasibility(landData) {
   if (roadWidthMeters >= 6) smallScore += 5;
   scores['small-solar'] = Math.min(Math.max(smallScore, 10), 90);
 
+  // 1c. Off-grid solar utility kit — standalone power, no grid tie needed
+  let kitScore = 50;
+  if (ghi >= 5.0) kitScore += 10;
+  else if (ghi >= 4.7) kitScore += 5;
+  if (gridDistanceMeters > 500) kitScore += 20; // far from the line — off-grid wins
+  else if (gridDistanceMeters > 200) kitScore += 5;
+  if (areaSqM < 15) kitScore -= 30;
+  if (landType === 'pond') kitScore -= 15;
+  scores['solar-utility-kit'] = Math.min(Math.max(kitScore, 10), 88);
+
   // 2. Agrivoltaics
   let agriScore = 60;
   if (areaRai >= 2 && areaRai <= 20) agriScore += 20;
@@ -290,6 +300,7 @@ export function calculateSolarFarmSpecs(landData) {
     mvCable: recommendedMvCable,
     protectionRelays: ['Overcurrent/Earth Fault (50/51/51N)', 'Under/Over Voltage (27/59)', 'Frequency Protection (81O/U)', 'Reverse Power (32R)', 'Differential Relay (87T)'],
     financials: {
+      totalCapexTHB: Math.round(totalCapex), // unrounded — display value above loses ≤5k at 2 decimals
       totalCapexMillionTHB: (totalCapex / 1000000).toFixed(2),
       annualRevenueMillionTHB: (annualRevenue / 1000000).toFixed(2),
       netAnnualCashflowMillionTHB: (netAnnualCashflow / 1000000).toFixed(2),
@@ -386,6 +397,7 @@ export function calculateSmallSolarSpecs(landData) {
     annualEnergyMWh: Math.round(annualEnergyMWh).toLocaleString(),
     protectionRelays: ['MCB + Type-B RCD on LV board', 'Surge protection Class II'],
     financials: {
+      totalCapexTHB: Math.round(totalCapex), // unrounded — display value above loses ≤5k at 2 decimals
       totalCapexMillionTHB: (totalCapex / 1000000).toFixed(2),
       annualRevenueMillionTHB: (annualSavings / 1000000).toFixed(2),
       netAnnualCashflowMillionTHB: (netAnnualCashflow / 1000000).toFixed(2),
@@ -397,6 +409,83 @@ export function calculateSmallSolarSpecs(landData) {
     cashFlowModel: 'CF_y = S_retail,1×(1−0.004)^(y−1) − OPEX — bill savings degrade 0.4%/yr with panel degradation (self-consumption, no FiT revenue)',
     esg: {
       co2TonsYear: Math.round(co2AvoidedTonsPerYear).toLocaleString(),
+      treesEquivalent: Math.round(co2AvoidedTonsPerYear * 60).toLocaleString()
+    }
+  };
+}
+
+// 1c. Off-grid Solar Utility Kit — standalone panel+battery+inverter for lights/fans/a small pump
+export function calculateSolarKitSpecs(landData) {
+  const { areaSqM = 1600, provinceData = {} } = landData;
+  const ghi = provinceData.ghi || 5.1;
+  const excludedAreaSqM = Math.max(0, landData.excludedAreaSqM || 0);
+  const usableArea = Math.max(0, areaSqM - excludedAreaSqM) * 0.78;
+
+  // Kit unit: 1× 620W panel + frame + 1.2 kWh LiFePO4 — needs ~12 m² per unit.
+  // Cap 8 units (~5 kWp / 9.6 kWh) — beyond that a grid-tied system is a better answer.
+  const kitUnits = Math.min(Math.max(1, Math.floor(usableArea / 12)), 8);
+  const pvKWp = kitUnits * 0.62;
+  const batteryKWh = kitUnits * 1.2;
+  const inverterKW = kitUnits <= 2 ? 1.5 : 3;
+
+  // Daily usable energy = min(PV harvest at 75% off-grid efficiency, battery 90% DoD)
+  const dailyPvKWh = pvKWp * ghi * 0.75;
+  const dailyUsableKWh = Math.min(dailyPvKWh, batteryKWh * 0.9);
+  // ~70% self-consumption — small kits rarely run at full load every day
+  const annualUsefulKWh = dailyUsableKWh * 365 * 0.7;
+
+  // CAPEX: per unit (panel+frame+battery 17.5k) + all-in-one inverter (~9k/kW) + BOS 5k
+  const totalCapex = kitUnits * 17500 + inverterKW * 9000 + 5000;
+
+  // Value = retail bill offset ~4.5 THB/kWh (worth more where it replaces a genset)
+  const retailTHBPerKWh = 4.5;
+  const annualSavings = annualUsefulKWh * retailTHBPerKWh;
+  const opexPerYear = totalCapex * 0.02;
+
+  // Cash flow: savings (0.4%/yr panel degradation) − opex − battery refresh ~y10 & y20
+  const battShare = (kitUnits * 10000) / totalCapex;
+  const cashFlows = [-totalCapex];
+  for (let y = 1; y <= 25; y++) {
+    const battReplace = (y === 10 || y === 20) ? totalCapex * battShare * 0.6 : 0;
+    cashFlows.push(annualSavings * Math.pow(0.996, y - 1) - opexPerYear - battReplace);
+  }
+  const cfFin = financeFromCashFlows(cashFlows);
+  const netAnnualCashflow = annualSavings - opexPerYear;
+  const co2AvoidedTonsPerYear = (annualUsefulKWh * 0.4999) / 1000;
+
+  return {
+    kitUnits,
+    offGrid: true,
+    dcCapacityKWp: parseFloat(pvKWp.toFixed(2)),
+    dcCapacityMWp: (pvKWp / 1000).toFixed(3),
+    acCapacityKW: inverterKW,
+    moduleCount: kitUnits,
+    inverterCount: 1,
+    inverterUnitKW: inverterKW,
+    inverterModel: `All-in-one off-grid inverter ${inverterKW} kW (MPPT built-in)`,
+    bessKWh: batteryKWh,
+    dailyUsableKWh: dailyUsableKWh.toFixed(1),
+    annualUsefulKWh: Math.round(annualUsefulKWh).toLocaleString(),
+    annualEnergyMWh: (annualUsefulKWh / 1000).toFixed(2),
+    excludedAreaSqM,
+    tariffStatus: 'scenario',
+    retailRateTHB: retailTHBPerKWh,
+    moduleType: 'N-Type TOPCon 620W (demo)',
+    protectionRelays: ['DC fuse + battery breaker', 'SPD Class II surge protection'],
+    cashFlows,
+    financials: {
+      totalCapexTHB: Math.round(totalCapex), // unrounded — display value above loses ≤5k at 2 decimals
+      totalCapexMillionTHB: (totalCapex / 1000000).toFixed(2),
+      annualRevenueMillionTHB: (annualSavings / 1000000).toFixed(2),
+      netAnnualCashflowMillionTHB: (netAnnualCashflow / 1000000).toFixed(2),
+      paybackYears: cfFin.paybackYears,
+      paybackInterpolated: cfFin.paybackInterpolated,
+      irrPercent: cfFin.irrPercent,
+      npv25YrMillionTHB: cfFin.npv25YrMillionTHB
+    },
+    cashFlowModel: 'CF_y = S_retail,1×0.996^(y−1) − OPEX − Batt(y10,y20) — off-grid savings (retail offset), LFP refresh ~60% of battery share at years 10/20',
+    esg: {
+      co2TonsYear: co2AvoidedTonsPerYear.toFixed(1),
       treesEquivalent: Math.round(co2AvoidedTonsPerYear * 60).toLocaleString()
     }
   };
@@ -468,6 +557,7 @@ export function calculateAgrivoltaicsSpecs(landData) {
       totalRevenueMillionTHB: (totalAnnualRevenue / 1000000).toFixed(2)
     },
     financials: {
+      totalCapexTHB: Math.round(totalCapex), // unrounded — display value above loses ≤5k at 2 decimals
       totalCapexMillionTHB: (totalCapex / 1000000).toFixed(2),
       annualRevenueMillionTHB: (totalAnnualRevenue / 1000000).toFixed(2),
       netAnnualCashflowMillionTHB: (netAnnualCashflow / 1000000).toFixed(2),
@@ -558,6 +648,7 @@ export function calculateEVHubSpecs(landData) {
     annualEnergyDispensedMWh: Math.round(annualKWhSold / 1000),
     utilizationRamp: UTIL_RAMP,
     financials: {
+      totalCapexTHB: Math.round(totalCapex), // unrounded — display value above loses ≤5k at 2 decimals
       totalCapexMillionTHB: (totalCapex / 1000000).toFixed(2),
       annualRevenueMillionTHB: (annualChargingRevenue / 1000000).toFixed(2),
       netAnnualCashflowMillionTHB: (netAnnualCashflow / 1000000).toFixed(2),
@@ -615,6 +706,7 @@ export function calculateBESSFarmSpecs(landData) {
     fireSuppression: 'Novec 1230 / Aerosol with 3-stage smoke and gas detection',
     pcsInverter: `Bi-directional PCS ${powerMW.toFixed(1)} MW (Eff > 98.9%)`,
     financials: {
+      totalCapexTHB: Math.round(totalCapex), // unrounded — display value above loses ≤5k at 2 decimals
       totalCapexMillionTHB: (totalCapex / 1000000).toFixed(2),
       annualRevenueMillionTHB: (annualRevenue / 1000000).toFixed(2),
       netAnnualCashflowMillionTHB: (netAnnualCashflow / 1000000).toFixed(2),
@@ -656,6 +748,7 @@ export function calculateFloatingSolarSpecs(landData) {
     pontoonType: 'HDPE Food-grade UV Stabilized (25-yr warranty)',
     waterSavedM3Year: waterSavedCubicMeters.toLocaleString(),
     financials: {
+      totalCapexTHB: Math.round(totalCapex), // unrounded — display value above loses ≤5k at 2 decimals
       totalCapexMillionTHB: (totalCapex / 1000000).toFixed(2),
       annualRevenueMillionTHB: (annualRevenue / 1000000).toFixed(2),
       netAnnualCashflowMillionTHB: (netAnnualCashflow / 1000000).toFixed(2),
@@ -705,6 +798,7 @@ export function calculateBiogasSpecs(landData) {
     annualEnergyMWh: annualEnergyMWh.toLocaleString(),
     capacityFactor: '85% (continuous 24h output as a baseload plant)',
     financials: {
+      totalCapexTHB: Math.round(totalCapex), // unrounded — display value above loses ≤5k at 2 decimals
       totalCapexMillionTHB: (totalCapex / 1000000).toFixed(2),
       annualRevenueMillionTHB: (annualRevenue / 1000000).toFixed(2),
       netAnnualCashflowMillionTHB: (netAnnualCashflow / 1000000).toFixed(2),

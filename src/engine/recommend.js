@@ -36,6 +36,12 @@ export const PROJECT_FRIENDLY = {
     icon: 'Sun',
     oneLiner: 'A few panels sized to a modest budget — cuts your own power bill, expandable later',
   },
+  'solar-utility-kit': {
+    name: 'Off-grid solar power kit',
+    sub: 'Solar Utility Kit',
+    icon: 'BatteryCharging',
+    oneLiner: 'Panels + battery for lights, fans or a small pump — works with no grid line, fits the smallest budget',
+  },
   'ev-charging-hub': {
     name: 'EV charging station',
     sub: 'EV Charging Station',
@@ -91,6 +97,13 @@ function reasonsFor(projectId, land) {
       if (areaRai < 0.5) reasons.push('Works on a small plot or rooftop where utility-scale options do not fit');
       cautions.push('Savings depend on how much power you actually use during daylight hours');
       cautions.push('Ask the utility (PEA/MEA) about rules for connecting a small system to the meter');
+      break;
+    case 'solar-utility-kit':
+      reasons.push('Standalone kit — works with no grid connection at all');
+      if (land.gridDistanceMeters > 500) reasons.push(`The power line is ~${land.gridDistanceMeters} m away — off-grid avoids line-extension cost`);
+      reasons.push('Fits a very small budget — a single unit starts around 35,000 THB');
+      cautions.push('Powers lights, fans, phone charging or a small pump — not heavy loads like air-con');
+      cautions.push('The battery needs replacing roughly every 10 years — already counted in the estimate');
       break;
     case 'ev-charging-hub':
       if (land.roadType === 'main') reasons.push('Frontage on a main road with easy traffic access — ideal for a charging station');
@@ -163,6 +176,12 @@ function screening(projectId, land, goals) {
       if (areaRai < 0.03)
         return { status: 'no', blockReason: 'Too small even for a few panels' };
       return null;
+    case 'solar-utility-kit':
+      if (land.landType === 'pond')
+        return { status: 'insufficient', blockReason: 'Mostly water — the kit needs a frame or roof on dry land' };
+      if (land.areaSqM < 15)
+        return { status: 'no', blockReason: 'No space for even a single-panel kit' };
+      return null;
     case 'solar-farm':
       if (areaRai < 0.5)
         return { status: 'no', blockReason: 'Too small for a meaningful ground-mounted array' };
@@ -182,6 +201,7 @@ function goalBoost(projectId, aims) {
   const map = {
     'solar-farm': ['income', 'save', 'unsure'],
     'small-solar': ['save', 'backup', 'income', 'unsure'],
+    'solar-utility-kit': ['backup', 'save', 'unsure'],
     'ev-charging-hub': ['ev', 'income'],
     'agrivoltaics': ['farm', 'income'],
     'grid-bess': ['backup'],

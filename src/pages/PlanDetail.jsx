@@ -4,6 +4,7 @@ import { useApp } from '../state/AppState';
 import { recommendProjects, PROJECT_FRIENDLY, BUDGET_MAX_THB } from '../engine/recommend';
 import { getSpecs, friendlySummary, realityChecklist } from '../engine/specs';
 import { EE_PROJECTS } from '../data/eeProjects';
+import { PROVIDERS } from '../data/providers';
 import SiteLayoutCanvas from '../components/SiteLayoutCanvas';
 import FinancialYieldChart from '../components/FinancialYieldChart';
 import EngineeringView from '../components/EngineeringView';
@@ -13,7 +14,27 @@ import {
 import {
   ArrowLeft, Banknote, Ruler, Zap, Clock, GitCompareArrows,
   Save, FileText, CheckCircle2, AlertTriangle, Info, Wrench, ChevronRight,
+  ExternalLink, Phone,
 } from 'lucide-react';
+
+// Company logo: real favicon fetched from the company's own domain; falls back to an initial tile.
+function ProviderLogo({ name, website }) {
+  const [err, setErr] = useState(false);
+  // data file is trusted, but a bad entry shouldn't crash the page
+  const host = website ? (() => { try { return new URL(website).hostname; } catch { return null; } })() : null;
+  if (!host || err) {
+    return (
+      <div className="w-9 h-9 rounded-lg bg-brand-100 text-brand-700 flex items-center justify-center text-sm font-bold flex-shrink-0">
+        {name.charAt(0)}
+      </div>
+    );
+  }
+  return (
+    <img src={`https://www.google.com/s2/favicons?domain=${host}&sz=64`} alt={`${name} logo`}
+      onError={() => setErr(true)} loading="lazy"
+      className="w-9 h-9 rounded-lg object-contain bg-white border border-[#E8E8ED] p-1 flex-shrink-0" />
+  );
+}
 
 const JOURNEY_STEPS = ['Your land', 'Goals & budget', 'Suggested options', 'Review plan', 'Save/report'];
 
@@ -263,6 +284,46 @@ export default function PlanDetail({ projectId }) {
             </ul>
           </div>
         </section>
+
+        {/* Providers */}
+        {PROVIDERS[id]?.length > 0 && (
+          <section>
+            <h2 className="text-lg font-bold mb-1">Who could build this?</h2>
+            <p className="text-sm text-ink-soft mb-3">Example companies working in this field in Thailand — compare several before deciding</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {PROVIDERS[id].map(p => {
+                const Card = p.website ? 'a' : 'div';
+                return (
+                  <Card key={p.name} className={`card p-4 ${p.website ? 'hover:border-brand-400 hover:shadow-sm transition cursor-pointer no-underline text-inherit' : ''}`}
+                    {...(p.website ? { href: p.website, target: '_blank', rel: 'noopener noreferrer' } : {})}>
+                    <div className="flex items-start gap-3">
+                      <ProviderLogo name={p.name} website={p.website} />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="text-sm font-bold flex items-center gap-1.5">
+                            {p.name}
+                            {p.website && <ExternalLink className="w-3.5 h-3.5 text-ink-faint" />}
+                          </div>
+                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-paper border border-[#E8E8ED] text-ink-faint flex-shrink-0">{p.scale}</span>
+                        </div>
+                        <div className="text-xs text-ink-soft mt-1 leading-snug">{p.focus}</div>
+                        {p.contact && (
+                          <div className="text-[11px] text-brand-700 mt-1.5 flex items-center gap-1">
+                            <Phone className="w-3 h-3" /> {p.contact}
+                          </div>
+                        )}
+                        <div className="text-[11px] text-ink-faint mt-1.5 leading-snug">{p.note}</div>
+                      </div>
+                    </div>
+                  </Card>
+                );
+              })}
+            </div>
+            <div className="mt-3">
+              <Note>Reference list only — <strong>not an endorsement</strong>. Always compare 2–3 quotes and verify licenses, insurance and warranty terms before signing</Note>
+            </div>
+          </section>
+        )}
 
       </div>
       </>

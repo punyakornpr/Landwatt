@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { navigate } from '../router';
 import { useApp } from '../state/AppState';
 import { convertToSqMeters, convertSqMetersToThai } from '../utils/engineeringCalculations';
@@ -83,6 +83,8 @@ export default function Wizard() {
       : [...selectedKinds, id];
     updateLand(mergeKinds(next));
   };
+
+  useEffect(() => { window.scrollTo(0, 0); }, [step]);
 
   const finish = () => navigate('/results');
 

@@ -90,6 +90,8 @@ function RoutedApp() {
   const { path, param } = useRoute();
   const t = useT();
 
+  React.useEffect(() => { window.scrollTo(0, 0); }, [path]);
+
   let page;
   switch (path) {
     case '': page = <Landing />; break;

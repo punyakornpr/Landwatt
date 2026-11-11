@@ -51,7 +51,23 @@ export default function Wizard() {
   const finish = () => navigate('/results');
 
   return (
-    <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8">
+    <div className="relative">
+      <div aria-hidden="true" className="absolute inset-0 pointer-events-none">
+        <div className="absolute inset-0" style={{
+          background: `
+            radial-gradient(ellipse 70% 30% at 50% 0%, rgba(37,99,235,0.07), transparent),
+            radial-gradient(ellipse 40% 20% at 85% 10%, rgba(16,185,129,0.05), transparent),
+            linear-gradient(#F7F9FC, #FFFFFF 45%)
+          `,
+        }} />
+        <div className="absolute inset-x-0 top-0 h-[420px]" style={{
+          backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(100,116,139,0.14) 1px, transparent 0)',
+          backgroundSize: '26px 26px',
+          maskImage: 'linear-gradient(to bottom, black, transparent)',
+          WebkitMaskImage: 'linear-gradient(to bottom, black, transparent)',
+        }} />
+      </div>
+      <div className="relative max-w-3xl mx-auto px-4 sm:px-6 py-8">
       <div className="mb-8">
         <StepProgress steps={JOURNEY_STEPS.map(t)} current={step} />
       </div>
@@ -313,6 +329,7 @@ export default function Wizard() {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }

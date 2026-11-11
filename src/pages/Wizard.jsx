@@ -4,6 +4,7 @@ import { useApp } from '../state/AppState';
 import { convertToSqMeters, convertSqMetersToThai } from '../utils/engineeringCalculations';
 import { GOAL_OPTIONS, BUDGET_OPTIONS } from '../engine/recommend';
 import GoogleMapPicker from '../components/GoogleMapPicker';
+import heroBg from '../assets/hero-landscape.svg';
 import { StepProgress, OptionCard, Collapsible, Note, ICONS } from '../components/ui';
 import { useT } from '../i18n';
 import {
@@ -51,7 +52,12 @@ export default function Wizard() {
   const finish = () => navigate('/results');
 
   return (
-    <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8">
+    <div className="relative">
+      <div aria-hidden="true" className="absolute inset-x-0 top-0 h-[340px] pointer-events-none overflow-hidden">
+        <div className="absolute inset-0 bg-cover bg-bottom" style={{ backgroundImage: `url(${heroBg})` }} />
+        <div className="absolute inset-0 bg-gradient-to-b from-white/75 via-white/40 to-white" />
+      </div>
+      <div className="relative max-w-3xl mx-auto px-4 sm:px-6 py-8">
       <div className="mb-8">
         <StepProgress steps={JOURNEY_STEPS.map(t)} current={step} />
       </div>
@@ -313,6 +319,7 @@ export default function Wizard() {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }

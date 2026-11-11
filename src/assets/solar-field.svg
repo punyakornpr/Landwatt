@@ -21,6 +21,44 @@
     <stop offset="0" stop-color="#9ed6a4"/>
     <stop offset="1" stop-color="#7cc489"/>
   </linearGradient>
+  <linearGradient id="pcell" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#3b5fa8"/>
+    <stop offset="1" stop-color="#1a3572"/>
+  </linearGradient>
+
+  <!-- panel table: small (far) -->
+  <g id="pvA">
+    <polygon points="10,0 180,0 170,78 0,78" fill="url(#pcell)" stroke="#12285e" stroke-width="2"/>
+    <line x1="10" y1="0" x2="180" y2="0" stroke="#c7dcf7" stroke-width="2"/>
+    <line x1="67" y1="0" x2="57" y2="78" stroke="#8ba8dd" stroke-width="1.5" opacity="0.75"/>
+    <line x1="123" y1="0" x2="114" y2="78" stroke="#8ba8dd" stroke-width="1.5" opacity="0.75"/>
+    <line x1="5" y1="39" x2="175" y2="39" stroke="#8ba8dd" stroke-width="1.5" opacity="0.75"/>
+    <line x1="55" y1="78" x2="55" y2="92" stroke="#5b6b85" stroke-width="4"/>
+    <line x1="125" y1="78" x2="125" y2="92" stroke="#5b6b85" stroke-width="4"/>
+    <ellipse cx="90" cy="97" rx="85" ry="7" fill="#1c4d33" opacity="0.22"/>
+  </g>
+  <!-- panel table: medium -->
+  <g id="pvB">
+    <polygon points="13,0 218,0 205,115 0,115" fill="url(#pcell)" stroke="#12285e" stroke-width="2.5"/>
+    <line x1="13" y1="0" x2="218" y2="0" stroke="#c7dcf7" stroke-width="2.5"/>
+    <line x1="82" y1="0" x2="68" y2="115" stroke="#8ba8dd" stroke-width="2" opacity="0.75"/>
+    <line x1="150" y1="0" x2="137" y2="115" stroke="#8ba8dd" stroke-width="2" opacity="0.75"/>
+    <line x1="6" y1="57" x2="211" y2="57" stroke="#8ba8dd" stroke-width="2" opacity="0.75"/>
+    <line x1="65" y1="115" x2="65" y2="138" stroke="#5b6b85" stroke-width="5"/>
+    <line x1="150" y1="115" x2="150" y2="138" stroke="#5b6b85" stroke-width="5"/>
+    <ellipse cx="107" cy="143" rx="105" ry="9" fill="#1c4d33" opacity="0.22"/>
+  </g>
+  <!-- panel table: large (near) -->
+  <g id="pvC">
+    <polygon points="17,0 262,0 245,155 0,155" fill="url(#pcell)" stroke="#12285e" stroke-width="3"/>
+    <line x1="17" y1="0" x2="262" y2="0" stroke="#c7dcf7" stroke-width="3"/>
+    <line x1="99" y1="0" x2="82" y2="155" stroke="#8ba8dd" stroke-width="2.5" opacity="0.75"/>
+    <line x1="180" y1="0" x2="163" y2="155" stroke="#8ba8dd" stroke-width="2.5" opacity="0.75"/>
+    <line x1="8" y1="77" x2="253" y2="77" stroke="#8ba8dd" stroke-width="2.5" opacity="0.75"/>
+    <line x1="78" y1="155" x2="78" y2="188" stroke="#5b6b85" stroke-width="6"/>
+    <line x1="180" y1="155" x2="180" y2="188" stroke="#5b6b85" stroke-width="6"/>
+    <ellipse cx="129" cy="195" rx="130" ry="11" fill="#1c4d33" opacity="0.22"/>
+  </g>
 </defs>
 
 <!-- sky -->
@@ -71,46 +109,31 @@
          C 700 1200, 640 1180, 560 1176
          Z" fill="#f0e6c8" opacity="0.95"/>
 
-<!-- small ground-mount solar panels at edges -->
+<!-- solar farm block on the meadow -->
 <g>
-  <!-- left mid -->
-  <g transform="translate(60,1420) rotate(-16)">
-    <rect x="-10" y="70" width="20" height="90" fill="#8a97a8"/>
-    <rect x="0" y="0" width="150" height="95" rx="4" fill="#22356b" stroke="#15204a" stroke-width="4"/>
-    <line x1="50" y1="0" x2="50" y2="95" stroke="#6f89c9" stroke-width="3"/>
-    <line x1="100" y1="0" x2="100" y2="95" stroke="#6f89c9" stroke-width="3"/>
-    <line x1="0" y1="47" x2="150" y2="47" stroke="#6f89c9" stroke-width="3"/>
-    <line x1="0" y1="6" x2="150" y2="6" stroke="#c7dcf7" stroke-width="3"/>
-  </g>
-  <!-- left lower -->
-  <g transform="translate(20,1900) rotate(-16) scale(1.25)">
-    <rect x="-10" y="70" width="20" height="100" fill="#8a97a8"/>
-    <rect x="0" y="0" width="150" height="95" rx="4" fill="#22356b" stroke="#15204a" stroke-width="4"/>
-    <line x1="50" y1="0" x2="50" y2="95" stroke="#6f89c9" stroke-width="3"/>
-    <line x1="100" y1="0" x2="100" y2="95" stroke="#6f89c9" stroke-width="3"/>
-    <line x1="0" y1="47" x2="150" y2="47" stroke="#6f89c9" stroke-width="3"/>
-    <line x1="0" y1="6" x2="150" y2="6" stroke="#c7dcf7" stroke-width="3"/>
-  </g>
-  <!-- right lower, near house -->
-  <g transform="translate(1150,1750) rotate(-14) scale(0.9)">
-    <rect x="-10" y="70" width="20" height="90" fill="#8a97a8"/>
-    <rect x="0" y="0" width="150" height="95" rx="4" fill="#22356b" stroke="#15204a" stroke-width="4"/>
-    <line x1="50" y1="0" x2="50" y2="95" stroke="#6f89c9" stroke-width="3"/>
-    <line x1="100" y1="0" x2="100" y2="95" stroke="#6f89c9" stroke-width="3"/>
-    <line x1="0" y1="47" x2="150" y2="47" stroke="#6f89c9" stroke-width="3"/>
-    <line x1="0" y1="6" x2="150" y2="6" stroke="#c7dcf7" stroke-width="3"/>
-  </g>
+  <use href="#pvA" x="720" y="1340"/>
+  <use href="#pvA" x="930" y="1340"/>
+  <use href="#pvA" x="1140" y="1340"/>
+  <use href="#pvA" x="1350" y="1340"/>
+  <use href="#pvB" x="660" y="1490"/>
+  <use href="#pvB" x="905" y="1490"/>
+  <use href="#pvB" x="1150" y="1490"/>
+  <use href="#pvB" x="1395" y="1490"/>
+  <use href="#pvC" x="600" y="1690"/>
+  <use href="#pvC" x="905" y="1690"/>
+  <use href="#pvC" x="1210" y="1690"/>
+  <use href="#pvC" x="1515" y="1690"/>
 </g>
 
 <!-- bushes -->
 <g fill="#5fae74">
-  <ellipse cx="980" cy="2060" rx="55" ry="40"/>
-  <ellipse cx="1050" cy="2080" rx="40" ry="30"/>
-  <ellipse cx="1480" cy="2280" rx="60" ry="42"/>
+  <ellipse cx="500" cy="2060" rx="55" ry="40"/>
+  <ellipse cx="560" cy="2085" rx="38" ry="28"/>
+  <ellipse cx="1180" cy="2180" rx="60" ry="42"/>
 </g>
 <g fill="#4d9c63" opacity="0.8">
-  <ellipse cx="1010" cy="2090" rx="30" ry="22"/>
-  <ellipse cx="1500" cy="2310" rx="35" ry="24"/>
+  <ellipse cx="530" cy="2090" rx="28" ry="20"/>
+  <ellipse cx="1200" cy="2210" rx="34" ry="24"/>
 </g>
 
 <!-- house bottom-right -->

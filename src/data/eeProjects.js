@@ -151,5 +151,30 @@ export const EE_PROJECTS = [
       'Automated gas-leak detection, flame arrester and safety flare',
       'Step-up transformer 400V / 22kV with MV VCB switchgear'
     ]
+  },
+  {
+    id: 'small-solar',
+    title: 'Small-Scale Solar (Self-Consumption)',
+    shortTitle: 'Small Solar',
+    category: 'renewable',
+    icon: 'Sun',
+    accentColor: 'amber',
+    tagline: 'A few panels on a roof or a corner of the land — sized to a modest budget',
+    suitableAreaMinRai: 0.05,
+    preferredZoning: ['green', 'yellow', 'purple', 'light_green'],
+    standards: ['PEA/MEA small-producer notification rules', 'EIT wiring standards (Wiring Code)'],
+    description: 'Install a small PV array (one to a few kilowatts) on a rooftop, shed or backyard frame to offset the household or on-site electricity bill directly at the retail tariff. The system connects at the low-voltage main distribution board — no medium-voltage interconnection needed — and can be expanded later as budget allows',
+    keyBenefits: [
+      'Entry-level investment — one small string starts around a hundred-thousand baht',
+      'Offsets the retail tariff (~4–5 THB/kWh) instead of selling at a lower FiT',
+      'Simple low-voltage connection to the existing meter/board',
+      'Modular — add more strings later when budget allows'
+    ],
+    technicalHighlights: [
+      'N-Type TOPCon 620W modules in short strings of 6 (≈3.7 kWp each)',
+      'Residential string inverter ~5 kW, MPPT 80–500V, 97%+ efficiency',
+      'MCB + Type-B RCD and Class II surge protection on the LV board',
+      'Aluminium rail mounting on roof or light ground frame — no piling needed'
+    ]
   }
 ];

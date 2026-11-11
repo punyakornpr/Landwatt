@@ -7,6 +7,7 @@ export default function SingleLineDiagram({ project, specs, landData }) {
   const isEV = project.id === 'ev-charging-hub';
   const isBESS = project.id === 'grid-bess';
   const isBiogas = project.id === 'biomass-biogas';
+  const isSmallSolar = project.id === 'small-solar';
   const isSolar = !isEV && !isBESS && !isBiogas;
 
   const gridVoltage = landData.provinceData?.grid === 'MEA' ? '24 kV' : '22 kV';
@@ -139,7 +140,7 @@ export default function SingleLineDiagram({ project, specs, landData }) {
               {isEV ? 'DLM UNIT' : 'INVERTER'}
             </span>
             <span className="text-[10px] mt-0.5 opacity-80">
-              {isEV ? 'Load Balancing' : `${specs.inverterCount || 1}x 300kW`}
+              {isEV ? 'Load Balancing' : `${specs.inverterCount || 1}x ${specs.inverterUnitKW || 300}kW`}
             </span>
             <span className="text-[9px] mt-0.5 font-mono opacity-60">
               Eff &gt; 98.8%
@@ -165,13 +166,13 @@ export default function SingleLineDiagram({ project, specs, landData }) {
               ⚡
             </div>
             <span className="text-[11px] font-mono font-bold">
-              TRANSFORMER
+              {isSmallSolar ? 'MAIN DB' : 'TRANSFORMER'}
             </span>
             <span className="text-[10px] mt-0.5 opacity-80">
-              {specs.transformerKVA || 1000} kVA
+              {isSmallSolar ? 'Existing LV board' : `${specs.transformerKVA || 1000} kVA`}
             </span>
             <span className="text-[9px] mt-0.5 font-mono opacity-60">
-              0.4 / {gridVoltage} Dyn11
+              {isSmallSolar ? '230/400V' : `0.4 / ${gridVoltage} Dyn11`}
             </span>
           </div>
 
@@ -194,13 +195,13 @@ export default function SingleLineDiagram({ project, specs, landData }) {
               50/51
             </div>
             <span className="text-[11px] font-mono font-bold">
-              RMU & RELAYS
+              {isSmallSolar ? 'MCB / RCD' : 'RMU & RELAYS'}
             </span>
             <span className="text-[10px] mt-0.5 opacity-80">
-              VCB 24kV 25kA
+              {isSmallSolar ? 'Type-B RCD + SPD II' : 'VCB 24kV 25kA'}
             </span>
             <span className="text-[9px] mt-0.5 font-mono opacity-60">
-              50/51 | 51N | 27/59 | 81
+              {isSmallSolar ? 'LV protection' : '50/51 | 51N | 27/59 | 81'}
             </span>
           </div>
 
@@ -229,7 +230,7 @@ export default function SingleLineDiagram({ project, specs, landData }) {
               Bi-directional meter
             </span>
             <span className="text-[9px] mt-0.5 font-mono opacity-60">
-              {gridVoltage} 3-Phase
+              {isSmallSolar ? '230/400V' : `${gridVoltage} 3-Phase`}
             </span>
           </div>
 

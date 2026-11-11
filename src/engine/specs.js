@@ -1,6 +1,7 @@
 // Dispatch engineering calculations per project type + summarize in plain language
 import {
   calculateSolarFarmSpecs,
+  calculateSmallSolarSpecs,
   calculateAgrivoltaicsSpecs,
   calculateEVHubSpecs,
   calculateBESSFarmSpecs,
@@ -11,6 +12,7 @@ import {
 function computeSpecs(projectId, safeLand) {
   switch (projectId) {
     case 'solar-farm': return calculateSolarFarmSpecs(safeLand);
+    case 'small-solar': return calculateSmallSolarSpecs(safeLand);
     case 'agrivoltaics': return calculateAgrivoltaicsSpecs(safeLand);
     case 'ev-charging-hub': return calculateEVHubSpecs(safeLand);
     case 'grid-bess': return calculateBESSFarmSpecs(safeLand);
@@ -27,17 +29,23 @@ export function getSpecs(projectId, land, budgetMaxTHB = null) {
   const capex = parseFloat(specs?.financials?.totalCapexMillionTHB) * 1e6;
   if (!capex || capex <= budgetMaxTHB) return specs;
   // All designs size from land area — shrink the working area until the build fits the budget.
-  // 0.92 margin absorbs discrete steps (whole strings/containers);
-  // 120 m² floor ≈ one full PV string — below that installed capacity drops to 0.
-  const resized = { ...safeLand, areaSqM: Math.max(120, safeLand.areaSqM * (budgetMaxTHB / capex) * 0.92) };
-  const specs2 = computeSpecs(projectId, resized);
-  if (!specs2?.financials) return specs;
+  // Iterate (≤8 passes): quantization and size caps make CAPEX non-proportional, so one
+  // linear guess can overshoot. 0.92 margin per pass; floor ≈ one smallest string
+  // per design — below it installed capacity drops to 0 (120 m²: 20×620W, 34 m²: 6×620W).
+  const minAreaSqM = projectId === 'small-solar' ? 34 : 120;
+  let areaSqM = safeLand.areaSqM, specs2 = specs, capex2 = capex;
+  for (let i = 0; i < 8 && capex2 > budgetMaxTHB; i++) {
+    areaSqM = Math.max(minAreaSqM, areaSqM * (budgetMaxTHB / capex2) * 0.92);
+    specs2 = computeSpecs(projectId, { ...safeLand, areaSqM });
+    if (!specs2?.financials) return specs;
+    capex2 = parseFloat(specs2.financials.totalCapexMillionTHB) * 1e6;
+  }
   specs2.budgetFit = {
     resized: true,
-    usedAreaSqM: Math.round(resized.areaSqM),
-    usedAreaRai: (resized.areaSqM / 1600).toFixed(2),
+    usedAreaSqM: Math.round(areaSqM),
+    usedAreaRai: (areaSqM / 1600).toFixed(2),
     originalCapexMillionTHB: (capex / 1e6).toFixed(2),
-    stillOverBudget: parseFloat(specs2.financials.totalCapexMillionTHB) * 1e6 > budgetMaxTHB,
+    stillOverBudget: capex2 > budgetMaxTHB,
   };
   return specs2;
 }
@@ -67,6 +75,10 @@ export function friendlySummary(projectId, specs, land) {
       areaUsed = `${plotShare} (~${(areaRai * 0.78).toFixed(1)} rai usable)`;
       benefit = `Generates about ${specs.annualEnergyMWh} MWh/yr — equal to ~${Math.round(M(specs.annualEnergyMWh) * 1000 / 3000).toLocaleString()} homes`;
       break;
+    case 'small-solar':
+      areaUsed = `~${((specs.stringDesign?.installedPanelCount || 0) * 4 / 1600).toFixed(2)} rai (rooftop or a land corner)`;
+      benefit = `Offsets your own power bill — generates ~${specs.annualEnergyMWh} MWh/yr`;
+      break;
     case 'ev-charging-hub':
       areaUsed = `${plotShare} (chargers + parking + rest area)`;
       benefit = `Serves ~${specs.dailyCarsServiced} cars/day or sells ~${specs.annualEnergyDispensedMWh} MWh/yr`;
@@ -94,6 +106,7 @@ export function realityChecklist(projectId) {
   ];
   const per = {
     'solar-farm': ['Check zoning / land-use rules with the local authority', 'Apply for construction / land-grading permits under local law'],
+    'small-solar': ['Check the roof/structure can bear panel weight and has no daytime shading', 'Ask the utility (PEA/MEA) about small-system connection rules and metering'],
     'ev-charging-hub': ['Survey real traffic and nearby competitors', 'Apply to install charging under utility standards'],
     'agrivoltaics': ['Trial shade-tolerant crops on a small patch first', 'Check rules for combining farmland with structures'],
     'grid-bess': ['Secure a service buyer / clear contract before investing', 'Verify battery safety standards with regulators'],

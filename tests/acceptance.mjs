@@ -191,7 +191,7 @@ checkFinConsistency(fl, 'Floating@2072');
 
 // ===== ทุกประเภทต้องมี cashFlows ผ่าน getSpecs ด้วย =====
 const { getSpecs } = await import('../src/engine/specs.js');
-for (const pid of ['solar-farm', 'agrivoltaics', 'floating-solar', 'ev-charging-hub', 'grid-bess', 'biomass-biogas']) {
+for (const pid of ['solar-farm', 'small-solar', 'agrivoltaics', 'floating-solar', 'ev-charging-hub', 'grid-bess', 'biomass-biogas']) {
   const sp = getSpecs(pid, pid === 'ev-charging-hub' ? { areaSqM: 5000, roadWidthMeters: 8, provinceData: { ghi: GHI } } : L1);
   assert.ok(sp.cashFlows?.length === 26, `getSpecs(${pid}): cashFlows ครบ 26 จุด`);
   assert.ok(sp.cashFlowModel, `getSpecs(${pid}): มี cashFlowModel`);
@@ -222,6 +222,19 @@ const sLegacy = getSpecs('solar-farm', L1, BUDGET_MAX_THB['under-500k']);
 assert.ok(sLegacy.budgetFit?.resized && !sLegacy.budgetFit.stillOverBudget, 'legacy id under-500k ยัง resize ได้');
 const sBess2m = getSpecs('grid-bess', L1, BUDGET_MAX_THB['0.5-2m']);
 assert.ok(sBess2m.budgetFit?.stillOverBudget, 'งบ ≤2M: BESS min 39M ต้อง over-budget');
+
+// ===== small-solar: โปรเจกต์งบน้อย ต้อง fit tier 50–150k และทำงานครบทุกชั้น =====
+const sm150 = getSpecs('small-solar', L1, BUDGET_MAX_THB['50-150k']);
+assert.ok(sm150.budgetFit?.resized && !sm150.budgetFit.stillOverBudget, 'small-solar ต้อง fit งบ 50–150k');
+assert.ok(parseFloat(sm150.financials.totalCapexMillionTHB) * 1e6 <= 150000 &&
+  parseFloat(sm150.financials.totalCapexMillionTHB) > 0, `small-solar CAPEX ≤ 150k (ได้ ${sm150.financials.totalCapexMillionTHB}M)`);
+assert.ok(sm150.stringDesign.installedPanelCount > 0, 'small-solar ต้องมีแผงติดตั้งจริง');
+const sm50 = getSpecs('small-solar', L1, BUDGET_MAX_THB['under-50k']);
+assert.ok(sm50.budgetFit?.stillOverBudget, 'งบ <50k: small-solar min ~149k ต้อง over-budget');
+const smFull = getSpecs('small-solar', L1);
+assert.ok(smFull.cashFlows?.length === 26 && smFull.cashFlowModel, 'small-solar: cashFlows ครบ + มี model');
+assert.ok(smFull.stringDesign.nsMin <= smFull.stringDesign.stringSize && smFull.stringDesign.stringSize <= smFull.stringDesign.nsMax,
+  'small-solar string อยู่ในช่วงแรงดัน MPPT/Vmax');
 
 // ===== TH_ADMIN (ชุดอำเภอสำหรับค้นหา/เลือกอำเภอ) =====
 const { TH_ADMIN } = await import('../src/data/districts.js');

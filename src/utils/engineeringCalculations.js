@@ -103,6 +103,16 @@ export function evaluateLandFeasibility(landData) {
   if (roadWidthMeters >= 6) solarScore += 5;
   scores['solar-farm'] = Math.min(Math.max(solarScore, 10), 98);
 
+  // 1b. Small Solar for own use (rooftop/backyard — modest budgets)
+  let smallScore = 55;
+  if (ghi >= 5.2) smallScore += 15;
+  else if (ghi >= 4.9) smallScore += 10;
+  if (areaSqM < 40) smallScore -= 30; // not even one small string
+  else if (areaRai < 0.5) smallScore += 10; // fits small plots the big options can't use
+  if (landType === 'pond') smallScore -= 20;
+  if (roadWidthMeters >= 6) smallScore += 5;
+  scores['small-solar'] = Math.min(Math.max(smallScore, 10), 90);
+
   // 2. Agrivoltaics
   let agriScore = 60;
   if (areaRai >= 2 && areaRai <= 20) agriScore += 20;
@@ -292,6 +302,102 @@ export function calculateSolarFarmSpecs(landData) {
     esg: {
       co2TonsYear: Math.round(co2AvoidedTonsPerYear).toLocaleString(),
       treesEquivalent: treeEquivalent.toLocaleString()
+    }
+  };
+}
+
+// 1b. Small Solar for own use — rooftop/backyard scale, self-consumption (not power sales)
+export function calculateSmallSolarSpecs(landData) {
+  const { areaSqM = 1600, provinceData = {} } = landData;
+  const ghi = provinceData.ghi || 5.1; // kWh/m2/day
+  const excludedAreaSqM = Math.max(0, landData.excludedAreaSqM || 0);
+  const usableArea = Math.max(0, areaSqM - excludedAreaSqM) * 0.78;
+
+  // Same demo module; small systems still get the 4.0 m²/panel layout density.
+  // Cap ~160 panels (≈100 kWp) — beyond that it is no longer a self-consumption system.
+  const areaPerModule = 4.0;
+  const moduleCount = Math.min(Math.floor(usableArea / areaPerModule), 160);
+  const moduleWatt = 620;
+
+  // Residential string inverter (demo catalog): Vdc,max 600V, MPPT 80–500V → 6-module strings
+  const PV = { voc: 45.2, vmp: 38.1, betaVoc: -0.0025, betaVmp: -0.0030 };
+  const INV = { vdcMax: 600, mpptMin: 80, mpptMax: 500 };
+  const T_MIN = 10, T_HIGH = 60;
+  const vocCold = PV.voc * (1 + PV.betaVoc * (T_MIN - 25));
+  const vmpHot = PV.vmp * (1 + PV.betaVmp * (T_HIGH - 25));
+  const nsMax = Math.floor(INV.vdcMax / vocCold);
+  const nsMin = Math.ceil(INV.mpptMin / vmpHot);
+  const stringSize = Math.min(nsMax, 6);
+  const stringValid = nsMin <= nsMax;
+  const stringCount = stringValid ? Math.floor(moduleCount / stringSize) : 0;
+  const installedPanelCount = stringCount * stringSize;
+  const leftoverPanels = moduleCount - installedPanelCount;
+
+  const dcCapacityKWp = (installedPanelCount * moduleWatt) / 1000;
+  const dcCapacityMWp = dcCapacityKWp / 1000;
+
+  // 5 kW residential string inverters, design DC/AC ~1.1
+  const inverterUnitKW = 5;
+  const inverterCount = Math.max(1, Math.round((dcCapacityKWp / 1.1) / inverterUnitKW));
+  const acCapacityKW = inverterCount * inverterUnitKW;
+  const actualDcAcRatio = acCapacityKW ? dcCapacityKWp / acCapacityKW : 0;
+
+  const pr = 0.80;
+  const annualEnergyMWh = (dcCapacityKWp * ghi * 365 * pr) / 1000;
+
+  // Techno-economics: offsets the retail bill (~4.5 THB/kWh), not FiT power sales.
+  // Small-install premium ~40,000 THB/kWp incl. inverter, mounting, wiring, VAT.
+  const retailTHBPerKWh = 4.5;
+  const capexPerKWp = 40000;
+  const totalCapex = dcCapacityKWp * capexPerKWp;
+  const annualSavings = annualEnergyMWh * 1000 * retailTHBPerKWh;
+  const opexPerYear = totalCapex * 0.015;
+
+  const DEG = 0.004;
+  const cashFlows = [-totalCapex];
+  for (let y = 1; y <= 25; y++) {
+    cashFlows.push(annualSavings * Math.pow(1 - DEG, y - 1) - opexPerYear);
+  }
+  const cfFin = financeFromCashFlows(cashFlows);
+  const netAnnualCashflow = annualSavings - opexPerYear;
+  const co2AvoidedTonsPerYear = (annualEnergyMWh * 1000 * 0.4999) / 1000;
+
+  return {
+    dcCapacityKWp: Math.round(dcCapacityKWp),
+    dcCapacityMWp: dcCapacityMWp.toFixed(3),
+    acCapacityKW,
+    areaCandidatePanelCount: moduleCount.toLocaleString(),
+    moduleCount: installedPanelCount.toLocaleString(),
+    stringDesign: {
+      stringSize, stringCount, installedPanelCount, leftoverPanels, stringValid,
+      nsMin, nsMax, vocCold: vocCold.toFixed(1), vmpHot: vmpHot.toFixed(1),
+      vdcMax: INV.vdcMax, mpptMin: INV.mpptMin, mpptMax: INV.mpptMax,
+      catalogStatus: 'demo', // demo-catalog equipment, not a real datasheet
+    },
+    excludedAreaSqM,
+    tariffStatus: 'scenario',
+    retailRateTHB: retailTHBPerKWh,
+    cashFlows,
+    moduleType: 'N-Type TOPCon Bifacial 620W (Half-cut cells)',
+    inverterCount,
+    inverterUnitKW,
+    inverterModel: 'Residential String Inverter 5kW 1-Phase (MPPT 80–500V, Eff 97.6%)',
+    actualDcAcRatio: actualDcAcRatio.toFixed(3),
+    annualEnergyMWh: Math.round(annualEnergyMWh).toLocaleString(),
+    protectionRelays: ['MCB + Type-B RCD on LV board', 'Surge protection Class II'],
+    financials: {
+      totalCapexMillionTHB: (totalCapex / 1000000).toFixed(2),
+      annualRevenueMillionTHB: (annualSavings / 1000000).toFixed(2),
+      netAnnualCashflowMillionTHB: (netAnnualCashflow / 1000000).toFixed(2),
+      paybackYears: cfFin.paybackYears,
+      paybackInterpolated: cfFin.paybackInterpolated,
+      irrPercent: cfFin.irrPercent,
+      npv25YrMillionTHB: cfFin.npv25YrMillionTHB
+    },
+    cashFlowModel: 'CF_y = S_retail,1×(1−0.004)^(y−1) − OPEX — bill savings degrade 0.4%/yr with panel degradation (self-consumption, no FiT revenue)',
+    esg: {
+      co2TonsYear: Math.round(co2AvoidedTonsPerYear).toLocaleString(),
+      treesEquivalent: Math.round(co2AvoidedTonsPerYear * 60).toLocaleString()
     }
   };
 }

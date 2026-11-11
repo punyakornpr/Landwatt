@@ -121,7 +121,7 @@ export default function EngineeringView({ id, specs, land, project, summary }) {
   // Always use raw values: real panel count × 620W — specs.dcCapacityKWp is already rounded
   const sd_ = specs.stringDesign;
   const dcKwp = sd_ ? (sd_.installedPanelCount * 620) / 1000 : (specs.dcCapacityKWp || parseFloat(specs.dcCapacityMWp || 0) * 1000);
-  const acKw = (specs.inverterCount || 0) * 300;
+  const acKw = (specs.inverterCount || 0) * (specs.inverterUnitKW || 300);
   const fin = specs.financials || {};
 
   return (
@@ -228,7 +228,7 @@ Hot: 38.1 × [1 + (−0.0030) × (60 − 25)] = ${sd.vmpHot} V/panel → ${sd.st
         <Section title="E. Inverters & DC/AC ratio (F-06, F-07)" sub="Real nameplate values after rounding unit counts">
           <Trace fid="F-06" status="calc" name="Total inverter rated capacity?"
             formula="P_AC,rated = N_inv × P_inv,rated"
-            sub={`${specs.inverterCount} × 300`}
+            sub={`${specs.inverterCount} × ${specs.inverterUnitKW || 300}`}
             result={`= ${acKw.toLocaleString()} kWac (${(acKw / 1000).toFixed(3)} MWac)`}
             note="Combined inverter nameplate — not demand or export limit" />
           <Trace fid="F-07" status="warn" name="Panel-to-inverter DC/AC ratio?"
@@ -374,7 +374,7 @@ Hot: 38.1 × [1 + (−0.0030) × (60 − 25)] = ${sd.vmpHot} V/panel → ${sd.st
           <KV k="P_AC (inverter nameplate)" v={specs.acCapacityMW ? `${specs.acCapacityMW} MWac` : specs.pcsInverter || '—'} src="calc" />
           <KV k="DC/AC ratio" v={specs.actualDcAcRatio || '—'} src="calc" />
           <KV k="Panels" v={specs.moduleCount ? `${specs.moduleCount} × 620W` : '—'} src="calc" />
-          <KV k="Inverters" v={specs.inverterCount ? `${specs.inverterCount} × 300kW` : specs.pcsInverter || '—'} src="demo" />
+          <KV k="Inverters" v={specs.inverterCount ? `${specs.inverterCount} × ${specs.inverterUnitKW || 300}kW` : specs.pcsInverter || '—'} src="demo" />
           <KV k="Transformer" v={specs.transformerRating || '—'} src="est" />
           <KV k="Generation/yr" v={specs.annualEnergyMWh ? `${specs.annualEnergyMWh} MWh` : '—'} src="calc" />
           <KV k="MV Cable" v={specs.mvCable || '—'} src="est" />

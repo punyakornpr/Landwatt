@@ -30,6 +30,12 @@ export const PROJECT_FRIENDLY = {
     icon: 'Sun',
     oneLiner: 'Ground-mounted panels to sell electricity or cut your power bills long-term',
   },
+  'small-solar': {
+    name: 'Small solar for own use',
+    sub: 'Rooftop / Backyard Solar',
+    icon: 'Sun',
+    oneLiner: 'A few panels sized to a modest budget — cuts your own power bill, expandable later',
+  },
   'ev-charging-hub': {
     name: 'EV charging station',
     sub: 'EV Charging Station',
@@ -78,6 +84,13 @@ function reasonsFor(projectId, land) {
       if (land.gridDistanceMeters > 500) cautions.push(`The grid connection is far (~${land.gridDistanceMeters} m) — line-extension costs may apply`);
       if (areaRai < 2) cautions.push('Small plot — system size will be limited; better for self-consumption than commercial power sales');
       cautions.push('Selling power to the utility requires an interconnection application and may face quota limits');
+      break;
+    case 'small-solar':
+      if (ghi >= 5.0) reasons.push(`Good sun here (avg irradiance ${ghi} kWh/m²/day) — even a few panels produce useful power`);
+      reasons.push('The system is sized to your budget — start small and expand later if it works');
+      if (areaRai < 0.5) reasons.push('Works on a small plot or rooftop where utility-scale options do not fit');
+      cautions.push('Savings depend on how much power you actually use during daylight hours');
+      cautions.push('Ask the utility (PEA/MEA) about rules for connecting a small system to the meter');
       break;
     case 'ev-charging-hub':
       if (land.roadType === 'main') reasons.push('Frontage on a main road with easy traffic access — ideal for a charging station');
@@ -144,6 +157,12 @@ function screening(projectId, land, goals) {
       if (land.gridDistanceMeters > 800)
         return { status: 'insufficient', blockReason: 'Very far from the grid — interconnection must be checked with the utility first' };
       return null;
+    case 'small-solar':
+      if (land.landType === 'pond')
+        return { status: 'insufficient', blockReason: 'Mostly water — panels would need a roof or a structure on dry land' };
+      if (areaRai < 0.03)
+        return { status: 'no', blockReason: 'Too small even for a few panels' };
+      return null;
     case 'solar-farm':
       if (areaRai < 0.5)
         return { status: 'no', blockReason: 'Too small for a meaningful ground-mounted array' };
@@ -162,6 +181,7 @@ function screening(projectId, land, goals) {
 function goalBoost(projectId, aims) {
   const map = {
     'solar-farm': ['income', 'save', 'unsure'],
+    'small-solar': ['save', 'backup', 'income', 'unsure'],
     'ev-charging-hub': ['ev', 'income'],
     'agrivoltaics': ['farm', 'income'],
     'grid-bess': ['backup'],

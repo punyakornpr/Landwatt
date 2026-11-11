@@ -119,7 +119,7 @@ export default function Results() {
           return (
             <div key={r.id} className={`card p-5 sm:p-6 ${idx === 0 ? 'border-brand-300 ring-2 ring-brand-200/70 shadow-lg shadow-brand-600/10' : ''}`}>
               <div className="flex flex-col sm:flex-row gap-4">
-                <ProjectArt id={r.id} className="w-full sm:w-56 aspect-[120/84] self-start sm:order-2" />
+                <ProjectArt id={r.id} className="w-full sm:w-72 aspect-[120/84] self-start sm:order-2" />
                 <div className="flex-1 min-w-0 sm:order-1">
                   <div className="flex flex-wrap items-center gap-2">
                     <h2 className="text-lg font-bold">{meta.name}</h2>

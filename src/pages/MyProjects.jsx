@@ -76,7 +76,7 @@ export default function MyProjects() {
                   </div>
                   <div className="min-w-0">
                     <div className="font-semibold truncate">{p.name}</div>
-                    <div className="text-xs text-ink-faint mt-0.5">
+                    <div className="text-sm text-ink-faint mt-0.5">
                       {p.land.provinceData?.nameEn || p.land.provinceData?.name || t('No province')} · {(p.land.areaSqM / 1600).toFixed(2)} {t('rai')}
                       {p.chosenPlanId && projectFriendly(p.chosenPlanId, lang) ? ` · ${projectFriendly(p.chosenPlanId, lang).name}` : ''}
                     </div>

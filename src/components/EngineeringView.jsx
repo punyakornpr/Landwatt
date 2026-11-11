@@ -54,8 +54,8 @@ function Trace({ fid, name, status, purpose, formula, vars, provenance, sub, ste
       </div>
       {purpose && <div className="text-[11px] text-ink-faint">Purpose: {purpose}</div>}
       {/* 2. general formula + 5. substitution + 7. answer (visible) */}
-      <div className="font-mono text-xs text-ink-soft bg-paper rounded-lg px-3 py-2">{formula}</div>
-      <div className="font-mono text-xs whitespace-pre-line">{sub}</div>
+      <div className="font-mono text-sm text-ink-soft bg-paper rounded-lg px-3 py-2">{formula}</div>
+      <div className="font-mono text-sm whitespace-pre-line">{sub}</div>
       <div className="font-mono text-sm font-bold text-brand-800">{result}</div>
       {/* cautions/limits visible even when collapsed */}
       {note && <div className="text-[11px] text-volt-800">{note}</div>}
@@ -87,7 +87,7 @@ function Trace({ fid, name, status, purpose, formula, vars, provenance, sub, ste
             {provenance && <div className="text-[11px] text-ink-faint">Source: {provenance}</div>}
             {/* 6. step-by-step calculation */}
             {steps?.length > 0 && (
-              <ol className="font-mono text-xs space-y-0.5 list-decimal list-inside">
+              <ol className="font-mono text-sm space-y-0.5 list-decimal list-inside">
                 {steps.map((s, i) => <li key={i}>{s}</li>)}
               </ol>
             )}
@@ -106,7 +106,7 @@ function Trace({ fid, name, status, purpose, formula, vars, provenance, sub, ste
 const Section = ({ title, sub, children }) => (
   <section className="card p-5">
     <h3 className="text-base font-bold">{title}</h3>
-    {sub && <p className="text-xs text-ink-faint mt-0.5 mb-3">{sub}</p>}
+    {sub && <p className="text-sm text-ink-faint mt-0.5 mb-3">{sub}</p>}
     <div className="mt-3 space-y-3">{children}</div>
   </section>
 );
@@ -133,7 +133,7 @@ export default function EngineeringView({ id, specs, land, project, summary }) {
 
       {/* A. Inputs & data quality */}
       <Section title="A. Inputs & data quality" sub="Every value is labelled by source — demo values are not measurements">
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-sm">
           <KV k="Total area" v={`${(land.areaSqM || 0).toLocaleString()} m² (${areaRai.toFixed(3)} rai)`} src="user" />
           <KV k="Excluded area (buildings/ponds)" v={`${(specs.excludedAreaSqM || 0).toLocaleString()} m²`} src="user" />
           <KV k="Average GHI" v={`${land.provinceData?.ghi || '5.1'} kWh/m²/day`} src="est" />
@@ -300,23 +300,23 @@ Hot: 38.1 × [1 + (−0.0030) × (60 − 25)] = ${sd.vmpHot} V/panel → ${sd.st
       {/* F. SLD */}
       <Section title="G. Equipment & system diagram (SLD)" sub="Drawn from the same values as the tables above — conceptual draft, not construction documents">
         <SingleLineDiagram project={project} specs={specs} landData={land} />
-        <p className="text-xs text-ink-faint">This single-line diagram is a preliminary concept — protection/metering/utility interface not yet verified</p>
+        <p className="text-sm text-ink-faint">This single-line diagram is a preliminary concept — protection/metering/utility interface not yet verified</p>
       </Section>
 
       {/* G. Financial engineering */}
       <Section title="H. Financial calculation" sub="Same cash-flow set as the chart and summary cards">
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
           <KV k="CAPEX" v={fin.totalCapexMillionTHB ? `${fin.totalCapexMillionTHB}M THB` : '—'} src="calc" />
           <KV k="Annual revenue" v={fin.annualRevenueMillionTHB ? `${fin.annualRevenueMillionTHB}M THB` : '—'} src="calc" />
           <KV k="Net cash/yr" v={fin.netAnnualCashflowMillionTHB ? `${fin.netAnnualCashflowMillionTHB}M THB` : (fin.netAnnualProfitMillionTHB ? `${fin.netAnnualProfitMillionTHB}M THB` : '—')} src="calc" />
           <KV k="CAPEX per MWp" v={specs.capexPerMWpMillionTHB ? `~${specs.capexPerMWpMillionTHB}M THB/MWp` : 'flat rate by type'} src="demo" />
         </div>
         {specs.dualIncome && (
-          <div className="text-xs rounded-lg bg-paper border border-[#E8E8ED] p-3">
+          <div className="text-sm rounded-lg bg-paper border border-[#E8E8ED] p-3">
             Split income — power {fmtTHB(specs.dualIncome.powerRevenueMillionTHB)}/yr (assumed FiT) + crops {fmtTHB(specs.dualIncome.agriRevenueMillionTHB)}/yr (estimate, crop unspecified, do not treat as confirmed)
           </div>
         )}
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-sm">
           <KV k="Payback (first year CCF ≥ 0)" v={fin.paybackYears ? `${fin.paybackYears} yrs` : '—'} src="calc" />
           <KV k="NPV 25 yrs @ 6%" v={fin.npv25YrMillionTHB ? `${fin.npv25YrMillionTHB}M THB` : '—'} src="calc" />
           <KV k="IRR" v={fin.irrPercent ? `${fin.irrPercent}%` : '—'} src="calc" />
@@ -324,7 +324,7 @@ Hot: 38.1 × [1 + (−0.0030) × (60 − 25)] = ${sd.vmpHot} V/panel → ${sd.st
         <FinancialYieldChart project={project} specs={specs} landData={land} />
         {(specs.cashFlows?.length > 1) && (
           <details className="rounded-lg border border-[#E8E8ED]">
-            <summary className="cursor-pointer text-xs font-semibold px-4 py-3">
+            <summary className="cursor-pointer text-sm font-semibold px-4 py-3">
               Cash-flow table yrs 0–{(specs.cashFlows.length - 1)} (Payback/NPV/IRR reproducible)
             </summary>
             <div className="px-4 pb-4 overflow-x-auto">
@@ -360,7 +360,7 @@ Hot: 38.1 × [1 + (−0.0030) × (60 − 25)] = ${sd.vmpHot} V/panel → ${sd.st
             </div>
           </details>
         )}
-        <p className="text-xs text-ink-faint">
+        <p className="text-sm text-ink-faint">
           [F-24] CF₀ = −CAPEX · {specs.cashFlowModel || 'CF_y = revenue − annual costs, per project-type model'} · [F-26] payback = first year CCF ≥ 0{fin.paybackInterpolated && fin.paybackInterpolated !== '—' ? ` (interpolated ≈ ${fin.paybackInterpolated} yrs)` : ''} ·
           [F-27] NPV at 6%, 25 yrs · [F-28] IRR via numerical root-finding — unlevered pre-tax, excludes tax/debt ·
           Revenue rates are scenarios, not confirmed entitlements
@@ -369,7 +369,7 @@ Hot: 38.1 × [1 + (−0.0030) × (60 − 25)] = ${sd.vmpHot} V/panel → ${sd.st
 
       {/* H. Spec grid */}
       <Section title="I. Combined spec table" sub="Same values everywhere — cross-check against other sections">
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs font-mono">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-sm font-mono">
           <KV k="P_DC (nameplate)" v={specs.dcCapacityKWp ? `${specs.dcCapacityKWp} kWp` : specs.dcCapacityMWp ? `${specs.dcCapacityMWp} MWp` : '—'} src="calc" />
           <KV k="P_AC (inverter nameplate)" v={specs.acCapacityMW ? `${specs.acCapacityMW} MWac` : specs.pcsInverter || '—'} src="calc" />
           <KV k="DC/AC ratio" v={specs.actualDcAcRatio || '—'} src="calc" />

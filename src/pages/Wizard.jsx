@@ -8,7 +8,7 @@ import { StepProgress, OptionCard, Collapsible, Note, ICONS } from '../component
 import { useT } from '../i18n';
 import {
   Ruler, Mountain, ArrowLeft, ArrowRight, Check,
-  Store, Waves, Trees, HelpCircle,
+  Store, Waves, Trees, HelpCircle, Building2,
 } from 'lucide-react';
 
 const JOURNEY_STEPS = ['Your land', 'Goals & budget', 'Suggested options', 'Review plan', 'Save/report'];
@@ -20,6 +20,8 @@ const LAND_KINDS = [
     patch: { landKind: 'agri', landType: 'agri', hasWaterBody: false, landTypeUnknown: false, hasAgriculturalWaste: true, zoningColor: 'green' } },
   { id: 'roadside', icon: Store, title: 'Roadside / commercial', titleTh: 'ติดถนน / เชิงพาณิชย์', sub: 'Easy vehicle access, wide frontage', subTh: 'รถเข้าออกง่าย หน้าแปลงกว้าง',
     patch: { landKind: 'roadside', landType: 'flat', hasWaterBody: false, landTypeUnknown: false, hasAgriculturalWaste: false, roadType: 'main', roadWidthMeters: 12, zoningColor: 'orange' } },
+  { id: 'urban', icon: Building2, title: 'In-town / village lot', titleTh: 'ในเมือง / ในหมู่บ้าน', sub: 'Surrounded by houses, on a soi', subTh: 'มีบ้านล้อมรอบ อยู่ในซอย',
+    patch: { landKind: 'urban', landType: 'flat', hasWaterBody: false, landTypeUnknown: false, hasAgriculturalWaste: false, hasStructures: true, roadType: 'secondary', roadWidthMeters: 6, zoningColor: 'yellow', gridDistanceMeters: 50, gridUnknown: false } },
   { id: 'pond', icon: Waves, title: 'Has a pond / water body', titleTh: 'มีบ่อ / แหล่งน้ำ', sub: 'Part of the plot is water', subTh: 'แปลงบางส่วนเป็นน้ำ',
     patch: { landKind: 'pond', landType: 'pond', hasWaterBody: true, landTypeUnknown: false, hasAgriculturalWaste: false } },
   { id: 'slope', icon: Mountain, title: 'Sloped land', titleTh: 'ที่ดินลาดเอียง', sub: 'Hills or uneven terrain', subTh: 'เนินเขาหรือพื้นไม่เรียบ',
@@ -39,10 +41,10 @@ export default function Wizard() {
   const canNext1 = land.areaSqM > 0;
   // landKind = last card the user picked (fallback: infer from old fields for old drafts)
   const kind = LAND_KINDS.find(k => k.id === land.landKind)
-    || (land.landTypeUnknown ? LAND_KINDS[5]
-    : (land.hasWaterBody || land.landType === 'pond') ? LAND_KINDS[3]
+    || (land.landTypeUnknown ? LAND_KINDS[6]
+    : (land.hasWaterBody || land.landType === 'pond') ? LAND_KINDS[4]
     : land.landType === 'agri' ? LAND_KINDS[1]
-    : land.landType === 'slope' ? LAND_KINDS[4]
+    : land.landType === 'slope' ? LAND_KINDS[5]
     : (land.roadType === 'main' && land.zoningColor === 'orange') ? LAND_KINDS[2]
     : LAND_KINDS[0]);
 

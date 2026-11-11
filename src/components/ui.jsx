@@ -122,7 +122,7 @@ export function Collapsible({ title, sub, children, defaultOpen = false }) {
       >
         <div>
           <div className="text-sm font-semibold">{title}</div>
-          {sub && <div className="text-xs text-ink-faint mt-0.5">{sub}</div>}
+          {sub && <div className="text-sm text-ink-faint mt-0.5">{sub}</div>}
         </div>
         <ChevronDown className={`w-5 h-5 text-ink-faint transition-transform ${open ? 'rotate-180' : ''}`} />
       </button>
@@ -151,7 +151,7 @@ export function OptionCard({ selected, onClick, icon: IconCmp, title, sub }) {
       )}
       <div className="min-w-0">
         <div className={`text-sm font-semibold ${selected ? 'text-brand-900' : 'text-ink'}`}>{title}</div>
-        {sub && <div className="text-xs text-ink-faint mt-0.5 leading-relaxed">{sub}</div>}
+        {sub && <div className="text-sm text-ink-faint mt-0.5 leading-relaxed">{sub}</div>}
       </div>
       <div className={`ml-auto mt-1 w-5 h-5 rounded-full border-2 flex-shrink-0 flex items-center justify-center ${
         selected ? 'border-brand-600 bg-brand-600' : 'border-[#D2D2D7]'
@@ -202,7 +202,7 @@ export function fmtTHB(millionTHB) {
 export function DisclaimerStrip() {
   const t = useT();
   return (
-    <div className="rounded-xl bg-[#F5F5F7] border border-[#E8E8ED] px-4 py-3 text-xs text-ink-soft leading-relaxed flex items-start gap-2">
+    <div className="rounded-xl bg-[#F5F5F7] border border-[#E8E8ED] px-4 py-3 text-sm text-ink-soft leading-relaxed flex items-start gap-2">
       <Info className="w-4 h-4 flex-shrink-0 mt-0.5 text-ink-faint" />
       <span>
         {t('All results are preliminary estimates from the data provided and system assumptions — not a guarantee of land rights, permits, or actual prices/income. Survey the site and confirm with the authorities before investing')}

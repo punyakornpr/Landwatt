@@ -149,7 +149,7 @@ export default function PlanDetail({ projectId }) {
               {t('This is the plan LandWatt suggests for your land —')} {meta.oneLiner}
             </p>
             {rec && (
-              <p className="text-xs text-ink-faint mt-1">
+              <p className="text-sm text-ink-faint mt-1">
                 {t('On {loc} {rai} rai · feasibility:')
                   .replace('{loc}', land.provinceData?.nameEn || land.provinceData?.name || t('the pinned land'))
                   .replace('{rai}', (land.areaSqM / 1600).toFixed(2))}{' '}
@@ -194,7 +194,7 @@ export default function PlanDetail({ projectId }) {
         {summaryCards.map((c, i) => (
           <div key={i} className="card p-4">
             <c.icon className="w-5 h-5 text-brand-600 mb-2" />
-            <div className="text-xs text-ink-faint">{c.label}</div>
+            <div className="text-sm text-ink-faint">{c.label}</div>
             <div className="text-sm font-bold mt-1 leading-snug">{c.value}</div>
             <div className="text-[11px] text-ink-faint mt-1">{c.sub}</div>
           </div>
@@ -235,7 +235,7 @@ export default function PlanDetail({ projectId }) {
                 </li>
               ))}
             </ul>
-            <p className="text-xs text-ink-faint mt-4">{t('Counts and sizes are computed from the area you gave — they change if the land size changes')}</p>
+            <p className="text-sm text-ink-faint mt-4">{t('Counts and sizes are computed from the area you gave — they change if the land size changes')}</p>
           </div>
         </section>
 
@@ -245,11 +245,11 @@ export default function PlanDetail({ projectId }) {
           <div className="card p-5 space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
               <div className="rounded-xl bg-paper border border-[#E8E8ED] p-4">
-                <div className="text-xs text-ink-faint">{t('Initial investment')}</div>
+                <div className="text-sm text-ink-faint">{t('Initial investment')}</div>
                 <div className="text-lg font-bold mt-0.5">{summary.capex ? fmtTHB(summary.capex.mid) : '—'}</div>
               </div>
               <div className="rounded-xl bg-paper border border-[#E8E8ED] p-4">
-                <div className="text-xs text-ink-faint">{t('Revenue/savings per year (approx.)')}</div>
+                <div className="text-sm text-ink-faint">{t('Revenue/savings per year (approx.)')}</div>
                 <div className="text-lg font-bold mt-0.5">
                   {specs.financials?.annualRevenueMillionTHB ? fmtTHB(specs.financials.annualRevenueMillionTHB) : t('Not estimable yet')}
                 </div>
@@ -264,7 +264,7 @@ export default function PlanDetail({ projectId }) {
                 )}
               </div>
               <div className="rounded-xl bg-paper border border-[#E8E8ED] p-4">
-                <div className="text-xs text-ink-faint">{t('Rough payback')}</div>
+                <div className="text-sm text-ink-faint">{t('Rough payback')}</div>
                 <div className="text-lg font-bold mt-0.5">{summary.payback}</div>
               </div>
             </div>
@@ -353,7 +353,7 @@ export default function PlanDetail({ projectId }) {
                           </div>
                           <span className="text-[10px] px-2 py-0.5 rounded-full bg-paper border border-[#E8E8ED] text-ink-faint flex-shrink-0">{t(p.scale)}</span>
                         </div>
-                        <div className="text-xs text-ink-soft mt-1 leading-snug">{p.focus}</div>
+                        <div className="text-sm text-ink-soft mt-1 leading-snug">{p.focus}</div>
                         {p.contact && (
                           <div className="text-[11px] text-brand-700 mt-1.5 flex items-center gap-1">
                             <Phone className="w-3 h-3" /> {p.contact}

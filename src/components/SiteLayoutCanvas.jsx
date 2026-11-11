@@ -615,7 +615,7 @@ export default function SiteLayoutCanvas({ project, specs, landData }) {
           <h3 className="text-base font-bold text-mute-900">
             Simulated 2D site layout & setback
           </h3>
-          <p className="text-xs text-mute-500 mt-0.5">
+          <p className="text-sm text-mute-500 mt-0.5">
             Panel orientation (15° tilt facing south), transformer station and legal setbacks
           </p>
         </div>
@@ -660,7 +660,7 @@ export default function SiteLayoutCanvas({ project, specs, landData }) {
       </div>
 
       {/* Legend & Layout Notes */}
-      <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-mute-500 px-1 pt-1">
+      <div className="flex flex-wrap items-center justify-between gap-3 text-sm text-mute-500 px-1 pt-1">
         <div className="flex items-center space-x-4">
           <span className="flex items-center space-x-1.5">
             <span className="w-3 h-3 bg-electric-700 rounded-sm" />

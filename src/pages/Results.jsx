@@ -56,14 +56,14 @@ export default function Results() {
       <div className="max-w-md mx-auto px-4 py-28 text-center">
         <div className="w-14 h-14 rounded-full border-4 border-brand-100 border-t-brand-600 animate-spin mx-auto" />
         <p className="mt-6 text-sm text-ink-soft font-medium">{msgs[analyzeMsg]}…</p>
-        <p className="mt-1 text-xs text-ink-faint">{t('Analyzing from your inputs — just a moment')}</p>
+        <p className="mt-1 text-sm text-ink-faint">{t('Analyzing from your inputs — just a moment')}</p>
       </div>
     );
   }
 
   const landKindLabel = lang === 'th'
-    ? ({ flat: 'ที่ดินราบ/โล่ง', agri: 'ที่ทำเกษตร', pond: 'มีบ่อน้ำ', slope: 'ที่ลาดเอียง' }[land.landType] || 'ไม่ระบุ')
-    : ({ flat: 'flat/open land', agri: 'farmland', pond: 'has a pond', slope: 'sloped land' }[land.landType] || 'unspecified');
+    ? ({ open: 'ที่ดินราบ/โล่ง', agri: 'ที่ทำเกษตร', roadside: 'ที่ติดถนน/เชิงพาณิชย์', urban: 'ที่ดินในเมือง/หมู่บ้าน', pond: 'มีบ่อน้ำ', slope: 'ที่ลาดเอียง', flat: 'ที่ดินราบ/โล่ง' }[land.landKind || land.landType] || 'ไม่ระบุ')
+    : ({ open: 'flat/open land', agri: 'farmland', roadside: 'roadside/commercial lot', urban: 'in-town/community lot', pond: 'has a pond', slope: 'sloped land', flat: 'flat/open land' }[land.landKind || land.landType] || 'unspecified');
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
@@ -82,19 +82,19 @@ export default function Results() {
               <div className="text-sm font-semibold">
                 {land.provinceData?.nameEn || land.provinceData?.name || t('Pinned location')} · {(land.areaSqM / 1600).toFixed(2)} {t('rai')}
               </div>
-              <div className="text-xs text-ink-faint mt-0.5">
+              <div className="text-sm text-ink-faint mt-0.5">
                 {landKindLabel}
                 {land.roadType === 'main' ? ` · ${t('main road')}` : land.roadType === 'dirt' ? ` · ${t('hard to reach')}` : ` · ${t('secondary road')}`}
                 {goals.budget && goals.budget !== 'unsure' ? ` · ${t('budget:')} ${(b => lang === 'th' ? b?.labelTh : b?.label)(BUDGET_OPTIONS.find(b => b.id === goals.budget)) || goals.budget}` : ''}
               </div>
             </div>
           </div>
-          <button onClick={() => navigate('/start')} className="btn-ghost text-xs self-start sm:self-auto">
+          <button onClick={() => navigate('/start')} className="btn-ghost text-sm self-start sm:self-auto">
             <Pencil className="w-3.5 h-3.5" /> {t('Edit info')}
           </button>
         </div>
         {confidence.missing.length > 0 && (
-          <div className="mt-3 flex items-start gap-2 text-xs text-volt-800 bg-volt-50 border border-volt-200 rounded-xl px-3.5 py-2.5">
+          <div className="mt-3 flex items-start gap-2 text-sm text-volt-800 bg-volt-50 border border-volt-200 rounded-xl px-3.5 py-2.5">
             <Info className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" />
             <span>{t('Data confidence:')} <strong>{t(confidence.level)}</strong> — {t('no data yet on {missing}, so results are rougher').replace('{missing}', confidence.missing.join(', '))}</span>
           </div>
@@ -122,13 +122,13 @@ export default function Results() {
                 <div className="flex-1 min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
                     <h2 className="text-lg font-bold">{meta.name}</h2>
-                    <span className="text-xs text-ink-faint font-normal">{meta.sub}</span>
+                    <span className="text-sm text-ink-faint font-normal">{meta.sub}</span>
                     {idx === 0 && (r.score > top[1]?.score || r.status !== top[1]?.status || !top[1]) && <span className="chip bg-brand-700 text-white">{t('Best fit right now')}</span>}
                   </div>
                   <p className="text-sm text-ink-soft mt-0.5">{meta.oneLiner}</p>
                   <div className="mt-2.5 flex flex-wrap items-center gap-2">
                     <StatusBadge status={r.status} />
-                    <span className="flex items-center gap-1.5 text-xs text-ink-faint">
+                    <span className="flex items-center gap-1.5 text-sm text-ink-faint">
                       {t('Suitability')}
                       <span className="w-16 h-1.5 rounded-full bg-brand-100 overflow-hidden">
                         <span className="score-bar" style={{ width: `${r.score}%` }} />
@@ -139,7 +139,7 @@ export default function Results() {
                   </div>
 
                   {whyOpen === r.id && (
-                    <div className="mt-3 rounded-xl bg-paper border border-[#E8E8ED] p-4 text-xs text-ink-soft space-y-1.5">
+                    <div className="mt-3 rounded-xl bg-paper border border-[#E8E8ED] p-4 text-sm text-ink-soft space-y-1.5">
                       <div className="font-medium text-ink">{t('Scoring factors (prototype weights)')}</div>
                       <ul className="list-disc pl-4 space-y-1">
                         <li>{t('Land area and terrain suitability')}</li>
@@ -174,9 +174,9 @@ export default function Results() {
                     ) : (
                       <span className="text-ink-faint">{t('not estimable yet')}</span>
                     )}
-                    <span className="text-xs text-ink-faint ml-1">{t('(estimate, not a real price)')}</span>
+                    <span className="text-sm text-ink-faint ml-1">{t('(estimate, not a real price)')}</span>
                     {specs?.budgetFit?.resized && (
-                      <span className="block text-xs text-brand-700 mt-0.5">
+                      <span className="block text-sm text-brand-700 mt-0.5">
                         {t('Sized to fit your budget — uses ~{rai} rai of your {total}-rai plot')
                           .replace('{rai}', specs.budgetFit.usedAreaRai)
                           .replace('{total}', (land.areaSqM / 1600).toFixed(2))}
@@ -217,10 +217,10 @@ export default function Results() {
                       <span className="text-sm font-semibold">{meta.name}</span>
                       <StatusBadge status={r.status} />
                     </div>
-                    <p className="text-xs text-ink-soft mt-1 leading-relaxed">{r.reasons[0] || meta.oneLiner}</p>
+                    <p className="text-sm text-ink-soft mt-1 leading-relaxed">{r.reasons[0] || meta.oneLiner}</p>
                   </div>
                   <button onClick={() => { setChosenPlan(r.id); navigate(`/plan/${r.id}`); }}
-                    className="text-xs font-medium text-brand-700 hover:underline flex-shrink-0 mt-1">
+                    className="text-sm font-medium text-brand-700 hover:underline flex-shrink-0 mt-1">
                     {t('Details')}
                   </button>
                 </div>

@@ -3,7 +3,7 @@ import L from 'leaflet';
 import { 
   MapPin, ExternalLink, Search, Layers, Compass, 
   Zap, Eye, PenTool, Trash2, Undo2, 
-  Maximize2, Sparkles, Check, RefreshCw 
+  Maximize2, Sparkles, Check, RefreshCw, LocateFixed 
 } from 'lucide-react';
 import { PROVINCES_DATA, findClosestProvince, calculateDistanceKm } from '../data/provinces';
 import { TH_ADMIN, findActualProvince, searchAdmin } from '../data/districts';
@@ -43,6 +43,7 @@ export default function GoogleMapPicker({
   const [pickProvince, setPickProvince] = useState('');
   const [pickDistrict, setPickDistrict] = useState('');
   const [measuredDistanceM, setMeasuredDistanceM] = useState(gridDistanceMeters);
+  const [locating, setLocating] = useState(false);
 
   const [isDrawingBoundary, setIsDrawingBoundary] = useState(false);
   const [polygonPoints, setPolygonPoints] = useState([]);
@@ -468,6 +469,17 @@ export default function GoogleMapPicker({
     setSearchState(null);
   };
 
+  const locateMe = () => {
+    if (!navigator.geolocation) { setSearchState('geo-error'); return; }
+    setLocating(true);
+    setSearchState(null);
+    navigator.geolocation.getCurrentPosition(
+      pos => { setLocating(false); flyToLocation(pos.coords.latitude, pos.coords.longitude, 16); },
+      () => { setLocating(false); setSearchState('geo-error'); },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  };
+
   // Geocoding via Nominatim (OSM) — free, no API key; only used when local data lacks coverage
   const geocodeNominatim = async (query) => {
     const url = `https://nominatim.openstreetmap.org/search?format=jsonv2&countrycodes=th&accept-language=th&limit=6&q=${encodeURIComponent(query)}`;
@@ -647,6 +659,18 @@ export default function GoogleMapPicker({
             <MapPin className="w-3.5 h-3.5" />
             <span>Province</span>
           </button>
+          <button
+            type="button"
+            onClick={locateMe}
+            disabled={locating}
+            title="Use my current location (GPS)"
+            className="shrink-0 px-2.5 py-1.5 rounded-lg border text-[11px] font-medium transition flex items-center space-x-1 bg-white text-zinc-700 border-zinc-200 hover:border-zinc-400 disabled:opacity-60"
+          >
+            {locating
+              ? <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+              : <LocateFixed className="w-3.5 h-3.5" />}
+            <span>{locating ? 'Locating…' : 'Locate me'}</span>
+          </button>
         </div>
 
         {/* Map Layers */}
@@ -717,11 +741,13 @@ export default function GoogleMapPicker({
       )}
 
       {/* Search status */}
-      {(searchState === 'loading' || searchState === 'error') && (
-        <p className={`text-[11px] px-1 ${searchState === 'error' ? 'text-red-600' : 'text-zinc-500'}`}>
+      {(searchState === 'loading' || searchState === 'error' || searchState === 'geo-error') && (
+        <p className={`text-[11px] px-1 ${searchState === 'loading' ? 'text-zinc-500' : 'text-red-600'}`}>
           {searchState === 'loading'
             ? 'Searching location…'
-            : 'Location not found — try "district + province" or the Province button'}
+            : searchState === 'geo-error'
+              ? 'Could not get your location — allow location access or pin the map manually'
+              : 'Location not found — try "district + province" or the Province button'}
         </p>
       )}
 

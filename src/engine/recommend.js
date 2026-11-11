@@ -18,7 +18,10 @@ export const BUDGET_MAX_THB = {
   '0.5-2m': 2000000,
   '2-5m': 5000000,
   '5-10m': 10000000,
-  'over-10m': Infinity,
+  '10-20m': 20000000,
+  '20-50m': 50000000,
+  'over-50m': Infinity,
+  'over-10m': Infinity, // legacy id from older saves — same as over-50m
   unsure: Infinity,
 };
 
@@ -265,7 +268,9 @@ export const BUDGET_OPTIONS = [
   { id: '0.5-2m', label: '500,000 – 2 million THB' },
   { id: '2-5m', label: '2 – 5 million THB' },
   { id: '5-10m', label: '5 – 10 million THB' },
-  { id: 'over-10m', label: 'Over 10 million THB' },
+  { id: '10-20m', label: '10 – 20 million THB' },
+  { id: '20-50m', label: '20 – 50 million THB' },
+  { id: 'over-50m', label: 'Over 50 million THB' },
   { id: 'unsure', label: 'Not sure yet' },
 ];
 

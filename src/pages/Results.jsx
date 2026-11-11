@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { navigate } from '../router';
 import { useApp } from '../state/AppState';
-import { recommendProjects, dataConfidence, PROJECT_FRIENDLY, budgetCaution, BUDGET_MAX_THB } from '../engine/recommend';
+import { recommendProjects, dataConfidence, PROJECT_FRIENDLY, budgetCaution, BUDGET_MAX_THB, BUDGET_OPTIONS } from '../engine/recommend';
 import { getSpecs } from '../engine/specs';
 import { StepProgress, StatusBadge, ProjectIcon, Note, Collapsible, fmtTHB, DisclaimerStrip } from '../components/ui';
 import {
@@ -81,7 +81,7 @@ export default function Results() {
               <div className="text-xs text-ink-faint mt-0.5">
                 {landKindLabel}
                 {land.roadType === 'main' ? ' · main road' : land.roadType === 'dirt' ? ' · hard to reach' : ' · secondary road'}
-                {goals.budget && goals.budget !== 'unsure' ? ` · budget: ${{ 'under-500k': 'under ฿500k', '0.5-2m': '฿0.5–2M', '2-5m': '฿2–5M', '5-10m': '฿5–10M', 'over-10m': 'over ฿10M' }[goals.budget]}` : ''}
+                {goals.budget && goals.budget !== 'unsure' ? ` · budget: ${BUDGET_OPTIONS.find(b => b.id === goals.budget)?.label || goals.budget}` : ''}
               </div>
             </div>
           </div>

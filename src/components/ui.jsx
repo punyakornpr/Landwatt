@@ -22,7 +22,7 @@ export function PageBackdrop() {
         backgroundRepeat: 'no-repeat',
       }} />
       <div className="absolute inset-0" style={{
-        background: 'linear-gradient(rgba(255,255,255,0.78), rgba(255,255,255,0.55) 30%, rgba(255,255,255,0.62) 70%, rgba(255,255,255,0.8))',
+        background: 'linear-gradient(rgba(255,255,255,0.6), rgba(255,255,255,0.42) 30%, rgba(255,255,255,0.52) 70%, rgba(255,255,255,0.72))',
       }} />
     </div>
   );

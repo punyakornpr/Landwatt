@@ -1,0 +1,127 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="2400" viewBox="0 0 1600 2400" preserveAspectRatio="xMidYMin slice">
+<defs>
+  <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#aad4f0"/>
+    <stop offset="0.6" stop-color="#d6ecfa"/>
+    <stop offset="1" stop-color="#eef8fd"/>
+  </linearGradient>
+  <radialGradient id="sunglow" cx="0.5" cy="0.5" r="0.5">
+    <stop offset="0" stop-color="#fce9a8" stop-opacity="0.55"/>
+    <stop offset="1" stop-color="#fce9a8" stop-opacity="0"/>
+  </radialGradient>
+  <linearGradient id="hillA" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#c4e4c6"/>
+    <stop offset="1" stop-color="#a9d8ae"/>
+  </linearGradient>
+  <linearGradient id="hillB" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#aedeae"/>
+    <stop offset="1" stop-color="#8fce97"/>
+  </linearGradient>
+  <linearGradient id="meadow" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#9ed6a4"/>
+    <stop offset="1" stop-color="#7cc489"/>
+  </linearGradient>
+</defs>
+
+<!-- sky -->
+<rect width="1600" height="1150" fill="url(#sky)"/>
+<circle cx="1370" cy="330" r="210" fill="url(#sunglow)"/>
+<circle cx="1370" cy="330" r="92" fill="#fbe38a"/>
+
+<!-- clouds -->
+<g fill="#ffffff">
+  <g opacity="0.95">
+    <ellipse cx="240" cy="170" rx="130" ry="42"/>
+    <ellipse cx="350" cy="150" rx="105" ry="34"/>
+    <ellipse cx="440" cy="175" rx="95" ry="30"/>
+    <rect x="150" y="160" width="380" height="55" rx="27"/>
+  </g>
+  <g opacity="0.9">
+    <ellipse cx="880" cy="430" rx="120" ry="36"/>
+    <ellipse cx="980" cy="415" rx="90" ry="28"/>
+    <rect x="790" y="420" width="270" height="46" rx="23"/>
+  </g>
+  <g opacity="0.85">
+    <ellipse cx="150" cy="640" rx="110" ry="32"/>
+    <ellipse cx="250" cy="625" rx="85" ry="26"/>
+    <rect x="70" y="630" width="260" height="42" rx="21"/>
+  </g>
+  <g opacity="0.8">
+    <ellipse cx="1330" cy="700" rx="100" ry="28"/>
+    <ellipse cx="1420" cy="688" rx="75" ry="22"/>
+  </g>
+</g>
+
+<!-- hills -->
+<path d="M0 980 Q 300 860 640 940 T 1600 900 L1600 1180 L0 1180 Z" fill="url(#hillA)"/>
+<path d="M0 1080 Q 400 980 820 1060 T 1600 1040 L1600 1300 L0 1300 Z" fill="url(#hillB)"/>
+
+<!-- meadow -->
+<path d="M0 1180 Q 500 1120 900 1180 T 1600 1160 L1600 2400 L0 2400 Z" fill="url(#meadow)"/>
+
+<!-- winding path -->
+<path d="M430 1180
+         C 400 1300, 460 1400, 380 1520
+         C 300 1640, 340 1780, 260 1920
+         C 190 2040, 220 2220, 150 2400
+         L 430 2400
+         C 490 2240, 470 2080, 540 1950
+         C 610 1820, 560 1680, 640 1560
+         C 720 1440, 660 1320, 690 1230
+         C 700 1200, 640 1180, 560 1176
+         Z" fill="#f0e6c8" opacity="0.95"/>
+
+<!-- small ground-mount solar panels at edges -->
+<g>
+  <!-- left mid -->
+  <g transform="translate(60,1420) rotate(-16)">
+    <rect x="-10" y="70" width="20" height="90" fill="#8a97a8"/>
+    <rect x="0" y="0" width="150" height="95" rx="4" fill="#22356b" stroke="#15204a" stroke-width="4"/>
+    <line x1="50" y1="0" x2="50" y2="95" stroke="#6f89c9" stroke-width="3"/>
+    <line x1="100" y1="0" x2="100" y2="95" stroke="#6f89c9" stroke-width="3"/>
+    <line x1="0" y1="47" x2="150" y2="47" stroke="#6f89c9" stroke-width="3"/>
+    <line x1="0" y1="6" x2="150" y2="6" stroke="#c7dcf7" stroke-width="3"/>
+  </g>
+  <!-- left lower -->
+  <g transform="translate(20,1900) rotate(-16) scale(1.25)">
+    <rect x="-10" y="70" width="20" height="100" fill="#8a97a8"/>
+    <rect x="0" y="0" width="150" height="95" rx="4" fill="#22356b" stroke="#15204a" stroke-width="4"/>
+    <line x1="50" y1="0" x2="50" y2="95" stroke="#6f89c9" stroke-width="3"/>
+    <line x1="100" y1="0" x2="100" y2="95" stroke="#6f89c9" stroke-width="3"/>
+    <line x1="0" y1="47" x2="150" y2="47" stroke="#6f89c9" stroke-width="3"/>
+    <line x1="0" y1="6" x2="150" y2="6" stroke="#c7dcf7" stroke-width="3"/>
+  </g>
+  <!-- right lower, near house -->
+  <g transform="translate(1150,1750) rotate(-14) scale(0.9)">
+    <rect x="-10" y="70" width="20" height="90" fill="#8a97a8"/>
+    <rect x="0" y="0" width="150" height="95" rx="4" fill="#22356b" stroke="#15204a" stroke-width="4"/>
+    <line x1="50" y1="0" x2="50" y2="95" stroke="#6f89c9" stroke-width="3"/>
+    <line x1="100" y1="0" x2="100" y2="95" stroke="#6f89c9" stroke-width="3"/>
+    <line x1="0" y1="47" x2="150" y2="47" stroke="#6f89c9" stroke-width="3"/>
+    <line x1="0" y1="6" x2="150" y2="6" stroke="#c7dcf7" stroke-width="3"/>
+  </g>
+</g>
+
+<!-- bushes -->
+<g fill="#5fae74">
+  <ellipse cx="980" cy="2060" rx="55" ry="40"/>
+  <ellipse cx="1050" cy="2080" rx="40" ry="30"/>
+  <ellipse cx="1480" cy="2280" rx="60" ry="42"/>
+</g>
+<g fill="#4d9c63" opacity="0.8">
+  <ellipse cx="1010" cy="2090" rx="30" ry="22"/>
+  <ellipse cx="1500" cy="2310" rx="35" ry="24"/>
+</g>
+
+<!-- house bottom-right -->
+<g transform="translate(1280,2030)">
+  <rect x="0" y="90" width="230" height="170" fill="#f7f1e6"/>
+  <polygon points="-20,92 115,-10 250,92" fill="#c98d6b"/>
+  <polygon points="115,-10 250,92 232,92 115,8" fill="#b57a5a"/>
+  <rect x="24" y="130" width="46" height="52" rx="4" fill="#9db8d8"/>
+  <rect x="96" y="130" width="46" height="52" rx="4" fill="#9db8d8"/>
+  <rect x="166" y="140" width="44" height="120" rx="4" fill="#a0714f"/>
+  <circle cx="200" cy="200" r="4" fill="#f7f1e6"/>
+  <rect x="-8" y="258" width="250" height="10" fill="#e8dfcd"/>
+</g>
+</svg>

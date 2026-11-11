@@ -15,7 +15,7 @@ import {
   Save, FileText, CheckCircle2, AlertTriangle, Info, Wrench, ChevronRight,
 } from 'lucide-react';
 
-const JOURNEY_STEPS = ['ที่ดินของคุณ', 'เป้าหมายและงบ', 'ทางเลือกแนะนำ', 'ดูแผน', 'เก็บแผน/รายงาน'];
+const JOURNEY_STEPS = ['Your land', 'Goals & budget', 'Suggested options', 'Review plan', 'Save/report'];
 
 export default function PlanDetail({ projectId }) {
   const { land, goals, toggleCompare, compareIds, saveCurrent, setChosenPlan, chosenPlanId } = useApp();
@@ -23,7 +23,7 @@ export default function PlanDetail({ projectId }) {
   const project = EE_PROJECTS.find(p => p.id === id) || EE_PROJECTS[0];
   const meta = PROJECT_FRIENDLY[id];
   const [saved, setSaved] = useState(false);
-  const [mode, setMode] = useState('general'); // ค่าเริ่มต้น = มุมมองผู้ใช้ทั่วไป
+  const [mode, setMode] = useState('general'); // default = general user view
 
   const specs = useMemo(() => getSpecs(id, land), [id, land]);
   const summary = useMemo(() => friendlySummary(id, specs, land), [id, specs, land]);
@@ -32,7 +32,7 @@ export default function PlanDetail({ projectId }) {
   const isCompared = compareIds.includes(id);
 
   const handleSave = () => {
-    const name = window.prompt('ตั้งชื่อแผนนี้', `${meta.name} — ${land.provinceData?.name || 'ที่ดินของฉัน'}`);
+    const name = window.prompt('Name this plan', `${meta.name} — ${land.provinceData?.nameEn || land.provinceData?.name || 'My land'}`);
     if (name === null) return;
     setChosenPlan(id);
     saveCurrent(name || undefined);
@@ -42,26 +42,26 @@ export default function PlanDetail({ projectId }) {
 
   const summaryCards = [
     {
-      icon: Banknote, label: 'เงินลงทุนเบื้องต้น',
-      value: summary.capex ? `${fmtTHB(summary.capex.low)} – ${fmtTHB(summary.capex.high)}` : 'ยังประเมินไม่ได้',
-      sub: 'ช่วงประมาณการจากสมมติฐานกลาง',
+      icon: Banknote, label: 'Initial investment',
+      value: summary.capex ? `${fmtTHB(summary.capex.low)} – ${fmtTHB(summary.capex.high)}` : 'Not estimable yet',
+      sub: 'Estimated range from base assumptions',
     },
-    { icon: Ruler, label: 'พื้นที่ที่ใช้', value: summary.areaUsed.split('(')[0], sub: summary.areaUsed.includes('(') ? `(${summary.areaUsed.split('(')[1]}` : '' },
-    { icon: Zap, label: 'ประโยชน์ด้านพลังงาน', value: summary.benefit.split(' ').slice(0, 4).join(' ') + '…', sub: 'ดูรายละเอียดด้านล่าง' },
-    { icon: Clock, label: 'ระยะคืนทุนโดยประมาณ', value: summary.payback, sub: 'จากสมมติฐานที่เปิดเผยด้านล่าง' },
+    { icon: Ruler, label: 'Area used', value: summary.areaUsed.split('(')[0], sub: summary.areaUsed.includes('(') ? `(${summary.areaUsed.split('(')[1]}` : '' },
+    { icon: Zap, label: 'Energy benefit', value: summary.benefit.split(' ').slice(0, 4).join(' ') + '…', sub: 'Details below' },
+    { icon: Clock, label: 'Rough payback', value: summary.payback, sub: 'From the assumptions shown below' },
   ];
 
   const equipmentBullets = [
-    specs.moduleCount && `แผงรับแสงอาทิตย์ประมาณ ${specs.moduleCount} แผง`,
-    specs.inverterCount && `เครื่องแปลงไฟ ${specs.inverterCount} ตัว`,
-    specs.dcChargersCount && `ตู้ชาร์จเร็ว ${specs.dcChargersCount} ตู้ (${specs.totalGuns} หัวชาร์จ)`,
-    specs.bessKWh && `แบตเตอรี่สำรอง ${specs.bessKWh} kWh`,
-    specs.solarCanopyKWp && `หลังคาโซลาร์เหนือที่จอด ~${specs.solarCanopyKWp} kWp`,
-    specs.containerCount && `ตู้แบตเตอรี่คอนเทนเนอร์ ${specs.containerCount} ตู้`,
-    specs.transformerRating && `หม้อแปลงไฟฟ้า ${specs.transformerRating.split(',')[0]}`,
-    specs.digesterVolumeM3 && `บ่อหมักก๊าซชีวภาพ ~${specs.digesterVolumeM3} ลบ.ม.`,
-    specs.pontoonType && `ทุ่นลอยน้ำ ${specs.pontoonType.split('(')[0]}`,
-    specs.mountingStructure && `โครงสร้างยกสูงสำหรับทำเกษตรใต้แผง`,
+    specs.moduleCount && `~${specs.moduleCount} solar panels`,
+    specs.inverterCount && `${specs.inverterCount} inverters`,
+    specs.dcChargersCount && `${specs.dcChargersCount} fast chargers (${specs.totalGuns} guns)`,
+    specs.bessKWh && `${specs.bessKWh} kWh backup battery`,
+    specs.solarCanopyKWp && `~${specs.solarCanopyKWp} kWp solar canopy over parking`,
+    specs.containerCount && `${specs.containerCount} battery containers`,
+    specs.transformerRating && `Transformer ${specs.transformerRating.split(',')[0]}`,
+    specs.digesterVolumeM3 && `~${specs.digesterVolumeM3} m³ biogas digester`,
+    specs.pontoonType && `Floating pontoons ${specs.pontoonType.split('(')[0]}`,
+    specs.mountingStructure && `Raised structure for farming under panels`,
   ].filter(Boolean);
 
   return (
@@ -71,7 +71,7 @@ export default function PlanDetail({ projectId }) {
       </div>
 
       <button onClick={() => navigate('/results')} className="btn-ghost text-sm mb-4 -ml-2">
-        <ArrowLeft className="w-4 h-4" /> กลับไปดูทางเลือก
+        <ArrowLeft className="w-4 h-4" /> Back to options
       </button>
 
       {/* Header */}
@@ -84,22 +84,22 @@ export default function PlanDetail({ projectId }) {
               {rec && <StatusBadge status={rec.status} />}
             </div>
             <p className="text-sm text-ink-soft mt-1.5 leading-relaxed">
-              นี่คือแผนที่ LandWatt แนะนำสำหรับที่ดินของคุณ — {meta.oneLiner}
+              This is the plan LandWatt suggests for your land — {meta.oneLiner}
             </p>
             {rec && (
               <p className="text-xs text-ink-faint mt-1">
-                บนที่ดิน {land.provinceData?.name || 'ที่ปักหมุด'} {(land.areaSqM / 1600).toFixed(2)} ไร่ · สถานะความเป็นไปได้: {rec.status === 'great' ? 'เหมาะมาก' : rec.status === 'worth' ? 'น่าศึกษาต่อ' : rec.status === 'insufficient' ? 'ต้องมีข้อมูลเพิ่ม' : 'ยังไม่แนะนำ'}
+                On {land.provinceData?.nameEn || land.provinceData?.name || 'the pinned land'} {(land.areaSqM / 1600).toFixed(2)} rai · feasibility: {rec.status === 'great' ? 'great fit' : rec.status === 'worth' ? 'worth exploring' : rec.status === 'insufficient' ? 'needs more data' : 'not recommended'}
               </p>
             )}
           </div>
         </div>
       </div>
 
-      {/* สวิตช์โหมดการแสดงผล — อยู่บนสุดหลังชื่อโครงการ */}
-      <div className="card p-1.5 mb-6 grid grid-cols-2 gap-1.5" role="tablist" aria-label="โหมดการแสดงผล">
+      {/* Display-mode switch — top of page after the project name */}
+      <div className="card p-1.5 mb-6 grid grid-cols-2 gap-1.5" role="tablist" aria-label="Display mode">
         {[
-          ['general', 'สำหรับผู้ใช้ทั่วไป', 'General User'],
-          ['engineering', 'รายละเอียดวิศวกรรม', 'Engineering Details'],
+          ['general', 'General user view', 'Simple'],
+          ['engineering', 'Engineering details', 'Technical'],
         ].map(([m, label, sub]) => (
           <button
             key={m}
@@ -139,15 +139,15 @@ export default function PlanDetail({ projectId }) {
       <div className="space-y-8">
         {/* Layout */}
         <section>
-          <h2 className="text-lg font-bold mb-1">ถ้าทำจริง ที่ดินจะหน้าตาประมาณไหน?</h2>
-          <p className="text-sm text-ink-soft mb-3">ภาพจำลองการจัดวางบนแปลงตามสัดส่วนพื้นที่ของคุณ</p>
+          <h2 className="text-lg font-bold mb-1">What would the land look like if built?</h2>
+          <p className="text-sm text-ink-soft mb-3">Simulated layout scaled to your plot</p>
           <SiteLayoutCanvas project={project} specs={specs} landData={land} />
-          <div className="mt-2"><Note>ภาพนี้เป็น<strong>ภาพจำลองสัดส่วน</strong>เพื่อให้เห็นภาพคร่าว ๆ — ไม่ใช่แบบก่อสร้างและไม่ได้วัดตำแหน่งจริงบนแปลง</Note></div>
+          <div className="mt-2"><Note>This is a <strong>schematic simulation</strong> for a rough picture — not construction drawings and not measured positions on the plot</Note></div>
         </section>
 
         {/* Equipment */}
         <section>
-          <h2 className="text-lg font-bold mb-1">อุปกรณ์หลักมีอะไรบ้าง?</h2>
+          <h2 className="text-lg font-bold mb-1">What are the main components?</h2>
           <div className="card p-5">
             <ul className="space-y-2.5">
               {equipmentBullets.map((t, i) => (
@@ -156,48 +156,48 @@ export default function PlanDetail({ projectId }) {
                 </li>
               ))}
             </ul>
-            <p className="text-xs text-ink-faint mt-4">จำนวนและขนาดคำนวณจากพื้นที่ที่ให้มา หากเปลี่ยนขนาดที่ดินตัวเลขเหล่านี้จะเปลี่ยนตาม</p>
+            <p className="text-xs text-ink-faint mt-4">Counts and sizes are computed from the area you gave — they change if the land size changes</p>
           </div>
         </section>
 
         {/* Money */}
         <section>
-          <h2 className="text-lg font-bold mb-1">ต้องเตรียมเงินเท่าไร และคุ้มอย่างไร?</h2>
+          <h2 className="text-lg font-bold mb-1">How much money is needed and is it worth it?</h2>
           <div className="card p-5 space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
               <div className="rounded-xl bg-paper border border-[#E7E5DD] p-4">
-                <div className="text-xs text-ink-faint">เงินลงทุนเริ่มต้น</div>
+                <div className="text-xs text-ink-faint">Initial investment</div>
                 <div className="text-lg font-bold mt-0.5">{summary.capex ? fmtTHB(summary.capex.mid) : '—'}</div>
               </div>
               <div className="rounded-xl bg-paper border border-[#E7E5DD] p-4">
-                <div className="text-xs text-ink-faint">รายได้/เงินประหยัดต่อปี (ประมาณ)</div>
+                <div className="text-xs text-ink-faint">Revenue/savings per year (approx.)</div>
                 <div className="text-lg font-bold mt-0.5">
-                  {specs.financials?.annualRevenueMillionTHB ? fmtTHB(specs.financials.annualRevenueMillionTHB) : 'ยังประเมินไม่ได้'}
+                  {specs.financials?.annualRevenueMillionTHB ? fmtTHB(specs.financials.annualRevenueMillionTHB) : 'Not estimable yet'}
                 </div>
                 {specs.dualIncome && (
                   <div className="text-[11px] text-ink-soft mt-1 leading-snug">
-                    = ไฟฟ้า {fmtTHB(specs.dualIncome.powerRevenueMillionTHB)} (FiT สมมติฐาน)
-                    + พืชผล {fmtTHB(specs.dualIncome.agriRevenueMillionTHB)} (ประมาณการ ยังไม่ได้ระบุพืช)
+                    = power {fmtTHB(specs.dualIncome.powerRevenueMillionTHB)} (assumed FiT)
+                    + crops {fmtTHB(specs.dualIncome.agriRevenueMillionTHB)} (estimate, crop unspecified)
                   </div>
                 )}
                 {specs.tariffStatus === 'scenario' && (
-                  <div className="text-[11px] text-volt-800 mt-1">รายได้ไฟฟ้าใช้อัตราสมมติฐาน ไม่ใช่สิทธิขายไฟที่ยืนยันแล้ว</div>
+                  <div className="text-[11px] text-volt-800 mt-1">Power revenue uses an assumed rate, not a confirmed power-purchase entitlement</div>
                 )}
               </div>
               <div className="rounded-xl bg-paper border border-[#E7E5DD] p-4">
-                <div className="text-xs text-ink-faint">คืนทุนโดยประมาณ</div>
+                <div className="text-xs text-ink-faint">Rough payback</div>
                 <div className="text-lg font-bold mt-0.5">{summary.payback}</div>
               </div>
             </div>
             <FinancialYieldChart project={project} specs={specs} landData={land} />
-            <Note>ตัวเลขนี้เป็น<strong>การประมาณการเบื้องต้น</strong> — ผลจริงขึ้นกับราคาติดตั้ง พฤติกรรมใช้ไฟ และเงื่อนไขการเชื่อมต่อของการไฟฟ้า ไม่ใช่ราคาที่รับประกัน</Note>
-            <Collapsible title="ดูรายละเอียดผลตอบแทน (ขั้นสูง)" sub="NPV, IRR และสมมติฐานทางการเงิน">
+            <Note>These numbers are <strong>preliminary estimates</strong> — actuals depend on installation prices, usage behavior and utility interconnection terms; not a guaranteed price</Note>
+            <Collapsible title="Return details (advanced)" sub="NPV, IRR and financial assumptions">
               <div className="pt-3 grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
                 {[
-                  ['IRR (อัตราผลตอบแทน)', specs.financials?.irrPercent ? `${specs.financials.irrPercent}%` : '—'],
-                  ['NPV 25 ปี', specs.financials?.npv25YrMillionTHB ? `${fmtTHB(specs.financials.npv25YrMillionTHB)}` : '—'],
-                  ['กระแสเงินสดสุทธิ/ปี', specs.financials?.netAnnualCashflowMillionTHB ? fmtTHB(specs.financials.netAnnualCashflowMillionTHB) : specs.financials?.netAnnualProfitMillionTHB ? fmtTHB(specs.financials.netAnnualProfitMillionTHB) : '—'],
-                  ['อัตราส่วน DC/AC จริง', specs.actualDcAcRatio || '—'],
+                  ['IRR (return rate)', specs.financials?.irrPercent ? `${specs.financials.irrPercent}%` : '—'],
+                  ['NPV 25 yrs', specs.financials?.npv25YrMillionTHB ? `${fmtTHB(specs.financials.npv25YrMillionTHB)}` : '—'],
+                  ['Net cash flow/yr', specs.financials?.netAnnualCashflowMillionTHB ? fmtTHB(specs.financials.netAnnualCashflowMillionTHB) : specs.financials?.netAnnualProfitMillionTHB ? fmtTHB(specs.financials.netAnnualProfitMillionTHB) : '—'],
+                  ['Actual DC/AC ratio', specs.actualDcAcRatio || '—'],
                 ].map(([k, v], i) => (
                   <div key={i} className="rounded-xl border border-[#E7E5DD] p-3">
                     <div className="text-[11px] text-ink-faint">{k}</div>
@@ -211,10 +211,10 @@ export default function PlanDetail({ projectId }) {
 
         {/* Pros & cautions */}
         <section>
-          <h2 className="text-lg font-bold mb-3">มีข้อดีและอะไรที่ต้องระวัง?</h2>
+          <h2 className="text-lg font-bold mb-3">Strengths and things to watch out for?</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="card p-5">
-              <h3 className="text-sm font-semibold text-energy-800 mb-3">จุดเด่นของแผนนี้</h3>
+              <h3 className="text-sm font-semibold text-energy-800 mb-3">Plan strengths</h3>
               <ul className="space-y-2">
                 {(rec?.reasons || []).map((t, i) => (
                   <li key={i} className="flex items-start gap-2 text-sm"><CheckCircle2 className="w-4 h-4 text-energy-600 flex-shrink-0 mt-0.5" />{t}</li>
@@ -225,13 +225,13 @@ export default function PlanDetail({ projectId }) {
               </ul>
             </div>
             <div className="card p-5">
-              <h3 className="text-sm font-semibold text-volt-800 mb-3">สิ่งที่ต้องระวัง / ยังไม่ทราบ</h3>
+              <h3 className="text-sm font-semibold text-volt-800 mb-3">Cautions / unknowns</h3>
               <ul className="space-y-2">
                 {(rec?.cautions || []).map((t, i) => (
                   <li key={i} className="flex items-start gap-2 text-sm"><AlertTriangle className="w-4 h-4 text-volt-600 flex-shrink-0 mt-0.5" />{t}</li>
                 ))}
                 {(rec?.confidence?.missing || []).map((t, i) => (
-                  <li key={`m${i}`} className="flex items-start gap-2 text-sm text-ink-soft"><Info className="w-4 h-4 text-electric-600 flex-shrink-0 mt-0.5" />ยังไม่มีข้อมูลเรื่อง{t} — เพิ่มภายหลังเพื่อให้ผลแม่นขึ้น</li>
+                  <li key={`m${i}`} className="flex items-start gap-2 text-sm text-ink-soft"><Info className="w-4 h-4 text-electric-600 flex-shrink-0 mt-0.5" />No data on {t} yet — add it later for better accuracy</li>
                 ))}
               </ul>
             </div>
@@ -240,7 +240,7 @@ export default function PlanDetail({ projectId }) {
 
         {/* Checklist */}
         <section>
-          <h2 className="text-lg font-bold mb-3">ก่อนเริ่มลงทุนจริง ต้องทำอะไร?</h2>
+          <h2 className="text-lg font-bold mb-3">What to do before real investment?</h2>
           <div className="card p-5">
             <ul className="space-y-3">
               {checklist.map((t, i) => (
@@ -257,20 +257,20 @@ export default function PlanDetail({ projectId }) {
       </>
       )}
 
-      {/* Actions — ใช้ร่วมทั้งสองโหมด */}
+      {/* Actions — shared by both modes */}
       <div className="card p-5 mt-8">
         <div className="flex flex-col sm:flex-row gap-2.5">
-          <button onClick={() => navigate('/start')} className="btn-secondary flex-1">ปรับแผนให้เหมาะกับงบ</button>
+          <button onClick={() => navigate('/start')} className="btn-secondary flex-1">Adjust plan to budget</button>
           <button onClick={() => toggleCompare(id)} className={`btn-secondary flex-1 ${isCompared ? 'border-brand-600 text-brand-800 bg-brand-50' : ''}`}>
-            <GitCompareArrows className="w-4 h-4" /> {isCompared ? 'นำออกจากการเปรียบเทียบ' : 'เปรียบเทียบกับแผนอื่น'}
+            <GitCompareArrows className="w-4 h-4" /> {isCompared ? 'Remove from compare' : 'Compare with other plans'}
           </button>
           <button onClick={handleSave} className="btn-primary flex-1">
-            <Save className="w-4 h-4" /> {saved ? 'บันทึกแล้ว ✓' : 'บันทึกแผน'}
+            <Save className="w-4 h-4" /> {saved ? 'Saved ✓' : 'Save plan'}
           </button>
         </div>
         <button onClick={() => { setChosenPlan(id); navigate(`/report/${id}`); }}
           className="mt-2.5 w-full text-center text-sm font-medium text-brand-700 hover:underline py-2">
-          <FileText className="w-4 h-4 inline -mt-0.5 mr-1" /> ดูและพิมพ์รายงานสรุปของแผนนี้
+          <FileText className="w-4 h-4 inline -mt-0.5 mr-1" /> View & print the summary report for this plan
         </button>
       </div>
 

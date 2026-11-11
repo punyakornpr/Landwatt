@@ -1,9 +1,9 @@
-// เก็บข้อมูลแบบฟอร์มและโครงการใน localStorage (ต้นแบบ — ข้อมูลอยู่เฉพาะในเครื่องผู้ใช้)
+// Draft form and saved projects in localStorage (prototype — data stays on this device)
 const PROJECTS_KEY = 'terrawatt.projects.v1';
 const DRAFT_KEY = 'terrawatt.draft.v1';
 
 export const DEFAULT_LAND = {
-  areaSqM: 8000, // 5 ไร่
+  areaSqM: 8000, // 5 rai
   provinceId: null,
   provinceData: null,
   coordinates: { lat: 13.7563, lng: 100.5018 },
@@ -15,10 +15,10 @@ export const DEFAULT_LAND = {
   gridUnknown: false,
   hasWaterBody: false,
   hasAgriculturalWaste: false,
-  hasShading: null,   // true/false/null = ไม่ทราบ
-  hasStructures: null, // มีอาคาร/สิ่งกีดขวางไหม (user-declared)
-  excludedAreaSqM: 0,  // พื้นที่ยกเว้นที่ผู้ใช้ระบุ [F-02]
-  hasGridPower: null, // มีไฟฟ้าอยู่แล้วไหม
+  hasShading: null,   // true/false/null = unknown
+  hasStructures: null, // has structures/obstacles (user-declared)
+  excludedAreaSqM: 0,  // user-declared excluded area [F-02]
+  hasGridPower: null, // grid power already available
   soilStability: 'good',
   zoningColor: 'green',
 };
@@ -26,7 +26,7 @@ export const DEFAULT_LAND = {
 export const DEFAULT_GOALS = {
   aims: [],
   budget: 'unsure',
-  monthlyBill: null,    // ค่าไฟ/เดือน (บาท) ถ้าเลือกเป้าหมายประหยัด
+  monthlyBill: null,    // monthly electricity bill (THB) when saving goal chosen
   evTraffic: null,      // 'high'|'medium'|'low'|'unknown'
 };
 
@@ -75,7 +75,7 @@ export function exportProjectJSON(project) {
 
 export function importProjectJSON(text) {
   const obj = JSON.parse(text);
-  if (!obj.land || !obj.land.areaSqM) throw new Error('ไฟล์ไม่ถูกต้อง');
+  if (!obj.land || !obj.land.areaSqM) throw new Error('Invalid file');
   return {
     ...obj,
     id: obj.id || `p-${Date.now()}`,

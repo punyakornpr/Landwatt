@@ -7,62 +7,62 @@ import {
 
 const STEPS = [
   {
-    icon: MapPin, t: 'ขั้นที่ 1 — บอกข้อมูลที่ดิน',
+    icon: MapPin, t: 'Step 1 — Describe your land',
     items: [
-      'ปักหมุดบนแผนที่ หรือเลือกจังหวัด — ไม่ต้องรู้พิกัดเป๊ะ ๆ',
-      'ใส่ขนาดเป็น ไร่-งาน-ตารางวา หรือวาดขอบเขตบนแผนที่ (ขอบเขตที่วาดเองไม่ใช่การรังวัดทางกฎหมาย)',
-      'เลือกลักษณะที่ดินให้ใกล้ที่สุด ถ้าไม่แน่ใจเลือก "ยังไม่แน่ใจ" ได้',
+      'Drop a pin on the map or pick a province — exact coordinates not needed',
+      'Enter size in rai-ngan-square wah, or draw the boundary on the map (a drawn boundary is not a legal survey)',
+      'pick the closest land type — choose "Not sure yet" if unsure',
     ],
   },
   {
-    icon: Target, t: 'ขั้นที่ 2 — บอกเป้าหมายและงบ',
+    icon: Target, t: 'Step 2 — Goals & budget',
     items: [
-      'เลือกว่าอยากให้ที่ดินช่วยเรื่องอะไร เลือกได้หลายข้อ หรือให้ระบบช่วยแนะนำ',
-      'งบประมาณเป็นเพียงตัวกรอง ไม่ใช่ราคาจริง — เลือก "ยังไม่แน่ใจ" ได้',
-      'คำถามเสริมจะถามเฉพาะที่เกี่ยวกับเป้าหมายของคุณ ข้ามได้ทุกข้อ',
+      'Pick what you want the land to help with — multiple allowed, or let the system suggest',
+      'budget is only a filter, not a real price — "Not sure" is fine',
+      'Extra questions only relate to your goals — all skippable',
     ],
   },
   {
-    icon: Sparkles, t: 'ขั้นที่ 3 — ดูทางเลือกที่แนะนำ',
+    icon: Sparkles, t: 'Step 3 — Review suggested options',
     items: [
-      'ระบบจัดอันดับทางเลือกพร้อมเหตุผลและสิ่งที่ต้องระวัง',
-      'สถานะ "เหมาะมาก / น่าศึกษาต่อ / ต้องมีข้อมูลเพิ่ม / ยังไม่แนะนำ" มาจากเกณฑ์ของระบบ ไม่ใช่โอกาสสำเร็จ',
-      'กด "ทำไมได้คะแนนนี้" เพื่อดูปัจจัยที่ใช้',
+      'The system ranks options with reasons and cautions',
+      'statuses "Great fit / Worth exploring / Needs more data / Not recommended" come from system criteria, not success odds',
+      'press "why this score?" to see the factors used',
     ],
   },
   {
-    icon: Ruler, t: 'ขั้นที่ 4 — ดูแผนที่สนใจ',
+    icon: Ruler, t: 'Step 4 — Review a plan',
     items: [
-      'เห็นภาพจำลองการจัดวาง เงินลงทุน ประโยชน์ และระยะคืนทุนโดยประมาณ',
-      'ส่วน "รายละเอียดทางเทคนิค" มีสเปก สูตร และแบบวิศวกรรมสำหรับผู้เชี่ยวชาญ',
+      'See a simulated layout, investment, benefits and rough payback',
+      'the "Engineering details" view has specs, formulas and engineering diagrams for experts',
     ],
   },
   {
-    icon: Save, t: 'ขั้นที่ 5 — เก็บแผนและดาวน์โหลดรายงาน',
+    icon: Save, t: 'Step 5 — Save plans & download a report',
     items: [
-      'บันทึกแผนไว้ใน "โครงการของฉัน" เปรียบเทียบได้ 2–3 แผน',
-      'พิมพ์/ดาวน์โหลดรายงานสรุปพร้อมเช็กลิสต์สิ่งที่ต้องทำก่อนลงทุนจริง',
+      'save plans in "My projects" and compare 2–3 side by side',
+      'Print/download a summary report with a pre-investment checklist',
     ],
   },
 ];
 
 const GLOSSARY = [
-  ['kWp (กิโลวัตต์-พีค)', 'ขนาดกำลังผลิตของแผงโซลาร์เซลล์รวมกัน ยิ่งมากยิ่งผลิตไฟได้มาก'],
-  ['kWh (หน่วยไฟฟ้า)', 'ปริมาณไฟฟ้าที่ใช้หรือผลิตจริง ค่าไฟบ้านคิดเป็นหน่วยนี้'],
-  ['FiT', 'ราคาที่การไฟฟ้ารับซื้อไฟจากผู้ผลิตรายย่อยตามโครงการของรัฐ มีเงื่อนไขและโควต้า'],
-  ['แบตเตอรี่ (BESS)', 'ระบบเก็บไฟฟ้าไว้ใช้ภายหลัง เช่น เก็บไฟจากแผงกลางวันมาใช้ตอนกลางคืน'],
-  ['หม้อแปลงไฟฟ้า', 'อุปกรณ์เปลี่ยนแรงดันไฟให้เข้ากับระบบสายส่งของการไฟฟ้า'],
-  ['จุดเชื่อมต่อไฟฟ้า', 'ตำแหน่งที่ระบบของเราต่อเข้ากับสายส่งของการไฟฟ้า ยิ่งไกลยิ่งมีค่าใช้จ่ายสูง'],
-  ['ระยะคืนทุน', 'ระยะเวลาที่รายได้/เงินประหยัดสะสมเท่ากับเงินลงทุน เป็นการประมาณการไม่ใช่การรับประกัน'],
-  ['คะแนนความเหมาะสม', 'คะแนนที่ระบบให้ตามเกณฑ์พื้นที่ แดด ถนน และไฟฟ้า — ใช้เปรียบเทียบทางเลือกเท่านั้น'],
+  ['kWp (kilowatt-peak)', 'Combined generation capacity of the solar panels — the bigger the more power'],
+  ['kWh (energy unit)', 'Actual electricity used or produced — household bills use this unit'],
+  ['FiT', 'The rate utilities pay small producers under state programs — has conditions and quotas'],
+  ['Battery (BESS)', 'Stores electricity for later, e.g. daytime solar power for night use'],
+  ['Transformer', 'Steps voltage up or down to match the utility grid'],
+  ['Grid interconnection point', 'Where your system connects to the utility line — the farther the costlier'],
+  ['Payback period', 'Time until accumulated income/savings equals the investment — an estimate, not a guarantee'],
+  ['Suitability score', 'A system score from land, sun, road and grid criteria — for comparing options only'],
 ];
 
 export default function Help() {
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8">
       <PageHead
-        title="วิธีใช้งาน"
-        sub="LandWatt ออกแบบมาให้คนไม่มีความรู้เรื่องไฟฟ้าใช้ได้เอง — เตรียมแค่ว่าที่ดินอยู่ไหนและใหญ่ประมาณไหนก็เริ่มได้"
+        title="How to use"
+        sub="LandWatt is made for people with no electrical background — just knowing where the land is and roughly how big it is is enough to start"
       />
 
       <div className="space-y-4">
@@ -87,7 +87,7 @@ export default function Help() {
 
       <div className="card p-5 mt-6">
         <h2 className="font-semibold flex items-center gap-2">
-          <HelpCircle className="w-4 h-4 text-brand-600" /> คำศัพท์ที่อาจเจอ
+          <HelpCircle className="w-4 h-4 text-brand-600" /> Terms you may see
         </h2>
         <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3">
           {GLOSSARY.map(([term, def], i) => (
@@ -101,13 +101,13 @@ export default function Help() {
 
       <div className="mt-6 space-y-4">
         <Note>
-          <strong>ข้อจำกัดที่ควรรู้:</strong> ผลลัพธ์ของ LandWatt เป็นการประเมินเบื้องต้นจากข้อมูลที่ให้มาและสมมติฐานของระบบ
-          ระบบยังไม่ได้เชื่อมต่อข้อมูลเรียลไทม์ เช่น ตำแหน่งสายไฟจริง ราคาติดตั้งปัจจุบัน หรือโควต้ารับซื้อไฟ —
-          จึงไม่ใช่การรับรองว่าโครงการทำได้หรือราคา/รายได้จริง ก่อนตัดสินใจควรสำรวจพื้นที่และปรึกษาผู้เชี่ยวชาญ
+          <strong>Limitations to know:</strong> LandWatt results are preliminary estimates from your inputs and system assumptions.
+          The system has no live data feeds (real grid positions, current installation prices, purchase quotas) —
+          so it does not certify feasibility or real prices/income. Survey the site and consult experts before deciding
         </Note>
         <div className="text-center">
           <button onClick={() => navigate('/start')} className="btn-primary px-8">
-            พร้อมแล้ว — เริ่มวิเคราะห์ที่ดิน <ArrowRight className="w-4 h-4" />
+            Ready — analyze my land <ArrowRight className="w-4 h-4" />
           </button>
         </div>
       </div>

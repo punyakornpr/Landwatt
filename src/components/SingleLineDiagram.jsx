@@ -15,48 +15,48 @@ export default function SingleLineDiagram({ project, specs, landData }) {
   const elementDescriptions = {
     pv: {
       title: 'PV Array & DC Combiner Box',
-      standard: 'วสท. 022013-64 / IEC 62548',
-      desc: `แผงโซลาร์ N-Type TOPCon 620W รวม ${specs.moduleCount || '0'} แผง จัดวงจรสตริงละ ${specs.stringDesign?.stringSize || 20} แผง แรงดันสตริงสูงสุด ~${specs.stringDesign ? (specs.stringDesign.stringSize * parseFloat(specs.stringDesign.vocCold)).toFixed(0) : '—'} Vdc (≤ ${specs.stringDesign?.vdcMax || 1100} V พิกัดอินเวอร์เตอร์) พร้อมอุปกรณ์ป้องกันเสิร์จ Type 1+2 SPD`
+      standard: 'EIT 022013-64 / IEC 62548',
+      desc: `N-Type TOPCon 620W modules × ${specs.moduleCount || '0'}, ${specs.stringDesign?.stringSize || 20} per string; max string voltage ~${specs.stringDesign ? (specs.stringDesign.stringSize * parseFloat(specs.stringDesign.vocCold)).toFixed(0) : '—'} Vdc (≤ ${specs.stringDesign?.vdcMax || 1100} V inverter rating) with Type 1+2 SPD surge protection`
     },
     inverter: {
       title: 'String Inverter / Inverter Station',
       standard: 'IEC 62109-1/2, IEEE 1547-2018',
-      desc: `อินเวอร์เตอร์แปลงไฟกระแสตรงเป็นกระแสสลับ 3 เฟส 800Vac กำลังรวม ${specs.acCapacityMW || '0'} MW พร้อมระบบ MPPT และฟังก์ชันป้องกัน Anti-Islanding (IEEE 1547)`
+      desc: `DC-to-3-phase-AC inverters, 800Vac, ${specs.acCapacityMW || '0'} MW total, with MPPT and IEEE 1547 anti-islanding protection`
     },
     ev_chargers: {
       title: 'DC Fast Chargers & Dynamic Load Control',
-      standard: 'วสท. 022026-63 / IEC 61851-23',
-      desc: `ตู้ชาร์จ DC Superfast 180kW CCS2 จำนวน ${specs.dcChargersCount || 4} ตู้ พร้อม Dynamic Load Management (DLM) และ RCD Type B ตรวจจับไฟรั่ว`
+      standard: 'EIT 022026-63 / IEC 61851-23',
+      desc: `${specs.dcChargersCount || 4} × DC Superfast 180kW CCS2 cabinets with Dynamic Load Management (DLM) and Type-B RCD leakage detection`
     },
     bess_container: {
       title: 'BESS Container & Bi-directional PCS',
       standard: 'NFPA 855 / UL 9540',
-      desc: `ระบบแบตเตอรี่ลิเธียมฟอสเฟต (LFP) พร้อม Inverter สองทาง (PCS) ทำหน้าที่ Peak Shaving, Arbitrage และรักษาเสถียรภาพความถี่โครงข่าย`
+      desc: `Lithium iron phosphate (LFP) batteries with bi-directional PCS for peak shaving, arbitrage and grid frequency stabilization`
     },
     gen_biogas: {
       title: 'Biogas Lean-Burn Synchronous Generator',
-      standard: 'วสท. มาตรฐานเครื่องกำเนิดไฟฟ้า / IEEE C37.102',
-      desc: `เครื่องกำเนิดไฟฟ้าก๊าซชีวภาพ 400V 3-Phase Synchronous Generator 1500 RPM พร้อมระบบ Excitation และ Governor ควบคุมความถี่อัตโนมัติ`
+      standard: 'EIT generator standard / IEEE C37.102',
+      desc: `Biogas generator 400V 3-phase synchronous, 1500 RPM, with excitation and governor for automatic frequency control`
     },
     transformer: {
       title: 'Step-Up Transformer',
-      standard: 'มอก. 384-2543 / IEC 60076',
-      desc: `หม้อแปลงไฟฟ้ากำลัง ${specs.transformerRating || '1000 kVA'} อัตราแปลง 0.4kV / ${gridVoltage} ต่อขดลวดแบบ Dyn11 พร้อมบุชชิ่งแรงสูงและระบบป้องกันอุณหภูมิเกิน`
+      standard: 'TIS 384-2543 / IEC 60076',
+      desc: `${specs.transformerRating || '1000 kVA'} transformer, 0.4kV / ${gridVoltage} Dyn11 winding, with HV bushings and over-temperature protection`
     },
     rmu_switchgear: {
       title: 'Medium Voltage Switchgear & RMU (VCB)',
       standard: 'IEC 62271-200 / PEA Code',
-      desc: `ตู้สวิตช์เกียร์แรงกลางพร้อมเซอร์กิตเบรกเกอร์สุญญากาศ (Vacuum Circuit Breaker - VCB) พิกัด 24kV 630A Breaking Capacity 25kA`
+      desc: `MV switchgear with vacuum circuit breaker (VCB) rated 24kV 630A, breaking capacity 25kA`
     },
     protection_relay: {
       title: 'Numerical Protection Relays (ANSI Codes)',
       standard: 'IEEE C37.90 / PEA Protection Code',
-      desc: `ชุดรีเลย์ป้องกันระบบไฟ: 50/51 (Overcurrent), 51N (Earth Fault), 27/59 (Under/Over Voltage), 81O/U (Under/Over Frequency), 32R (Reverse Power Control)`
+      desc: `Protection relay set: 50/51 (overcurrent), 51N (earth fault), 27/59 (under/over voltage), 81O/U (frequency), 32R (reverse power)`
     },
     grid_pcc: {
       title: 'Point of Common Coupling (PCC) & Revenue Metering',
       standard: 'PEA/MEA Grid Code 2021',
-      desc: `จุดเชื่อมต่อระบบจำหน่ายของ ${gridName} แรงดัน ${gridVoltage} พร้อมหม้อแปลงวัดกระแส/แรงดัน (CT/PT Class 0.2S) สำหรับมาตรวัดคิดเงินแบบสองทิศทาง`
+      desc: `${gridName} distribution interconnection at ${gridVoltage} with CT/PT (Class 0.2S) for bi-directional revenue metering`
     }
   };
 
@@ -65,16 +65,16 @@ export default function SingleLineDiagram({ project, specs, landData }) {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3.5 border-b border-zinc-100 gap-2">
         <div>
           <h3 className="text-base font-bold text-zinc-900 flex items-center">
-            Single Line Diagram (SLD) — ไดอะแกรมเส้นเดียว
+            Single Line Diagram (SLD)
           </h3>
           <p className="text-xs text-zinc-500 mt-0.5">
-            ผังวงจรระบบไฟฟ้าตามมาตรฐาน วสท. และข้อกำหนดการเชื่อมต่อโครงข่าย {gridName}
+            Electrical schematic per EIT standards and {gridName} grid-interconnection rules
           </p>
         </div>
 
         <div className="text-[11px] text-zinc-500 flex items-center">
           <Info className="w-3.5 h-3.5 text-zinc-400 mr-1" />
-          <span>คลิกที่อุปกรณ์เพื่อดูค่าพิกัดทางวิศวกรรม</span>
+          <span>Click a component to view engineering ratings</span>
         </div>
       </div>
 
@@ -110,7 +110,7 @@ export default function SingleLineDiagram({ project, specs, landData }) {
               {isSolar ? 'PV ARRAY' : isEV ? 'EV CHARGERS' : isBESS ? 'BESS SYSTEM' : 'GAS ENGINE'}
             </span>
             <span className="text-[10px] mt-0.5 opacity-80">
-              {isSolar ? `${specs.dcCapacityMWp || '0'} MWp` : isEV ? `${specs.totalGuns || 8} หัวชาร์จ` : isBESS ? `${specs.capacityMWh || 3.7} MWh` : `${specs.generatorCapacityKW || 500} kW`}
+              {isSolar ? `${specs.dcCapacityMWp || '0'} MWp` : isEV ? `${specs.totalGuns || 8} guns` : isBESS ? `${specs.capacityMWh || 3.7} MWh` : `${specs.generatorCapacityKW || 500} kW`}
             </span>
             <span className="text-[9px] mt-0.5 font-mono opacity-60">
               {isSolar ? `~${specs.stringDesign ? (specs.stringDesign.stringSize * parseFloat(specs.stringDesign.vocCold)).toFixed(0) : '—'} Vdc` : '400 Vac'}
@@ -226,7 +226,7 @@ export default function SingleLineDiagram({ project, specs, landData }) {
               {gridName} PCC
             </span>
             <span className="text-[10px] mt-0.5 opacity-80">
-              มิเตอร์ 2 ทิศทาง
+              Bi-directional meter
             </span>
             <span className="text-[9px] mt-0.5 font-mono opacity-60">
               {gridVoltage} 3-Phase
@@ -254,32 +254,32 @@ export default function SingleLineDiagram({ project, specs, landData }) {
         </div>
       ) : (
         <div className="p-2.5 rounded-lg bg-zinc-50 border border-zinc-200 text-center text-xs text-zinc-500">
-          คลิกที่อุปกรณ์แต่ละตัวในไดอะแกรมเพื่อดูพิกัดวิศวกรรมไฟฟ้า (Voltage, Current, Protection Relays)
+          Click any component in the diagram for electrical ratings (voltage, current, protection relays)
         </div>
       )}
 
       {/* Engineering Specs Table */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 text-xs">
         <div className="p-3 rounded-lg bg-zinc-50 border border-zinc-200">
-          <span className="text-zinc-500 block text-[11px]">พิกัดกระแสแรงกลาง (MV)</span>
+          <span className="text-zinc-500 block text-[11px]">MV rated current</span>
           <span className="text-zinc-900 font-mono font-semibold text-sm mt-0.5 block">
             {specs.mvCurrentAmp || '26.2'} A @ {gridVoltage}
           </span>
         </div>
         <div className="p-3 rounded-lg bg-zinc-50 border border-zinc-200">
-          <span className="text-zinc-500 block text-[11px]">ขนาดสายเคเบิล</span>
+          <span className="text-zinc-500 block text-[11px]">Cable size</span>
           <span className="text-zinc-900 font-mono text-xs mt-0.5 block truncate">
             {specs.mvCable || 'XLPE 24kV 1x185 sq.mm'}
           </span>
         </div>
         <div className="p-3 rounded-lg bg-zinc-50 border border-zinc-200">
-          <span className="text-zinc-500 block text-[11px]">มาตรฐานอ้างอิง</span>
+          <span className="text-zinc-500 block text-[11px]">Reference standards</span>
           <span className="text-zinc-900 font-medium text-xs mt-0.5 block">
-            วสท. 022013-64 / PEA Code
+            EIT 022013-64 / PEA Code
           </span>
         </div>
         <div className="p-3 rounded-lg bg-zinc-50 border border-zinc-200">
-          <span className="text-zinc-500 block text-[11px]">จุดเชื่อมต่อจำหน่าย</span>
+          <span className="text-zinc-500 block text-[11px]">Grid interconnection</span>
           <span className="text-zinc-900 font-medium text-xs mt-0.5 block">
             {gridName} Overhead Feeder
           </span>

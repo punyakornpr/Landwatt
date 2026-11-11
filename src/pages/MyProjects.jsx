@@ -28,10 +28,10 @@ export default function MyProjects() {
     if (!file) return;
     try {
       const p = importProjectJSON(await file.text());
-      addProject({ ...p, id: `p-${Date.now()}`, name: p.name || 'แผนที่นำเข้า' });
+      addProject({ ...p, id: `p-${Date.now()}`, name: p.name || 'Imported plan' });
       setImportError('');
     } catch (err) {
-      setImportError('นำเข้าไม่สำเร็จ — ไฟล์ไม่ใช่แผน LandWatt ที่ถูกต้อง');
+      setImportError('Import failed — not a valid LandWatt plan file');
     }
     e.target.value = '';
   };
@@ -39,15 +39,15 @@ export default function MyProjects() {
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
       <PageHead
-        title="โครงการของฉัน"
-        sub="แผนที่ดินที่บันทึกไว้ — ข้อมูลเก็บในเบราว์เซอร์ของคุณเท่านั้น ไม่ได้ส่งไปเซิร์ฟเวอร์"
+        title="My projects"
+        sub="Your saved land plans — data stays in this browser, never sent to a server"
       >
         <div className="mt-4 flex flex-wrap gap-2">
           <button onClick={() => navigate('/start')} className="btn-primary text-sm">
-            <Plus className="w-4 h-4" /> เริ่มแผนใหม่
+            <Plus className="w-4 h-4" /> New plan
           </button>
           <button onClick={() => fileRef.current?.click()} className="btn-secondary text-sm">
-            <Upload className="w-4 h-4" /> นำเข้าไฟล์แผน (.json)
+            <Upload className="w-4 h-4" /> Import plan file (.json)
           </button>
           <input ref={fileRef} type="file" accept="application/json" className="hidden" onChange={handleImport} />
         </div>
@@ -57,10 +57,10 @@ export default function MyProjects() {
       {projects.length === 0 ? (
         <div className="card p-10 text-center">
           <FolderOpen className="w-10 h-10 text-ink-faint mx-auto mb-3" />
-          <h2 className="font-semibold">ยังไม่มีแผนที่บันทึกไว้</h2>
-          <p className="text-sm text-ink-soft mt-1.5">เริ่มวิเคราะห์ที่ดิน แล้วกด "บันทึกแผน" ในหน้าแผนเพื่อเก็บไว้ที่นี่</p>
+          <h2 className="font-semibold">No saved plans yet</h2>
+          <p className="text-sm text-ink-soft mt-1.5">Analyze your land, then press "Save plan" on the plan page to keep it here</p>
           <button onClick={() => navigate('/start')} className="btn-primary mt-5">
-            เริ่มวิเคราะห์ที่ดิน <ArrowRight className="w-4 h-4" />
+            Analyze land <ArrowRight className="w-4 h-4" />
           </button>
         </div>
       ) : (
@@ -75,32 +75,32 @@ export default function MyProjects() {
                   <div className="min-w-0">
                     <div className="font-semibold truncate">{p.name}</div>
                     <div className="text-xs text-ink-faint mt-0.5">
-                      {p.land.provinceData?.name || 'ไม่ระบุจังหวัด'} · {(p.land.areaSqM / 1600).toFixed(2)} ไร่
+                      {p.land.provinceData?.nameEn || p.land.provinceData?.name || 'No province'} · {(p.land.areaSqM / 1600).toFixed(2)} rai
                       {p.chosenPlanId && PROJECT_FRIENDLY[p.chosenPlanId] ? ` · ${PROJECT_FRIENDLY[p.chosenPlanId].name}` : ''}
                     </div>
                     <div className="text-[11px] text-ink-faint mt-0.5">
-                      บันทึกเมื่อ {new Date(p.createdAt).toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' })}
-                      {!p.engineVersion && <div className="text-[10px] text-volt-800 mt-0.5">สร้างด้วยเวอร์ชันเก่า — จะคำนวณใหม่จากข้อมูลเดิมตอนเปิด</div>}
+                      Saved {new Date(p.createdAt).toLocaleDateString('en-GB', { year: 'numeric', month: 'short', day: 'numeric' })}
+                      {!p.engineVersion && <div className="text-[10px] text-volt-800 mt-0.5">Made with an older version — recalculated from saved data on open</div>}
                     </div>
                   </div>
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
                   <button onClick={() => { openProject(p.id); navigate(p.chosenPlanId ? `/plan/${p.chosenPlanId}` : '/results'); }}
-                    className="btn-primary text-xs px-4 py-2.5">เปิดแผน</button>
-                  <button onClick={() => duplicateProject(p.id)} className="btn-ghost text-xs px-3 py-2.5" title="ทำสำเนา">
+                    className="btn-primary text-xs px-4 py-2.5">Open</button>
+                  <button onClick={() => duplicateProject(p.id)} className="btn-ghost text-xs px-3 py-2.5" title="Duplicate">
                     <Copy className="w-4 h-4" />
                   </button>
-                  <button onClick={() => handleExport(p)} className="btn-ghost text-xs px-3 py-2.5" title="ส่งออก JSON">
+                  <button onClick={() => handleExport(p)} className="btn-ghost text-xs px-3 py-2.5" title="Export JSON">
                     <Download className="w-4 h-4" />
                   </button>
                   {confirmId === p.id ? (
                     <span className="flex items-center gap-1.5">
                       <button onClick={() => { deleteProject(p.id); setConfirmId(null); }}
-                        className="text-xs font-medium text-white bg-red-600 rounded-lg px-3 py-2">ยืนยันลบ</button>
-                      <button onClick={() => setConfirmId(null)} className="btn-ghost text-xs px-2 py-2">ยกเลิก</button>
+                        className="text-xs font-medium text-white bg-red-600 rounded-lg px-3 py-2">Confirm delete</button>
+                      <button onClick={() => setConfirmId(null)} className="btn-ghost text-xs px-2 py-2">Cancel</button>
                     </span>
                   ) : (
-                    <button onClick={() => setConfirmId(p.id)} className="btn-ghost text-xs px-3 py-2.5 text-red-600" title="ลบ">
+                    <button onClick={() => setConfirmId(p.id)} className="btn-ghost text-xs px-3 py-2.5 text-red-600" title="Delete">
                       <Trash2 className="w-4 h-4" />
                     </button>
                   )}
@@ -113,7 +113,7 @@ export default function MyProjects() {
 
       <div className="mt-6">
         <Note>
-          ข้อมูลถูกเก็บใน localStorage ของเบราว์เซอร์นี้ — จะไม่หายเมื่อรีเฟรชหน้า แต่ถ้าล้างข้อมูลเบราว์เซอร์หรือเปลี่ยนอุปกรณ์ข้อมูลจะหายไป ส่งออกเป็นไฟล์ JSON เพื่อสำรองไว้ได้
+          Data is stored in this browser's localStorage — it survives refreshes but is lost if you clear browser data or switch devices. Export a JSON file as backup
         </Note>
       </div>
     </div>

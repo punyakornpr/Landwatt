@@ -104,7 +104,7 @@ for (const fid of fidCalls) {
 }
 assert.ok(evSrc.includes('aria-expanded'), 'ต้องมี aria-expanded บนปุ่มขยาย');
 assert.ok(evSrc.includes('aria-controls'), 'ต้องมี aria-controls');
-assert.ok(evSrc.includes('มีกำลังติดตั้งรวมเท่าไร'), 'F-04 ต้องเป็นหัวข้อคำถามกำลังติดตั้ง');
+assert.ok(evSrc.includes('installed DC capacity'), 'F-04 must be a capacity question heading');
 // กราฟต้องใช้ cashFlows เดียวกับ engine (11.5)
 const chartSrc = readFileSync(new URL('../src/components/FinancialYieldChart.jsx', import.meta.url), 'utf8');
 assert.ok(chartSrc.includes('specs.cashFlows'), 'กราฟต้องอ่าน specs.cashFlows ไม่คำนวณแยก');

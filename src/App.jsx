@@ -12,10 +12,10 @@ import Report from './pages/Report';
 import { Sun, Menu, X } from 'lucide-react';
 
 const NAV_ITEMS = [
-  { path: '', label: 'หน้าแรก' },
-  { path: 'start', label: 'เริ่มวิเคราะห์ที่ดิน' },
-  { path: 'projects', label: 'โครงการของฉัน' },
-  { path: 'help', label: 'วิธีใช้งาน' },
+  { path: '', label: 'Home' },
+  { path: 'start', label: 'Analyze land' },
+  { path: 'projects', label: 'My projects' },
+  { path: 'help', label: 'How to use' },
 ];
 
 function NavBar() {
@@ -36,7 +36,7 @@ function NavBar() {
           </div>
           <div className="text-left">
             <div className="font-bold text-base tracking-tight leading-none">LandWatt</div>
-            <div className="text-[10px] text-ink-faint leading-tight mt-0.5 hidden sm:block">ผู้ช่วยวางแผนที่ดินด้านพลังงาน</div>
+            <div className="text-[10px] text-ink-faint leading-tight mt-0.5 hidden sm:block">Land-energy planning assistant</div>
           </div>
         </button>
 
@@ -50,7 +50,7 @@ function NavBar() {
           ))}
         </nav>
 
-        <button className="md:hidden p-2" onClick={() => setOpen(o => !o)} aria-label="เมนู">
+        <button className="md:hidden p-2" onClick={() => setOpen(o => !o)} aria-label="Menu">
           {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
         </button>
       </div>
@@ -92,8 +92,8 @@ function RoutedApp() {
       <main className="flex-1">{page}</main>
       <footer className="border-t border-[#E7E5DD] py-8 px-4 sm:px-6 text-center no-print">
         <p className="text-xs text-ink-faint">
-          LandWatt — ผลลัพธ์เป็นการประเมินเบื้องต้น ไม่ใช่การรับรองทางกฎหมายหรือราคาจริง ·
-          ข้อมูลเก็บในเบราว์เซอร์ของคุณเท่านั้น
+          LandWatt — results are preliminary estimates, not legal or price guarantees ·
+          Your data is stored only in this browser
         </p>
       </footer>
     </div>

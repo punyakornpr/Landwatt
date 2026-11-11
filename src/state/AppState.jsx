@@ -31,7 +31,7 @@ export function AppStateProvider({ children }) {
     saveCurrent: (name) => {
       const p = {
         id: `p-${Date.now()}`,
-        name: name || `แผนที่ดิน ${new Date().toLocaleDateString('th-TH')}`,
+        name: name || `Land plan ${new Date().toLocaleDateString('en-GB')}`,
         createdAt: new Date().toISOString(),
         land: draft.land,
         goals: draft.goals,
@@ -50,7 +50,7 @@ export function AppStateProvider({ children }) {
     duplicateProject: (id) => {
       const p = projects.find(x => x.id === id);
       if (!p) return;
-      setProjects(list => [{ ...p, id: `p-${Date.now()}`, name: `${p.name} (สำเนา)` }, ...list]);
+      setProjects(list => [{ ...p, id: `p-${Date.now()}`, name: `${p.name} (copy)` }, ...list]);
     },
     deleteProject: (id) => setProjects(list => list.filter(x => x.id !== id)),
     addProject: (p) => setProjects(list => [p, ...list]),

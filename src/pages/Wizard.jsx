@@ -10,20 +10,20 @@ import {
   Store, Waves, Trees, HelpCircle,
 } from 'lucide-react';
 
-const JOURNEY_STEPS = ['ที่ดินของคุณ', 'เป้าหมายและงบ', 'ทางเลือกแนะนำ', 'ดูแผน', 'เก็บแผน/รายงาน'];
+const JOURNEY_STEPS = ['Your land', 'Goals & budget', 'Suggested options', 'Review plan', 'Save/report'];
 
 const LAND_KINDS = [
-  { id: 'open', icon: Mountain, title: 'ที่โล่งหรือที่ราบ', sub: 'พื้นว่าง ไม่มีอะไรบังแดด',
+  { id: 'open', icon: Mountain, title: 'Open or flat land', sub: 'Empty land, nothing shading it',
     patch: { landKind: 'open', landType: 'flat', hasWaterBody: false, landTypeUnknown: false, hasAgriculturalWaste: false, zoningColor: 'green' } },
-  { id: 'agri', icon: SproutIcon, title: 'สวน / พื้นที่เกษตร', sub: 'ปลูกพืชหรือทำเกษตรอยู่',
+  { id: 'agri', icon: SproutIcon, title: 'Orchard / farmland', sub: 'Currently planted or farmed',
     patch: { landKind: 'agri', landType: 'agri', hasWaterBody: false, landTypeUnknown: false, hasAgriculturalWaste: true, zoningColor: 'green' } },
-  { id: 'roadside', icon: Store, title: 'ติดถนนหรือย่านการค้า', sub: 'รถผ่านสะดวก หน้ากว้าง',
+  { id: 'roadside', icon: Store, title: 'Roadside / commercial', sub: 'Easy vehicle access, wide frontage',
     patch: { landKind: 'roadside', landType: 'flat', hasWaterBody: false, landTypeUnknown: false, hasAgriculturalWaste: false, roadType: 'main', roadWidthMeters: 12, zoningColor: 'orange' } },
-  { id: 'pond', icon: Waves, title: 'มีบ่อน้ำ / สระน้ำ', sub: 'มีพื้นที่น้ำอยู่ในแปลง',
+  { id: 'pond', icon: Waves, title: 'Has a pond / water body', sub: 'Part of the plot is water',
     patch: { landKind: 'pond', landType: 'pond', hasWaterBody: true, landTypeUnknown: false, hasAgriculturalWaste: false } },
-  { id: 'slope', icon: Mountain, title: 'ที่ลาดเอียง', sub: 'เนินหรือพื้นที่ไม่เรียบ',
+  { id: 'slope', icon: Mountain, title: 'Sloped land', sub: 'Hills or uneven terrain',
     patch: { landKind: 'slope', landType: 'slope', hasWaterBody: false, landTypeUnknown: false, hasAgriculturalWaste: false } },
-  { id: 'unsure', icon: HelpCircle, title: 'ยังไม่แน่ใจ', sub: 'ใส่ค่าประมาณไปก่อนได้ ทีหลังค่อยแก้',
+  { id: 'unsure', icon: HelpCircle, title: 'Not sure yet', sub: 'Enter rough values now, refine later',
     patch: { landKind: 'unsure', landType: 'flat', landTypeUnknown: true } },
 ];
 
@@ -35,7 +35,7 @@ export default function Wizard() {
   const thai = convertSqMetersToThai(land.areaSqM);
 
   const canNext1 = land.areaSqM > 0;
-  // landKind = การ์ดที่ผู้ใช้เลือกล่าสุด (fallback: เดาจากฟิลด์เดิมสำหรับ draft เก่า)
+  // landKind = last card the user picked (fallback: infer from old fields for old drafts)
   const kind = LAND_KINDS.find(k => k.id === land.landKind)
     || (land.landTypeUnknown ? LAND_KINDS[5]
     : (land.hasWaterBody || land.landType === 'pond') ? LAND_KINDS[3]
@@ -55,8 +55,8 @@ export default function Wizard() {
       {step === 0 && (
         <div className="space-y-6">
           <div>
-            <h1 className="text-2xl font-bold">ที่ดินของคุณอยู่ที่ไหน?</h1>
-            <p className="text-sm text-ink-soft mt-1">ปักหมุดบนแผนที่ หรือค้นหาชื่ออำเภอ/จังหวัดก็ได้ — ไม่ต้องรู้พิกัดเป๊ะ ๆ</p>
+            <h1 className="text-2xl font-bold">Where is your land?</h1>
+            <p className="text-sm text-ink-soft mt-1">Drop a pin on the map or search a district/province name — exact coordinates not needed</p>
           </div>
 
           {/* Location */}
@@ -72,11 +72,11 @@ export default function Wizard() {
             />
             {land.provinceData && (
               <Note type="ok">
-                เราได้ตำแหน่งประมาณนี้แล้ว: <strong>{land.detectedProvinceName || land.provinceData.name}</strong>
-                {land.detectedProvinceName && land.detectedProvinceName !== land.provinceData.name.split(' ')[0].split('/')[0] && (
-                  <span className="text-ink-faint"> (ข้อมูลแดด/กริดอ้างอิงจาก{land.provinceData.name}เพราะยังไม่มีข้อมูลเฉพาะจังหวัดนี้)</span>
+                We located roughly here: <strong>{land.detectedProvinceName || land.provinceData.nameEn || land.provinceData.name}</strong>
+                {land.detectedProvinceName && land.detectedProvinceName !== (land.provinceData.nameEn || land.provinceData.name).split('/')[0].trim() && (
+                  <span className="text-ink-faint"> (solar/grid data referenced from {land.provinceData.nameEn || land.provinceData.name} — no province-specific data yet)</span>
                 )} —
-                พื้นที่นี้มีแดดเฉลี่ย {land.provinceData.ghi} kWh/ตร.ม./วัน และอยู่ในเขต{land.provinceData.grid === 'MEA' ? 'การไฟฟ้านครหลวง' : 'การไฟฟ้าส่วนภูมิภาค'}
+                This area averages {land.provinceData.ghi} kWh/m²/day of sun and is in the {land.provinceData.grid === 'MEA' ? 'MEA (metropolitan)' : 'PEA (provincial)'} grid zone
               </Note>
             )}
           </div>
@@ -84,11 +84,11 @@ export default function Wizard() {
           {/* Size */}
           <div className="card p-5">
             <h2 className="text-base font-semibold flex items-center gap-2 mb-1">
-              <Ruler className="w-4 h-4 text-brand-600" /> ที่ดินมีขนาดประมาณเท่าไร?
+              <Ruler className="w-4 h-4 text-brand-600" /> Roughly how big is the land?
             </h2>
-            <p className="text-xs text-ink-faint mb-4">ไม่แน่ใจขนาดที่ดิน? ใส่ค่าประมาณไปก่อนได้ หรือวาดขอบเขตบนแผนที่ด้านบน</p>
+            <p className="text-xs text-ink-faint mb-4">Not sure of the size? Enter a rough value or draw the boundary on the map above</p>
             <div className="grid grid-cols-3 gap-3">
-              {[['rai', 'ไร่'], ['ngan', 'งาน'], ['sqWah', 'ตารางวา']].map(([k, label]) => (
+              {[['rai', 'Rai'], ['ngan', 'Ngan'], ['sqWah', 'Sq. wah']].map(([k, label]) => (
                 <div key={k}>
                   <label className="block text-xs text-ink-faint mb-1">{label}</label>
                   <input
@@ -103,18 +103,18 @@ export default function Wizard() {
               ))}
             </div>
             <div className="mt-3 flex items-center justify-between rounded-xl bg-paper border border-[#E7E5DD] px-4 py-2.5 text-sm">
-              <span className="text-ink-faint">พื้นที่รวม</span>
-              <span className="font-semibold">{(land.areaSqM / 1600).toFixed(2)} ไร่ ≈ {land.areaSqM.toLocaleString()} ตร.ม.</span>
+              <span className="text-ink-faint">Total area</span>
+              <span className="font-semibold">{(land.areaSqM / 1600).toFixed(2)} rai ≈ {land.areaSqM.toLocaleString()} m²</span>
             </div>
-            {land.areaSqM <= 0 && <Note type="warn">กรุณาใส่ขนาดพื้นที่อย่างน้อยคร่าว ๆ เพื่อให้ระบบประเมินได้</Note>}
+            {land.areaSqM <= 0 && <Note type="warn">Please enter at least a rough area so the system can estimate</Note>}
           </div>
 
           {/* Land kind */}
           <div className="card p-5">
             <h2 className="text-base font-semibold flex items-center gap-2 mb-1">
-              <Mountain className="w-4 h-4 text-brand-600" /> ที่ดินเป็นแบบไหน?
+              <Mountain className="w-4 h-4 text-brand-600" /> What kind of land is it?
             </h2>
-            <p className="text-xs text-ink-faint mb-4">เลือกแบบที่ใกล้ที่สุด — ถ้าไม่แน่ใจเลือก "ยังไม่แน่ใจ" ได้</p>
+            <p className="text-xs text-ink-faint mb-4">Pick the closest match — if unsure, choose "Not sure yet"</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {LAND_KINDS.map(k => (
                 <OptionCard
@@ -131,14 +131,14 @@ export default function Wizard() {
 
           {/* Optional extras */}
           <Collapsible
-            title="ตอบเพิ่มถ้าทราบ (ช่วยให้ผลแม่นขึ้น)"
-            sub="ข้ามได้ทั้งหมด — ระบบจะระบุไว้ว่าข้อมูลส่วนนี้ยังไม่มี"
+            title="Answer more if you know (improves accuracy)"
+            sub="All skippable — the system will note missing data"
           >
             <div className="space-y-5 pt-3">
               <div>
-                <div className="text-sm font-medium mb-2">มีต้นไม้ใหญ่หรืออาคารบังแสงแดดไหม?</div>
+                <div className="text-sm font-medium mb-2">Do large trees or buildings shade the site?</div>
                 <div className="flex flex-wrap gap-2">
-                  {[['ไม่มีหรือมีน้อย', false], ['มีบดบังพอสมควร', true], ['ไม่ทราบ', null]].map(([label, val]) => (
+                  {[['None or little', false], ['Noticeable shading', true], ['Unknown', null]].map(([label, val]) => (
                     <button key={label} type="button"
                       onClick={() => updateLand({ hasShading: val })}
                       className={`chip border transition ${land.hasShading === val ? 'bg-brand-700 text-white border-brand-700' : 'bg-white border-[#DDDAD0] text-ink-soft hover:border-brand-400'}`}>
@@ -148,9 +148,9 @@ export default function Wizard() {
                 </div>
               </div>
               <div>
-                <div className="text-sm font-medium mb-2">มีอาคาร/บ่อ/สิ่งกีดขวางในพื้นที่ไหม? (จะหักออกจากพื้นที่ใช้งาน)</div>
+                <div className="text-sm font-medium mb-2">Any buildings/ponds/obstructions? (deducted from usable area)</div>
                 <div className="flex flex-wrap gap-2">
-                  {[['ไม่มี', 'none'], ['มี — ระบุขนาด', 'yes'], ['ไม่ทราบ', 'unknown']].map(([label, val]) => (
+                  {[['None', 'none'], ['Yes — specify size', 'yes'], ['Unknown', 'unknown']].map(([label, val]) => (
                     <button key={val} type="button"
                       onClick={() => updateLand({ hasStructures: val, excludedAreaSqM: val === 'yes' ? land.excludedAreaSqM : 0 })}
                       className={`chip border transition ${land.hasStructures === val ? 'bg-brand-700 text-white border-brand-700' : 'bg-white border-[#DDDAD0] text-ink-soft hover:border-brand-400'}`}>
@@ -160,24 +160,24 @@ export default function Wizard() {
                 </div>
                 {land.hasStructures === 'yes' && (
                   <div className="mt-2 flex items-center gap-2">
-                    <input type="number" min="0" className="input-field w-32" placeholder="ตร.ม."
+                    <input type="number" min="0" className="input-field w-32" placeholder="m²"
                       value={land.excludedAreaSqM || ''}
                       onChange={(e) => updateLand({ excludedAreaSqM: Math.max(0, Number(e.target.value) || 0) })} />
                     <span className="text-xs text-ink-soft">
-                      ตร.ม. → พื้นที่ใช้งานเหลือ ≈ {Math.max(0, land.areaSqM - (land.excludedAreaSqM || 0)).toLocaleString()} ตร.ม.
+                      m² → usable left ≈ {Math.max(0, land.areaSqM - (land.excludedAreaSqM || 0)).toLocaleString()} m²
                     </span>
                   </div>
                 )}
                 {land.hasStructures === 'unknown' && (
-                  <p className="text-xs text-volt-700 mt-2">ไม่ทราบ — ระบบจะไม่สรุปว่าพื้นที่โล่ง แนะนำตรวจสอบภาคสนามก่อนตัดสินใจ</p>
+                  <p className="text-xs text-volt-700 mt-2">Unknown — the system will not assume open land; a site visit is recommended</p>
                 )}
               </div>
               <div>
-                <div className="text-sm font-medium mb-2">เดินทางเข้าที่ดินสะดวกแค่ไหน?</div>
+                <div className="text-sm font-medium mb-2">How easy is road access to the land?</div>
                 <div className="flex flex-wrap gap-2">
-                  {[['ติดถนนใหญ่', { roadType: 'main', roadWidthMeters: 12 }],
-                    ['ถนนรอง/ลาดยาง', { roadType: 'secondary', roadWidthMeters: 8 }],
-                    ['ทางลูกรัง/เข้ายาก', { roadType: 'dirt', roadWidthMeters: 4 }]].map(([label, patch]) => (
+                  {[['On a main road', { roadType: 'main', roadWidthMeters: 12 }],
+                    ['Secondary/paved road', { roadType: 'secondary', roadWidthMeters: 8 }],
+                    ['Dirt road/hard to reach', { roadType: 'dirt', roadWidthMeters: 4 }]].map(([label, patch]) => (
                     <button key={label} type="button"
                       onClick={() => updateLand(patch)}
                       className={`chip border transition ${land.roadType === patch.roadType ? 'bg-brand-700 text-white border-brand-700' : 'bg-white border-[#DDDAD0] text-ink-soft hover:border-brand-400'}`}>
@@ -187,17 +187,17 @@ export default function Wizard() {
                 </div>
               </div>
               <div>
-                <div className="text-sm font-medium mb-2">มีสายไฟแรงสูงผ่านใกล้ที่ดินไหม?</div>
+                <div className="text-sm font-medium mb-2">Is a power line near the land?</div>
                 <div className="flex flex-wrap gap-2 mb-3">
                   <button type="button"
                     onClick={() => updateLand({ gridUnknown: true })}
                     className={`chip border transition ${land.gridUnknown ? 'bg-brand-700 text-white border-brand-700' : 'bg-white border-[#DDDAD0] text-ink-soft hover:border-brand-400'}`}>
-                    ไม่ทราบ (ข้ามได้)
+                    Unknown (skip)
                   </button>
                   <button type="button"
                     onClick={() => updateLand({ gridUnknown: false })}
                     className={`chip border transition ${!land.gridUnknown ? 'bg-brand-700 text-white border-brand-700' : 'bg-white border-[#DDDAD0] text-ink-soft hover:border-brand-400'}`}>
-                    ทราบคร่าว ๆ
+                    Know roughly
                   </button>
                 </div>
                 {!land.gridUnknown ? (
@@ -206,22 +206,22 @@ export default function Wizard() {
                       onChange={(e) => updateLand({ gridDistanceMeters: parseInt(e.target.value) })}
                       className="w-full accent-brand-700" />
                     <div className="flex justify-between text-xs text-ink-faint mt-1">
-                      <span>ติดขอบแปลง</span>
-                      <span className="font-medium text-ink">ห่างประมาณ {land.gridDistanceMeters} เมตร</span>
-                      <span>ไกลมาก</span>
+                      <span>Adjacent</span>
+                      <span className="font-medium text-ink">about {land.gridDistanceMeters} m away</span>
+                      <span>Very far</span>
                     </div>
                   </div>
                 ) : (
-                  <Note>ไม่เป็นไร — เราจะประเมินด้วยค่าประมาณและบอกไว้ในผลว่าควรตรวจสอบจุดเชื่อมต่อไฟฟ้ากับการไฟฟ้าพื้นที่ภายหลัง</Note>
+                  <Note>No problem — we will estimate and flag in results that the grid connection point should be confirmed with the local utility</Note>
                 )}
               </div>
             </div>
           </Collapsible>
 
           <div className="flex items-center justify-between pt-2">
-            <button onClick={() => navigate('/')} className="btn-ghost"><ArrowLeft className="w-4 h-4" /> กลับหน้าแรก</button>
+            <button onClick={() => navigate('/')} className="btn-ghost"><ArrowLeft className="w-4 h-4" /> Back to home</button>
             <button onClick={() => setStep(1)} disabled={!canNext1} className="btn-primary">
-              ถัดไป <ArrowRight className="w-4 h-4" />
+              Next <ArrowRight className="w-4 h-4" />
             </button>
           </div>
         </div>
@@ -230,8 +230,8 @@ export default function Wizard() {
       {step === 1 && (
         <div className="space-y-6">
           <div>
-            <h1 className="text-2xl font-bold">คุณอยากให้ที่ดินแปลงนี้ช่วยเรื่องอะไร?</h1>
-            <p className="text-sm text-ink-soft mt-1">เลือกได้มากกว่า 1 ข้อ หรือเลือก "ยังไม่มีไอเดีย" ให้ระบบช่วยแนะนำ</p>
+            <h1 className="text-2xl font-bold">What do you want this land to help with?</h1>
+            <p className="text-sm text-ink-soft mt-1">Pick more than one, or "No idea yet" and let the system suggest</p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -254,13 +254,13 @@ export default function Wizard() {
 
           {goals.aims.includes('save') && (
             <div className="card p-5">
-              <div className="text-sm font-medium mb-2">ค่าไฟเฉลี่ยเดือนละประมาณเท่าไร? <span className="text-ink-faint font-normal">(ข้ามได้)</span></div>
+              <div className="text-sm font-medium mb-2">Average monthly electricity bill? <span className="text-ink-faint font-normal">(optional)</span></div>
               <div className="flex flex-wrap gap-2">
-                {[['ต่ำกว่า 3,000', 2000], ['3,000–10,000', 6500], ['10,000–30,000', 20000], ['มากกว่า 30,000', 45000]].map(([label, val]) => (
+                {[['Under 3,000', 2000], ['3,000–10,000', 6500], ['10,000–30,000', 20000], ['Over 30,000', 45000]].map(([label, val]) => (
                   <button key={label} type="button"
                     onClick={() => updateGoals({ monthlyBill: val })}
                     className={`chip border transition ${goals.monthlyBill === val ? 'bg-brand-700 text-white border-brand-700' : 'bg-white border-[#DDDAD0] text-ink-soft hover:border-brand-400'}`}>
-                    {label} บาท
+                    {label} THB
                   </button>
                 ))}
               </div>
@@ -269,9 +269,9 @@ export default function Wizard() {
 
           {goals.aims.includes('ev') && (
             <div className="card p-5">
-              <div className="text-sm font-medium mb-2">ที่ดินติดถนนที่มีรถผ่านมากไหม? <span className="text-ink-faint font-normal">(ข้ามได้)</span></div>
+              <div className="text-sm font-medium mb-2">Is the land on a busy road? <span className="text-ink-faint font-normal">(optional)</span></div>
               <div className="flex flex-wrap gap-2">
-                {[['รถผ่านมาก', 'high'], ['ปานกลาง', 'medium'], ['ไม่ค่อยมี', 'low'], ['ไม่ทราบ', 'unknown']].map(([label, val]) => (
+                {[['Heavy traffic', 'high'], ['Moderate', 'medium'], ['Quiet', 'low'], ['Unknown', 'unknown']].map(([label, val]) => (
                   <button key={label} type="button"
                     onClick={() => updateGoals({ evTraffic: val })}
                     className={`chip border transition ${goals.evTraffic === val ? 'bg-brand-700 text-white border-brand-700' : 'bg-white border-[#DDDAD0] text-ink-soft hover:border-brand-400'}`}>
@@ -283,8 +283,8 @@ export default function Wizard() {
           )}
 
           <div className="card p-5">
-            <h2 className="text-base font-semibold mb-1">มีงบลงทุนในใจหรือยัง?</h2>
-            <p className="text-xs text-ink-faint mb-4">ช่วงงบนี้ใช้กรองทางเลือกให้เหมาะกับคุณ ไม่ใช่ราคาจริงของโครงการ</p>
+            <h2 className="text-base font-semibold mb-1">Do you have a budget in mind?</h2>
+            <p className="text-xs text-ink-faint mb-4">This range filters suitable options — not a real project price</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
               {BUDGET_OPTIONS.map(b => (
                 <button key={b.id} type="button"
@@ -299,9 +299,9 @@ export default function Wizard() {
           </div>
 
           <div className="flex items-center justify-between pt-2">
-            <button onClick={() => setStep(0)} className="btn-ghost"><ArrowLeft className="w-4 h-4" /> กลับ</button>
+            <button onClick={() => setStep(0)} className="btn-ghost"><ArrowLeft className="w-4 h-4" /> Back</button>
             <button onClick={finish} className="btn-primary text-base px-7">
-              <Check className="w-4 h-4" /> ดูทางเลือกที่แนะนำ
+              <Check className="w-4 h-4" /> See suggested options
             </button>
           </div>
         </div>

@@ -1,155 +1,155 @@
-// ข้อมูลโครงการวิศวกรรมไฟฟ้าสำหรับการพัฒนาที่ดินว่างเปล่า
+// Electrical-engineering land-use project profiles for vacant-land development
 // Comprehensive Electrical Engineering Land-Use Project Profiles
 
 export const EE_PROJECTS = [
   {
     id: 'solar-farm',
-    title: 'โรงไฟฟ้าพลังงานแสงอาทิตย์บนดิน (Ground-Mounted Solar Farm)',
-    shortTitle: 'Solar Farm (บนดิน)',
+    title: 'Ground-Mounted Solar Farm',
+    shortTitle: 'Solar Farm (ground)',
     category: 'renewable',
     icon: 'Sun',
     accentColor: 'amber',
-    tagline: 'เปลี่ยนที่ดินว่างเปล่าเป็นแหล่งผลิตไฟฟ้าพลังงานสะอาด จำหน่ายให้ กฟภ./กฟน. หรือนิคมฯ',
-    suitableAreaMinRai: 2, // เริ่มต้นตั้งแต่ 2 ไร่ขึ้นไป (หรือ scalable)
+    tagline: 'Turn vacant land into a clean power source sold to PEA/MEA or an industrial estate',
+    suitableAreaMinRai: 2, // from ~2 rai (scalable)
     preferredZoning: ['green', 'yellow', 'purple', 'light_green'],
-    standards: ['วสท. 022013-64 (มาตรฐานการติดตั้งโซลาร์เซลล์)', 'PEA Interconnection Code 2021', 'ERC Regulations 2022-2030'],
-    description: 'โครงการพัฒนาพื้นที่เพื่อติดตั้งระบบผลิตไฟฟ้าพลังงานแสงอาทิตย์แบบติดตั้งบนพื้นดิน (Ground-mounted Solar PV) เชื่อมต่อระบบโครงข่ายจำหน่ายไฟฟ้าแรงกลาง (Medium Voltage 22kV / 33kV) หรือแรงสูง เพื่อจำหน่ายไฟผ่านโครงการ Utility Green Tariff (UGT), Feed-in Tariff (FiT) หรือ Private PPA ให้กับโรงงานข้างเคียง',
+    standards: ['EIT 022013-64 (solar installation standard)', 'PEA Interconnection Code 2021', 'ERC Regulations 2022-2030'],
+    description: 'Develop the site for a ground-mounted solar PV system interconnected to the medium-voltage distribution network (22kV / 33kV) or higher, selling power via Utility Green Tariff (UGT), Feed-in Tariff (FiT) or a Private PPA with neighboring factories',
     keyBenefits: [
-      'สร้างกระแสเงินสดสม่ำเสมอยาวนาน 20-25 ปี (PPA/FiT)',
-      'มูลค่าการลงทุนต่อวัตต์ลดลงอย่างมากด้วยเทคโนโลยี N-Type TOPCon / Bifacial',
-      'ค่าบำรุงรักษาต่ำ (Low OPEX) เมื่อเทียบกับโรงไฟฟ้าประเภทอื่น',
-      'ลดการปล่อยก๊าซเรือนกระจกและได้คาร์บอนเครดิต (T-VER)'
+      'Steady cash flow for 20-25 years (PPA/FiT)',
+      'Cost per watt keeps falling with N-Type TOPCon / Bifacial technology',
+      'Low O&M compared to other generation types',
+      'Cuts greenhouse-gas emissions and earns carbon credits (T-VER)'
     ],
     technicalHighlights: [
-      'ใช้แผง Bifacial 620W+ N-Type รับแสงทั้งสองด้าน (+5-15% Albedo gain)',
-      'อินเวอร์เตอร์ String Inverter (Grid-tie) ขนาด 250-330 kW ประสิทธิภาพ >98.8%',
-      'หม้อแปลง Step-up 0.8kV / 22kV (หรือ 33kV) พร้อมระบบตัดตอนและป้องกัน VCB/Relay 50/51',
-      'ระบบควบคุม SCADA / Weather Station ตรวจวัดอุณหภูมิแผงและความเข้มแสง (Pyranometer)'
+      'Bifacial 620W+ N-Type modules harvesting both sides (+5-15% albedo gain)',
+      'String inverters (grid-tie) 250-330 kW at >98.8% efficiency',
+      'Step-up transformer 0.8kV / 22kV (or 33kV) with VCB / 50-51 protection relays',
+      'SCADA / weather station monitoring module temperature and irradiance (pyranometer)'
     ]
   },
   {
     id: 'agrivoltaics',
-    title: 'เกษตรพลังงานแสงอาทิตย์ร่วม (Agrivoltaics / Dual-Use Solar)',
-    shortTitle: 'Agrivoltaics (เกษตร+โซลาร์)',
+    title: 'Agrivoltaics / Dual-Use Solar',
+    shortTitle: 'Agrivoltaics',
     category: 'hybrid',
     icon: 'Sprout',
     accentColor: 'emerald',
-    tagline: 'ใช้พื้นที่ผืนเดียวกัน 2 เท่า: ทำเกษตรอินทรีย์พืชใต้ร่มเงาควบคู่กับผลิตไฟฟ้าพลังงานแสงอาทิตย์',
+    tagline: 'Double-use the same land: organic shade crops alongside solar generation',
     suitableAreaMinRai: 1.5,
     preferredZoning: ['green', 'light_green', 'rural'],
-    standards: ['วสท. 022013-64', 'PEA VSPP Code', 'กรมวิชาการเกษตร (พืชใต้ร่มเงา)'],
-    description: 'การออกแบบโครงสร้างค้ำยันแผงโซลาร์เซลล์ให้มีความสูงยกพื้น 2.5 - 3.5 เมตร และมีระยะห่างแถว (Pitch distance) เพื่อให้แสงส่องถึงพืชด้านล่างอย่างพอเหมาะ ช่วยลดอุณหภูมิของแผงโซลาร์จากความชื้นของดิน ทำให้แผงผลิตไฟได้ดีขึ้น ขณะเดียวกันก็สร้างรายได้ 2 ทาง ทั้งจากพืชผลการเกษตร (วานิลลา, ฟ้าทะลายโจร, เห็ด, ผักสลัด) และค่าไฟฟ้า',
+    standards: ['EIT 022013-64', 'PEA VSPP Code', 'Dept. of Agriculture (shade crops)'],
+    description: 'Design elevated PV structures at 2.5-3.5 m clearance with row pitch that lets sunlight reach crops below. Soil moisture cools the panels for slightly better yield while the site earns twice: crop income (vanilla, andrographis, mushrooms, salad greens) plus electricity revenue',
     keyBenefits: [
-      'ไม่ต้องเปลี่ยนการใช้ประโยชน์ที่ดินตามผังเมือง ลดปัญหาภาษีที่ดินเกษตรกรรม',
-      'พืชช่วยลดอุณหภูมิใต้แผง (Microclimate) เพิ่มประสิทธิภาพการแปลงพลังงานไฟฟ้า ~2-4%',
-      'รายได้ 2 ทาง: ผลผลิตทางการเกษตรเกรดพรีเมียม + กระแสเงินสดจากการขายไฟฟ้า',
-      'ภาพลักษณ์ ESG และความยั่งยืนระดับสูงสุด ชนะใจชุมชนและสถาบันการเงิน'
+      'No zoning change needed — avoids farmland tax issues',
+      'Crop microclimate cools panels, lifting conversion efficiency ~2-4%',
+      'Two income streams: premium produce + electricity cash flow',
+      'Top-tier ESG image — wins community and lender support'
     ],
     technicalHighlights: [
-      'โครงสร้างเหล็กชุบกัลวาไนซ์สูงพิเศษ (Clearance > 2.8m) ให้รถแทรกเตอร์ขนาดเล็กเข้าได้',
-      'ระยะ Row Pitch กว้าง 6-8 เมตรเพื่อป้องกันเงาบังและควบคุมปริมาณรังสีที่ส่องลงดิน',
-      'ระบบ Smart Micro-Irrigation ควบคุมการให้น้ำพืชโดยใช้ไฟจากโซลาร์เซลล์โดยตรง',
-      'ระบบป้องกันกระแสรั่วไหลลงดิน (RCD/GFCI) ระดับเข้มงวดเพื่อความปลอดภัยของเกษตรกร'
+      'Extra-tall galvanized steel structure (clearance > 2.8 m) fits small tractors',
+      'Wide 6-8 m row pitch controls shading and ground irradiance',
+      'Smart micro-irrigation powered directly by the PV array',
+      'Strict RCD/GFCI earth-leakage protection for farm-worker safety'
     ]
   },
   {
     id: 'ev-charging-hub',
-    title: 'ศูนย์ชาร์จยานยนต์ไฟฟ้าความเร็วสูง + โซลาร์รูฟ + BESS (EV Supercharging Plaza)',
+    title: 'EV Supercharging Plaza + Solar Canopy + BESS',
     shortTitle: 'EV Charging Plaza',
     category: 'infrastructure',
     icon: 'Zap',
     accentColor: 'cyan',
-    tagline: 'รองรับการเติบโตของยานยนต์ไฟฟ้า 100% บนทำเลติดถนน พร้อมระบบกักเก็บพลังงาน BESS ลดค่า Peak',
+    tagline: 'Ride the 100% EV transition on a road-side site, with BESS to cut demand charges',
     suitableAreaMinRai: 0.5,
     preferredZoning: ['red', 'orange', 'yellow', 'purple'],
-    standards: ['วสท. 022026-63 (มาตรฐานการติดตั้งสถานีอัดประจุไฟฟ้า)', 'PEA/MEA EV Charger Regulations', 'IEC 61851 / ISO 15118'],
-    description: 'พัฒนาที่ดินติดถนนสายหลักหรือทางผ่านให้เป็นสถานีอัดประจุไฟฟ้า DC Fast Charge (120kW - 360kW) ร่วมกับหลังคา Solar Carport และตู้แบตเตอรี่ BESS เพื่อช่วยโกนยอดโหลด (Peak Shaving) ป้องกันค่าตัดกระแสเกิน (Demand Charge) จากการไฟฟ้า พร้อมพื้นที่บริการคาเฟ่ ร้านสะดวกซื้อ และจุดพักผ่อน',
+    standards: ['EIT 022026-63 (EV charging installation standard)', 'PEA/MEA EV Charger Regulations', 'IEC 61851 / ISO 15118'],
+    description: 'Develop roadside land into a DC fast-charging plaza (120-360 kW) with a solar carport and BESS for peak shaving to avoid utility demand charges — plus a cafe, convenience store and rest area',
     keyBenefits: [
-      'รายได้สูงต่อตารางวาจากการให้บริการชาร์จไฟฟ้าและค่าเช่าพื้นที่ร้านค้า/คาเฟ่',
-      'BESS ช่วยลดค่า Demand Charge ประหยัดค่าไฟฟ้าจาก Peak ช่วงกลางวันได้มหาศาล',
-      'ตอบโจทย์แผนแม่บท EV 30@30 ของประเทศไทย รถยนต์ไฟฟ้าเติบโตแบบก้าวกระโดด',
-      'สามารถขยายขนาดแท่นชาร์จแบบโมดูลาร์ (Modular Expansion) ตามปริมาณรถที่เพิ่มขึ้น'
+      'High revenue per square wah from charging plus retail/cafe rent',
+      'BESS trims demand charges — big savings on daytime peak rates',
+      'Aligned with Thailand\'s EV 30@30 roadmap as EVs grow fast',
+      'Chargers expand modularly as traffic grows'
     ],
     technicalHighlights: [
-      'แท่นชาร์จ DC Superfast Liquid-Cooled 180kW - 360kW CCS2 / CHAdeMO',
-      'หม้อแปลงไฟฟ้าเฉพาะสถานีชาร์จ (Dedicated Transformer) ขนาด 500kVA - 1500kVA 22kV/400V',
-      'ระบบ Dynamic Load Management (DLM) เฉลี่ยกำลังไฟตามจำนวนหัวชาร์จที่ใช้งานจริง',
-      'BESS ขนาด 200kWh - 500kWh สำหรับ Peak Shaving และ Emergency Backup'
+      'DC superfast liquid-cooled 180-360 kW chargers, CCS2 / CHAdeMO',
+      'Dedicated station transformer 500-1500 kVA, 22kV/400V',
+      'Dynamic Load Management (DLM) sharing power across active guns',
+      '200-500 kWh BESS for peak shaving and emergency backup'
     ]
   },
   {
     id: 'grid-bess',
-    title: 'ระบบกักเก็บพลังงานแบตเตอรี่ระดับโครงข่าย (Utility-Scale BESS Farm)',
+    title: 'Utility-Scale BESS Farm',
     shortTitle: 'Grid-Scale BESS',
     category: 'storage',
     icon: 'BatteryCharging',
     accentColor: 'indigo',
-    tagline: 'โครงสร้างพื้นฐานยุคใหม่เพื่อสร้างเสถียรภาพระบบไฟฟ้า เสริมความมั่นคงของสายส่ง กฟผ./กฟภ.',
+    tagline: 'New-era infrastructure that stabilizes the EGAT/PEA transmission and distribution grid',
     suitableAreaMinRai: 1,
     preferredZoning: ['purple', 'industrial', 'yellow', 'green'],
-    standards: ['IEEE 1547-2018', 'NFPA 855 (Standard for Installation of ESS)', 'PEA Grid Ancillary Services Code'],
-    description: 'การนำที่ดินแปลงย่อยหรือพื้นที่ใกล้แนวสายส่ง/สถานีไฟฟ้าแรงสูง (Substation) มาติดตั้งตู้คอนเทนเนอร์แบตเตอรี่ลิเธียมไอออนฟอสเฟต (LFP) ระดับ Grid-Scale เพื่อให้บริการ Ancillary Services แก่ระบบไฟฟ้า เช่น Frequency Regulation, Spinning Reserve, และการทำ Energy Arbitrage (ชาร์จไฟช่วงไฟถูก Off-Peak ขายช่วง Peak)',
+    standards: ['IEEE 1547-2018', 'NFPA 855 (ESS installation standard)', 'PEA Grid Ancillary Services Code'],
+    description: 'Install grid-scale LFP battery containers on a small plot near a transmission corridor or substation, providing ancillary services such as frequency regulation and spinning reserve, plus energy arbitrage (charge off-peak, sell at peak)',
     keyBenefits: [
-      'ใช้พื้นที่ดินน้อยแต่สร้างมูลค่าทางวิศวกรรมไฟฟ้าสูงมาก (High Power Density)',
-      'อนาคตของระบบโครงข่ายไฟฟ้าไทย (Grid Modernization & Smart Grid)',
-      'สามารถทำสัญญาเช่าพื้นที่ระยะยาวกับบริษัทพลังงานชั้นนำ (Energy Conglomerates)',
-      'ระบบปลอดภัยสูงด้วยมาตรฐาน Liquid Cooling และระบบดับเพลิงอัตโนมัติ Aerosol/Novec'
+      'Little land for very high engineering value (high power density)',
+      'The future of Thailand\'s grid (modernization & smart grid)',
+      'Long-term site lease possible with major energy companies',
+      'High safety via liquid cooling and Aerosol/Novec suppression'
     ],
     technicalHighlights: [
-      'ตู้คอนเทนเนอร์ 20ft / 40ft LFP Energy Storage (ความจุ 2MWh - 5MWh ต่อตู้)',
-      'Power Conversion System (PCS) อินเวอร์เตอร์สองทาง (Bi-directional) ประสิทธิภาพ >98.5%',
-      'ระบบควบคุม Energy Management System (EMS) สื่อสารโปรโตคอล IEC 60870-5-104 / Modbus TCP',
-      'ระบบระบายความร้อนของเหลว (Liquid-Cooled Thermal Management) ยืดอายุรอบชาร์จ >6,000 Cycles'
+      '20 ft / 40 ft LFP storage containers (2-5 MWh each)',
+      'Bi-directional Power Conversion System (PCS) at >98.5% efficiency',
+      'Energy Management System (EMS) over IEC 60870-5-104 / Modbus TCP',
+      'Liquid-cooled thermal management for >6,000 cycle life'
     ]
   },
   {
     id: 'floating-solar',
-    title: 'โรงไฟฟ้าพลังงานแสงอาทิตย์ลอยน้ำ (Floating Solar / Hydro-Floating PV)',
-    shortTitle: 'Floating Solar (โซลาร์ลอยน้ำ)',
+    title: 'Floating Solar (Hydro-Floating PV)',
+    shortTitle: 'Floating Solar',
     category: 'renewable',
     icon: 'Waves',
     accentColor: 'blue',
-    tagline: 'เหมาะกับที่ดินที่มีบ่อน้ำ อ่างเก็บน้ำ หรือบ่อดินเดิม เพิ่มประสิทธิภาพผลิตไฟด้วยไอน้ำหล่อเย็น',
+    tagline: 'For land with a pond or reservoir — water cooling lifts panel yield',
     suitableAreaMinRai: 1.5,
     preferredZoning: ['green', 'yellow', 'water_body', 'rural'],
-    standards: ['วสท. มาตรฐานโซลาร์ลอยน้ำ', 'DEDE Guideline for Floating PV', 'PEA/EGAT Interconnection'],
-    description: 'สำหรับแปลงที่ดินที่มีบ่อน้ำ บ่อดินเก่า ขุมเหมืองเดิม หรืออ่างเก็บน้ำที่ไม่สามารถสร้างอาคารได้ ทุ่นลอยน้ำ HDPE คุณภาพสูงจะรองรับแผงโซลาร์เซลล์ ความเย็นของน้ำช่วยระบายความร้อนให้แผง ทำให้ผลิตไฟฟ้าได้มากกว่าแผงบนดินราว 5-10% พร้อมทั้งช่วยลดการระเหยของน้ำและยับยั้งการเจริญเติบโตของตะไคร่น้ำ',
+    standards: ['EIT floating-PV standard', 'DEDE floating PV guideline', 'PEA/EGAT Interconnection'],
+    description: 'For plots with a pond, old borrow pit or reservoir where buildings cannot go, food-grade HDPE floats carry PV modules. Water cooling lifts output roughly 5-10% over ground-mount while cutting evaporation and suppressing algae',
     keyBenefits: [
-      'ใช้ประโยชน์จากพื้นที่บ่อน้ำที่ปกติไม่สามารถใช้ประโยชน์เชิงพาณิชย์อื่นได้',
-      'ประสิทธิภาพผลิตไฟสูงขึ้น 5-10% จาก Cooling Effect ของผิวน้ำ',
-      'ช่วยลดการระเหยของน้ำในบ่อได้มากกว่า 70% รักษาปริมาณน้ำไว้ใช้ยามหน้าแล้ง',
-      'ทุ่นลอยผลิตจาก Food-grade HDPE ไร้สารพิษ ไม่กระทบต่อระบบนิเวศสัตว์น้ำ'
+      'Uses water surface that has no other commercial use',
+      '5-10% higher yield from the water cooling effect',
+      'Cuts pond evaporation by over 70% — keeps water for dry season',
+      'Food-grade HDPE floats are non-toxic to aquatic life'
     ],
     technicalHighlights: [
-      'ทุ่นหลักและทุ่นทางเดิน HDPE UV-resistant อายุการใช้งานมากกว่า 25 ปี',
-      'ระบบยึดโยง (Anchoring & Mooring System) ทนแรงดึงและรองรับการเปลี่ยนแปลงระดับน้ำ',
-      'สายเคเบิล DC ใต้น้ำชนิดกันน้ำ IP68 และทนแสงแดด UV (Double insulated Solar Cable)',
-      'อินเวอร์เตอร์แบบทนความชื้นและการกัดกร่อนระดับ C5-M'
+      'Main and walkway HDPE floats, UV-resistant, >25 yr life',
+      'Anchoring & mooring system tolerates water-level swings',
+      'IP68 underwater DC cable, UV-proof double-insulated solar cable',
+      'C5-M corrosion- and humidity-rated inverters'
     ]
   },
   {
     id: 'biomass-biogas',
-    title: 'โรงไฟฟ้าก๊าซชีวภาพ / ชีวมวลชุมชน (Biogas & Biomass Renewable Plant)',
+    title: 'Biogas & Biomass Renewable Plant',
     shortTitle: 'Biogas / Biomass',
     category: 'bioenergy',
     icon: 'Flame',
     accentColor: 'orange',
-    tagline: 'เปลี่ยนของเสียเกษตรกรรม/มูลสัตว์รอบที่ดิน เป็นพลังงานไฟฟ้าฐาน (Baseload Renewable)',
+    tagline: 'Turn farm waste/manure around the land into baseload renewable power',
     suitableAreaMinRai: 5,
     preferredZoning: ['green', 'rural', 'purple'],
-    standards: ['มาตรฐานความปลอดภัยโรงงานผลิตก๊าซชีวภาพ วสท.', 'กรมโรงงานอุตสาหกรรม', 'PEA VSPP'],
-    description: 'หากที่ดินตั้งอยู่ในเขตเกษตรกรรมหรือใกล้เคียงฟาร์มปศุสัตว์/โรงงานแปรรูปเกษตร สามารถพัฒนาเป็นโรงไฟฟ้าก๊าซชีวภาพ (Anaerobic Digester) หมักของเสียอินทรีย์ผลิตก๊าซมีเทน ขับเคลื่อนเครื่องยนต์ก๊าซ (Gas Engine Generator) จ่ายไฟฟ้าได้ต่อเนื่อง 24 ชั่วโมง เป็นโรงไฟฟ้าพลังงานหมุนเวียนที่เป็นโรงไฟฟ้าฐาน (Baseload Power Plant)',
+    standards: ['EIT biogas plant safety standard', 'Dept. of Industrial Works', 'PEA VSPP'],
+    description: 'If the land sits in a farming area or near livestock/agro-processing facilities, develop a biogas plant (anaerobic digester) fermenting organic waste into methane to drive a gas-engine generator — delivering continuous 24-hour baseload renewable power',
     keyBenefits: [
-      'จ่ายไฟฟ้าได้สม่ำเสมอ 24 ชม. ไม่ขึ้นกับสภาพอากาศเหมือนแดดหรือลม (Capacity Factor >85%)',
-      'ได้รายได้เสริมจากกากตะกอนปุ๋ยชีวภาพเข้มข้นหลังการหมัก จำหน่ายให้เกษตรกร',
-      'แก้ปัญหากลิ่นและน้ำเสียในชุมชนรอบข้าง สร้างความสัมพันธ์อันดีกับชุมชน (CSR)',
-      'อัตราค่าไฟฟ้า FiT สำหรับชีวภาพ/ชีวมวลมักมีราคารับซื้อที่จูงใจ (FiT Premium)'
+      'Steady 24h output regardless of weather (capacity factor >85%)',
+      'Extra income from concentrated bio-fertilizer digestate sold to farmers',
+      'Solves odor and wastewater issues — good community relations (CSR)',
+      'Biogas/biomass FiT usually carries an attractive premium'
     ],
     technicalHighlights: [
-      'บ่อหมักก๊าซชีวภาพแบบ CSTR หรือ Covered Lagoon พร้อมระบบบำบัด H2S Scrubber',
-      'เครื่องกำเนิดไฟฟ้าก๊าซชีวภาพ (Biogas Engine Synchronous Generator) ประสิทธิภาพทางไฟฟ้า ~40%',
-      'ระบบควบคุมอัตโนมัติ Gas Leak Detection, Flame Arrester และ Safety Flare',
-      'หม้อแปลง Step-up 400V / 22kV พร้อมตู้สวิตช์เกียร์ Medium Voltage VCB'
+      'CSTR or covered-lagoon digester with H2S scrubber',
+      'Biogas engine synchronous generator at ~40% electrical efficiency',
+      'Automated gas-leak detection, flame arrester and safety flare',
+      'Step-up transformer 400V / 22kV with MV VCB switchgear'
     ]
   }
 ];

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-// Hash router เบา ๆ: '#/path' รองรับปุ่ม back/forward ของเบราว์เซอร์
+// Lightweight hash router: '#/path' supports browser back/forward
 export function navigate(path) {
   window.location.hash = `#${path}`;
 }

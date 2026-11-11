@@ -47,7 +47,7 @@ export function ProjectIcon({ id, size = 'md', active }) {
 
 export function StepProgress({ steps, current }) {
   return (
-    <div className="flex items-center gap-0 w-full" aria-label="ขั้นตอนการใช้งาน">
+    <div className="flex items-center gap-0 w-full" aria-label="Steps">
       {steps.map((s, i) => {
         const done = i < current;
         const active = i === current;
@@ -157,9 +157,9 @@ export function GlossaryHint({ term, hint }) {
 export function fmtTHB(millionTHB) {
   const v = parseFloat(millionTHB);
   if (!isFinite(v)) return '—';
-  if (v >= 1000) return `${(v / 1000).toFixed(2)} พันล้าน`;
-  if (v >= 1) return `${v.toFixed(2)} ล้าน`;
-  return `${Math.round(v * 1000000).toLocaleString()} บาท`;
+  if (v >= 1000) return `฿${(v / 1000).toFixed(2)}B`;
+  if (v >= 1) return `฿${v.toFixed(2)}M`;
+  return `฿${Math.round(v * 1000000).toLocaleString()}`;
 }
 
 export function DisclaimerStrip() {
@@ -167,8 +167,8 @@ export function DisclaimerStrip() {
     <div className="rounded-xl bg-[#F3F1EA] border border-[#E7E5DD] px-4 py-3 text-xs text-ink-soft leading-relaxed flex items-start gap-2">
       <Info className="w-4 h-4 flex-shrink-0 mt-0.5 text-ink-faint" />
       <span>
-        ผลลัพธ์ทั้งหมดเป็น <strong>การประเมินเบื้องต้น</strong> จากข้อมูลที่ให้มาและสมมติฐานของระบบ —
-        ไม่ใช่การรับรองสิทธิ์ที่ดิน ใบอนุญาต หรือราคา/รายได้จริง ก่อนลงทุนควรสำรวจพื้นที่และยืนยันกับหน่วยงานที่เกี่ยวข้อง
+        All results are <strong>preliminary estimates</strong> from the data provided and system assumptions —
+        not a guarantee of land rights, permits, or actual prices/income. Survey the site and confirm with the authorities before investing
       </span>
     </div>
   );

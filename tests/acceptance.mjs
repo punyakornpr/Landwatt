@@ -222,7 +222,9 @@ assert.ok(pakS.length >= 5, `searchAdmin('ปาก') เจอ ${pakS.length} �
 assert.ok(pakS[0].district.name.startsWith('ปาก'), 'ผลแรกควรขึ้นต้นด้วยคำค้น');
 assert.ok(searchAdmin('ข').length > 50, 'คำสั้นควรเจอผลเยอะ (live suggestion)');
 const bkk = searchAdmin('กรุงเทพ');
-assert.ok(bkk[0].label === 'จังหวัดกรุงเทพมหานคร', 'จังหวัดต้องมาก่อนอำเภอ');
+assert.ok(bkk[0].label === 'Bangkok Province', 'จังหวัดต้องมาก่อนอำเภอ');
+const bkkEn = searchAdmin('bang');
+assert.ok(bkkEn[0].label === 'Bangkok Province', 'English search must find Bangkok');
 const pakchong = TH_ADMIN.find(p => p.province === 'นครราชสีมา').districts.find(d => d.name === 'ปากช่อง');
 const act = findActualProvince(pakchong.lat, pakchong.lng);
 assert.equal(act.province, 'นครราชสีมา', `ปากช่อง → ${act.province} (ต้องเป็นนครราชสีมา)`);
@@ -241,7 +243,7 @@ assert.equal(loaded[0].engineVersion, 'v6.1');
 const roundTrip = importProjectJSON(exportProjectJSON(proj));
 assert.equal(roundTrip.land.areaSqM, 2072);
 assert.equal(roundTrip.chosenPlanId, 'agrivoltaics');
-assert.throws(() => importProjectJSON('{"foo":1}'), /ไม่ถูกต้อง/, 'reject bad schema');
+assert.throws(() => importProjectJSON('{"foo":1}'), /Invalid/, 'reject bad schema');
 assert.throws(() => importProjectJSON('not json'), 'reject non-JSON');
 // เปิดโปรเจกต์เก่า (ไม่มี engineVersion/field ใหม่) ต้องไม่พังและคำนวณใหม่ได้
 const legacy = { id: 'old', name: 'เก่า', land: { areaSqM: 2072 }, goals: {} };

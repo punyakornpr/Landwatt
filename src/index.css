@@ -6,7 +6,7 @@
 @layer base {
   /* LandWatt palette — Main: Trust Blue #2563EB
      Supports: sky (info), emerald (success), orange (warning/CTA)
-     ค่าเป็น RGB channels เพื่อให้ Tailwind ผสม alpha ได้ */
+     values as RGB channels so Tailwind can mix alpha */
 
   :root {
     --paper: 248 250 252;

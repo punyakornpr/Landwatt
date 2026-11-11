@@ -36,7 +36,7 @@ export default function GoogleMapPicker({
   const [gridCoords, setGridCoords] = useState(null);
   const [isPinningGrid, setIsPinningGrid] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [detectedLocationName, setDetectedLocationName] = useState('นครราชสีมา');
+  const [detectedLocationName, setDetectedLocationName] = useState('Nakhon Ratchasima');
   const [searchResults, setSearchResults] = useState([]);
   const [searchState, setSearchState] = useState(null); // null | 'loading' | 'error'
   const [showDistrictPicker, setShowDistrictPicker] = useState(false);
@@ -53,7 +53,7 @@ export default function GoogleMapPicker({
   const tileLayers = {
     'esri-satellite': {
       url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-      name: 'ดาวเทียม',
+      name: 'Satellite',
       maxZoom: 19,
       subdomains: [],
       attribution: 'Tiles &copy; Esri'
@@ -67,7 +67,7 @@ export default function GoogleMapPicker({
     },
     'google-roadmap': {
       url: 'https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',
-      name: 'แผนที่ถนน',
+      name: 'Roadmap',
       maxZoom: 20,
       subdomains: [],
       attribution: 'Map &copy; Google'
@@ -140,7 +140,7 @@ export default function GoogleMapPicker({
             <span style="transform: rotate(45deg); font-size: 13px; font-weight: bold; color: white;">⚡</span>
           </div>
           <div style="background: #ffffff; color: #18181b; border: 1px solid #e4e4e7; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 600; margin-top: 3px; white-space: nowrap; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-            แปลงที่ดิน
+            Land plot
           </div>
         </div>
       `,
@@ -155,8 +155,8 @@ export default function GoogleMapPicker({
 
     marker.bindPopup(`
       <div style="color: #18181b; font-family: Prompt, sans-serif; font-size: 12px;">
-        <strong>ตำแหน่งแปลงที่ดิน</strong><br/>
-        พิกัด: ${coordinates.lat.toFixed(5)}, ${coordinates.lng.toFixed(5)}
+        <strong>Land plot position</strong><br/>
+        Coords: ${coordinates.lat.toFixed(5)}, ${coordinates.lng.toFixed(5)}
       </div>
     `);
 
@@ -217,7 +217,7 @@ export default function GoogleMapPicker({
         setCurrentCoords(coordinates);
 
         const actual = findActualProvince(coordinates.lat, coordinates.lng);
-        setDetectedLocationName(actual ? actual.province : findClosestProvince(coordinates.lat, coordinates.lng).province.name);
+        setDetectedLocationName(actual ? (actual.provinceEn || actual.province) : (findClosestProvince(coordinates.lat, coordinates.lng).province.nameEn || findClosestProvince(coordinates.lat, coordinates.lng).province.name));
       }
     }
   }, [coordinates]);
@@ -232,18 +232,19 @@ export default function GoogleMapPicker({
       onCoordinatesChange({ lat, lng });
     }
 
-    // จังหวัดจริงจากอำเภอที่ใกล้ที่สุด (แม่นกว่า centroid จังหวัด — กันชายแดน/จว.ที่ไม่มีในตาราง)
+    // Actual province via nearest district (more accurate than province centroid)
     const actual = findActualProvince(lat, lng);
     const actualName = actual ? actual.province : null;
-    // ข้อมูล GHI: ถ้าจังหวัดจริงมีในตารางใช้อันนั้น (ชื่อตรง) ไม่งั้นใช้จังหวัดที่ใกล้สุด
+    // GHI data: use the actual province if it is in the table (Thai name match); else nearest
     const ghiMatch = actualName
       ? PROVINCES_DATA.find(p => p.name.split(' ')[0].split('/')[0] === actualName)
       : null;
     const { province } = findClosestProvince(lat, lng);
     const dataProv = ghiMatch || province;
-    setDetectedLocationName(actualName || dataProv.name);
+    const displayName = actual?.provinceEn || dataProv.nameEn || actualName || dataProv.name;
+    setDetectedLocationName(displayName);
     if (onProvinceAutoSelect) {
-      onProvinceAutoSelect(dataProv, actualName || dataProv.name);
+      onProvinceAutoSelect(dataProv, displayName);
     }
 
     if (gridCoords && mapInstanceRef.current) {
@@ -404,7 +405,7 @@ export default function GoogleMapPicker({
             <span style="transform: rotate(45deg); font-size: 13px; font-weight: bold; color: white;">🗼</span>
           </div>
           <div style="background: #ffffff; color: #d97706; border: 1px solid #fcd34d; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 600; margin-top: 3px; white-space: nowrap; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-            สายส่ง 22kV
+            22kV Line
           </div>
         </div>
       `,
@@ -467,7 +468,7 @@ export default function GoogleMapPicker({
     setSearchState(null);
   };
 
-  // geocoding ผ่าน Nominatim (OSM) — ฟรี ไม่ต้อง API key; ใช้เฉพาะตอนชุดข้อมูล local ไม่ครอบคลุม
+  // Geocoding via Nominatim (OSM) — free, no API key; only used when local data lacks coverage
   const geocodeNominatim = async (query) => {
     const url = `https://nominatim.openstreetmap.org/search?format=jsonv2&countrycodes=th&accept-language=th&limit=6&q=${encodeURIComponent(query)}`;
     const res = await fetch(url, { headers: { 'Accept-Language': 'th' } });
@@ -482,15 +483,15 @@ export default function GoogleMapPicker({
     setSearchResults([]);
     setSearchState(null);
 
-    // 1) พิกัด lat,lng
+    // 1) lat,lng coordinates
     const coordMatch = q.match(/^(-?\d+(\.\d+)?),\s*(-?\d+(\.\d+)?)$/);
     if (coordMatch) {
       flyToLocation(parseFloat(coordMatch[1]), parseFloat(coordMatch[3]), 16);
       return;
     }
 
-    // 2) ชื่ออำเภอ/เขต/จังหวัดจากชุดข้อมูลในประเทศ (ครบ 77 จังหวัด)
-    const bare = q.replace(/^(อำเภอ|เขต|จังหวัด|ตำบล|แขวง)\s*/, '').trim();
+    // 2) district/khet/province names from the local dataset (all 77 provinces)
+    const bare = q.replace(/^(อำเภอ|เขต|จังหวัด|ตำบล|แขวง|amphoe|district|province|tambon|khwaeng)\s*/i, '').trim();
     if (bare.length > 0) {
       const matches = searchAdmin(bare);
       if (matches.length === 1 && matches[0].lat) {
@@ -498,13 +499,13 @@ export default function GoogleMapPicker({
         return;
       }
       if (matches.length > 0) {
-        // หลายผลลัพธ์/ไม่มีพิกัด → ให้เลือกจากรายการ (เด้ง geocode ตอนคลิกถ้าจำเป็น)
+        // multiple results/no coords → show list (geocode on click if needed)
         setSearchResults(matches.slice(0, 10).map(m => ({ ...m, source: 'local' })));
         return;
       }
     }
 
-    // 3) จังหวัดในตาราง GHI เดิม (มีพิกัดพร้อม)
+    // 3) province from the GHI table (coords included)
     const foundProv = PROVINCES_DATA.find(p =>
       p.name.toLowerCase().includes(bare.toLowerCase()) ||
       p.id.toLowerCase().includes(bare.toLowerCase())
@@ -514,7 +515,7 @@ export default function GoogleMapPicker({
       return;
     }
 
-    // 4) ตำบล/ชื่อสถานที่อื่น → geocoding ออนไลน์
+    // 4) sub-district/other place names → online geocoding
     setSearchState('loading');
     try {
       const results = await geocodeNominatim(q);
@@ -544,10 +545,10 @@ export default function GoogleMapPicker({
       flyToLocation(item.lat, item.lng, item.district ? 13 : 11, item.label);
       return;
     }
-    // ผลลัพธ์ local ที่ไม่มีพิกัด (เขต กทม. บางเขต/ทั้งจังหวัด) → geocode ตอนคลิก
+    // local result without coords (some Bangkok khets / whole provinces) → geocode on click
     setSearchState('loading');
     try {
-      const results = await geocodeNominatim(item.label.replace('จ.', 'จังหวัด'));
+      const results = await geocodeNominatim(`${item.label}, Thailand`);
       if (results.length > 0) {
         flyToLocation(parseFloat(results[0].lat), parseFloat(results[0].lon), item.district ? 13 : 11, item.label);
       } else {
@@ -559,19 +560,19 @@ export default function GoogleMapPicker({
   };
 
   const confirmDistrictPick = async () => {
-    const prov = TH_ADMIN.find(p => p.province === pickProvince);
-    const dist = prov?.districts.find(d => `${d.prefix}${d.name}` === pickDistrict || d.name === pickDistrict);
+    const prov = TH_ADMIN.find(p => p.provinceEn === pickProvince);
+    const dist = prov?.districts.find(d => d.nameEn === pickDistrict);
     if (!prov) return;
-    const label = dist ? `${dist.prefix}${dist.name} จ.${prov.province}` : `จังหวัด${prov.province}`;
+    const label = dist ? `${dist.prefixEn} ${dist.nameEn}, ${prov.provinceEn}` : `${prov.provinceEn} Province`;
     if (dist?.lat) {
       flyToLocation(dist.lat, dist.lng, 13, label);
       setShowDistrictPicker(false);
       return;
     }
-    // ไม่มีพิกัดในชุดข้อมูล → geocode ชื่อเต็ม
+    // no coords in dataset → geocode the full name
     setSearchState('loading');
     try {
-      const query = dist ? `${dist.prefix}${dist.name} จังหวัด${prov.province}` : `จังหวัด${prov.province}`;
+      const query = dist ? `${dist.prefixEn} ${dist.nameEn}, ${prov.provinceEn}, Thailand` : `${prov.provinceEn} Province, Thailand`;
       const results = await geocodeNominatim(query);
       if (results.length > 0) {
         flyToLocation(parseFloat(results[0].lat), parseFloat(results[0].lon), dist ? 13 : 11, label);
@@ -603,15 +604,15 @@ export default function GoogleMapPicker({
               onChange={(e) => {
                 const v = e.target.value;
                 setSearchQuery(v);
-                // live suggestion ระหว่างพิมพ์ — ข้ามถ้าเป็นการพิมพ์พิกัด
-                const b = v.replace(/^(อำเภอ|เขต|จังหวัด|ตำบล|แขวง)\s*/, '').trim();
+                // live suggestions while typing — skip coordinate-like input
+                const b = v.replace(/^(อำเภอ|เขต|จังหวัด|ตำบล|แขวง|amphoe|district|province|tambon|khwaeng)\s*/i, '').trim();
                 setSearchResults(
                   b.length > 0 && !/^[\d\s.,-]+$/.test(v)
                     ? searchAdmin(b).slice(0, 10).map(m => ({ ...m, source: 'local' }))
                     : []
                 );
               }}
-              placeholder="ค้นหาอำเภอ, ตำบล, จังหวัด หรือพิกัด..."
+              placeholder="Search district, province or coordinates..."
               className="w-full bg-white border border-zinc-200 focus:border-zinc-900 rounded-lg pl-8 pr-16 py-1.5 text-xs text-zinc-900 placeholder-zinc-400 outline-none transition"
             />
             <Search className="w-3.5 h-3.5 text-zinc-400 absolute left-2.5 top-2 pointer-events-none" />
@@ -619,7 +620,7 @@ export default function GoogleMapPicker({
               type="submit"
               className="absolute right-1 top-1 px-2.5 py-0.5 rounded bg-zinc-900 hover:bg-zinc-800 text-white text-[11px] font-medium transition"
             >
-              ค้นหา
+              Search
             </button>
             {searchResults.length > 0 && (
               <div className="absolute left-0 right-0 top-full mt-1 z-[1100] bg-white border border-zinc-200 rounded-lg shadow-lg overflow-hidden">
@@ -644,7 +645,7 @@ export default function GoogleMapPicker({
             }`}
           >
             <MapPin className="w-3.5 h-3.5" />
-            <span>เลือกจังหวัด</span>
+            <span>Province</span>
           </button>
         </div>
 
@@ -657,7 +658,7 @@ export default function GoogleMapPicker({
               mapType === 'esri-satellite' ? 'bg-zinc-900 text-white' : 'text-zinc-600 hover:text-zinc-900'
             }`}
           >
-            ดาวเทียม
+            Satellite
           </button>
           <button
             type="button"
@@ -675,7 +676,7 @@ export default function GoogleMapPicker({
               mapType === 'google-roadmap' ? 'bg-zinc-900 text-white' : 'text-zinc-600 hover:text-zinc-900'
             }`}
           >
-            แผนที่ถนน
+            Roadmap
           </button>
         </div>
 
@@ -690,8 +691,8 @@ export default function GoogleMapPicker({
             onChange={(e) => { setPickProvince(e.target.value); setPickDistrict(''); }}
             className="bg-white border border-zinc-200 rounded-md px-2 py-1.5 text-xs text-zinc-800 max-w-[10rem]"
           >
-            <option value="">เลือกจังหวัด</option>
-            {TH_ADMIN.map(p => <option key={p.province} value={p.province}>{p.province}</option>)}
+            <option value="">Select province</option>
+            {TH_ADMIN.map(p => <option key={p.provinceEn} value={p.provinceEn}>{p.provinceEn}</option>)}
           </select>
           <select
             value={pickDistrict}
@@ -699,9 +700,9 @@ export default function GoogleMapPicker({
             disabled={!pickProvince}
             className="bg-white border border-zinc-200 rounded-md px-2 py-1.5 text-xs text-zinc-800 max-w-[12rem] disabled:opacity-50"
           >
-            <option value="">{pickProvince ? 'ทั้งจังหวัด / เลือกอำเภอ' : 'เลือกจังหวัดก่อน'}</option>
-            {pickProvince && TH_ADMIN.find(p => p.province === pickProvince)?.districts.map(d => (
-              <option key={`${d.prefix}${d.name}`} value={`${d.prefix}${d.name}`}>{d.prefix}{d.name}</option>
+            <option value="">{pickProvince ? 'Whole province / pick a district' : 'Pick a province first'}</option>
+            {pickProvince && TH_ADMIN.find(p => p.provinceEn === pickProvince)?.districts.map(d => (
+              <option key={d.nameEn} value={d.nameEn}>{d.prefixEn} {d.nameEn}</option>
             ))}
           </select>
           <button
@@ -710,7 +711,7 @@ export default function GoogleMapPicker({
             disabled={!pickProvince}
             className="px-3 py-1.5 rounded-md bg-zinc-900 hover:bg-zinc-800 text-white text-[11px] font-medium transition disabled:opacity-40"
           >
-            ไปที่ตำแหน่งนี้
+            Go
           </button>
         </div>
       )}
@@ -719,8 +720,8 @@ export default function GoogleMapPicker({
       {(searchState === 'loading' || searchState === 'error') && (
         <p className={`text-[11px] px-1 ${searchState === 'error' ? 'text-red-600' : 'text-zinc-500'}`}>
           {searchState === 'loading'
-            ? 'กำลังค้นหาตำแหน่ง…'
-            : 'ไม่พบตำแหน่ง — ลองพิมพ์ "อำเภอ + จังหวัด" หรือใช้ปุ่มเลือกอำเภอ'}
+            ? 'Searching location…'
+            : 'Location not found — try "district + province" or the Province button'}
         </p>
       )}
 
@@ -743,17 +744,17 @@ export default function GoogleMapPicker({
             }`}
           >
             <PenTool className="w-3.5 h-3.5" />
-            <span>{isDrawingBoundary ? 'กำลังคลิกวาด (คลิกมุมบนแผนที่)' : 'วาดกรอบแปลงที่ดิน'}</span>
+            <span>{isDrawingBoundary ? 'Drawing… (click corners)' : 'Draw plot boundary'}</span>
           </button>
 
           <button
             type="button"
             onClick={handleAutoGenerateBoundaryBox}
             className="px-2.5 py-1.5 rounded-md bg-zinc-100 hover:bg-zinc-200 text-zinc-700 transition flex items-center space-x-1 text-xs"
-            title="สร้างกรอบสี่เหลี่ยมอัตโนมัติตามขนาดพื้นที่ปัจจุบันรอบจุดปักหมุด"
+            title="Auto-generate a rectangle of the current area around the pin"
           >
             <Sparkles className="w-3.5 h-3.5 text-zinc-600" />
-            <span>ตีกรอบอัตโนมัติ</span>
+            <span>Auto-box area</span>
           </button>
 
           {polygonPoints.length > 0 && (
@@ -762,20 +763,20 @@ export default function GoogleMapPicker({
                 type="button"
                 onClick={handleUndoPoint}
                 className="px-2 py-1.5 rounded-md bg-zinc-100 hover:bg-zinc-200 text-zinc-600 transition flex items-center space-x-1"
-                title="ย้อนกลับจุดมุมล่าสุด"
+                title="Undo last corner"
               >
                 <Undo2 className="w-3 h-3" />
-                <span>ย้อนกลับ ({polygonPoints.length})</span>
+                <span>Undo ({polygonPoints.length})</span>
               </button>
 
               <button
                 type="button"
                 onClick={handleClearPolygon}
                 className="px-2 py-1.5 rounded-md bg-zinc-100 hover:bg-rose-50 text-rose-600 transition flex items-center space-x-1"
-                title="ลบเส้นกรอบขอบเขต"
+                title="Clear boundary"
               >
                 <Trash2 className="w-3 h-3" />
-                <span>ลบกรอบ</span>
+                <span>Clear</span>
               </button>
             </>
           )}
@@ -786,7 +787,7 @@ export default function GoogleMapPicker({
             type="button"
             onClick={invalidateMapSize}
             className="p-1.5 rounded-md bg-zinc-100 hover:bg-zinc-200 text-zinc-600 transition"
-            title="รีเฟรชขนาดแผนที่"
+            title="Refresh map size"
           >
             <RefreshCw className="w-3.5 h-3.5" />
           </button>
@@ -806,7 +807,7 @@ export default function GoogleMapPicker({
             }`}
           >
             <Zap className="w-3.5 h-3.5" />
-            <span>{isPinningGrid ? 'คลิกวางเสาสายส่ง' : 'วัดระยะสายส่ง 22kV'}</span>
+            <span>{isPinningGrid ? 'Click to place pylon' : 'Measure 22kV line distance'}</span>
           </button>
         </div>
 
@@ -830,7 +831,7 @@ export default function GoogleMapPicker({
         {isDrawingBoundary && (
           <div className="absolute top-3 inset-x-8 z-[500] mx-auto max-w-sm bg-white/95 border border-zinc-300 text-zinc-800 px-3.5 py-1.5 rounded-lg shadow-md backdrop-blur-md text-xs text-center flex items-center justify-center space-x-2">
             <PenTool className="w-3.5 h-3.5 text-zinc-700 flex-shrink-0" />
-            <span>คลิกบนแผนที่ทีละมุมเพื่อกำหนดกรอบที่ดิน (อย่างน้อย 3 จุด)</span>
+            <span>Click the map to set each plot corner (at least 3 points)</span>
           </div>
         )}
 
@@ -840,17 +841,17 @@ export default function GoogleMapPicker({
             <div className="flex items-center justify-between text-zinc-500 text-[11px]">
               <span className="font-semibold text-zinc-900 flex items-center">
                 <Maximize2 className="w-3.5 h-3.5 mr-1 text-zinc-600" />
-                ขนาดกรอบที่วาด
+                Drawn plot size
               </span>
-              <span className="font-mono">{polygonPoints.length} มุม</span>
+              <span className="font-mono">{polygonPoints.length} corners</span>
             </div>
             
             <div className="text-zinc-900 font-mono font-bold text-sm">
-              {polygonArea.totalRaiDecimal} ไร่ <span className="text-xs text-zinc-500 font-normal">({polygonArea.sqM.toLocaleString()} ตร.ม.)</span>
+              {polygonArea.totalRaiDecimal} rai <span className="text-xs text-zinc-500 font-normal">({polygonArea.sqM.toLocaleString()} m²)</span>
             </div>
 
             <div className="text-[11px] text-zinc-500 flex justify-between">
-              <span>เส้นรอบรูป: <strong className="text-zinc-800 font-mono">{polygonPerimeterM}</strong> ม.</span>
+              <span>Perimeter: <strong className="text-zinc-800 font-mono">{polygonPerimeterM}</strong> m</span>
             </div>
 
             <button
@@ -859,12 +860,12 @@ export default function GoogleMapPicker({
               className="w-full mt-1 py-1.5 px-2.5 rounded-md bg-zinc-900 hover:bg-zinc-800 text-white font-medium text-xs flex items-center justify-center space-x-1.5 transition"
             >
               <Check className="w-3.5 h-3.5" />
-              <span>ใช้ขนาดพื้นที่นี้คำนวณ</span>
+              <span>Use this area</span>
             </button>
 
             {areaAppliedAlert && (
               <div className="text-[10px] text-emerald-600 text-center font-medium">
-                ✓ อัปเดตขนาดพื้นที่เรียบร้อยแล้ว
+                ✓ Area updated
               </div>
             )}
           </div>
@@ -887,7 +888,7 @@ export default function GoogleMapPicker({
       {/* Real-Time Pin Coordinates Bar */}
       <div className="p-2.5 rounded-lg bg-white border border-zinc-200 grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
         <div>
-          <span className="text-zinc-400 block text-[11px]">พิกัดหมุด (GPS Coordinates)</span>
+          <span className="text-zinc-400 block text-[11px]">Pin coordinates (GPS)</span>
           <span className="text-zinc-900 font-mono font-medium text-xs mt-0.5 block flex items-center">
             <MapPin className="w-3.5 h-3.5 mr-1 text-zinc-500" />
             {currentCoords.lat.toFixed(5)}° N, {currentCoords.lng.toFixed(5)}° E
@@ -895,16 +896,16 @@ export default function GoogleMapPicker({
         </div>
 
         <div>
-          <span className="text-zinc-400 block text-[11px]">พื้นที่และเขตสายส่ง</span>
+          <span className="text-zinc-400 block text-[11px]">Location</span>
           <span className="text-zinc-800 font-medium text-xs mt-0.5 block">
-            {/(อำเภอ|เขต)/.test(detectedLocationName) ? detectedLocationName : `จ. ${detectedLocationName}`}
+            {detectedLocationName}
           </span>
         </div>
 
         <div>
-          <span className="text-zinc-400 block text-[11px]">คำแนะนำ</span>
+          <span className="text-zinc-400 block text-[11px]">Tip</span>
           <span className="text-zinc-500 text-[11px] mt-0.5 block">
-            ลากหมุด ⚡ หรือคลิก "วาดกรอบแปลงที่ดิน" เพื่อครอบแนวแปลงจริง
+            Drag the ⚡ pin or use "Draw plot boundary" to outline the real plot
           </span>
         </div>
       </div>

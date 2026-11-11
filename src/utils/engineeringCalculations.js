@@ -1,6 +1,6 @@
-// ฟังก์ชันคำนวณและประเมินทางวิศวกรรมไฟฟ้าและการเงิน (Electrical Engineering & Techno-Economics)
+// Electrical engineering & techno-economics calculation functions
 
-// --- การแปลงหน่วยที่ดิน (Thai Land Units) ---
+// --- Thai land unit conversion ---
 export function convertToSqMeters(rai = 0, ngan = 0, sqWah = 0) {
   const r = parseFloat(rai) || 0;
   const n = parseFloat(ngan) || 0;
@@ -18,21 +18,21 @@ export function convertSqMetersToThai(sqMeters = 0) {
   return { rai, ngan, sqWah: parseFloat(sqWah), totalSqM: m };
 }
 
-// คำนวณพื้นที่รูปหลายเหลี่ยม (Polygon Area) จากพิกัด Lat/Lng ในหน่วยตารางเมตร (m²)
+// Polygon area from Lat/Lng coordinates in square meters (m²)
 export function calculatePolygonAreaSqM(coords) {
   if (!coords || coords.length < 3) return 0;
-  const R = 6378137; // รัศมีโลก WGS84 ในหน่วยเมตร
+  const R = 6378137; // WGS84 Earth radius in meters
   const len = coords.length;
-  // คำนวณละติจูดเฉลี่ยเป็นเรเดียนเพื่อปรับสเกลแกนลองจิจูด
+  // Mean latitude in radians to scale the longitude axis
   const meanLat = (coords.reduce((sum, c) => sum + c.lat, 0) / len) * (Math.PI / 180);
   
-  // แปลงพิกัดภูมิศาสตร์เป็น Cartesian Planar Coordinates (x, y) ในหน่วยเมตร
+  // Convert geographic coordinates to planar Cartesian (x, y) in meters
   const xy = coords.map(c => ({
     x: (c.lng * (Math.PI / 180)) * R * Math.cos(meanLat),
     y: (c.lat * (Math.PI / 180)) * R
   }));
 
-  // สูตร Shoelace Formula (Gauss's Area Formula)
+  // Shoelace formula (Gauss's area formula)
   let area = 0;
   for (let i = 0; i < len; i++) {
     const j = (i + 1) % len;
@@ -41,7 +41,7 @@ export function calculatePolygonAreaSqM(coords) {
   return Math.abs(area / 2);
 }
 
-// คำนวณความยาวเส้นรอบรูป (Perimeter) ของแปลงที่ดินในหน่วยเมตร
+// Land-plot perimeter length in meters
 export function calculatePolygonPerimeterMeters(coords) {
   if (!coords || coords.length < 2) return 0;
   const R = 6378137;
@@ -61,20 +61,20 @@ export function calculatePolygonPerimeterMeters(coords) {
   return perimeter;
 }
 
-// --- การประเมินคะแนนความเหมาะสม (Suitability Scoring Engine) ---
+// --- Suitability scoring engine ---
 export function evaluateLandFeasibility(landData) {
   const {
     areaSqM = 0,
     provinceData = {},
-    roadType = 'main', // 'main' (ทางหลวง/ถนนใหญ่), 'secondary' (ถนนรอง/ซอย), 'dirt' (ถนนลูกรัง/ไม่มีทางสาธารณะ)
+    roadType = 'main', // 'main' (highway/main road), 'secondary' (minor road/soi), 'dirt' (dirt track/no public road)
     roadWidthMeters = 8,
-    gridDistanceMeters = 100, // ระยะห่างถึงสายส่งแรงกลาง 22kV/33kV
-    landType = 'flat', // 'flat' (ที่ราบ), 'slope' (ที่ลาดเอียง), 'pond' (มีบ่อน้ำ/แอ่งน้ำ), 'agri' (ที่ดินเกษตรเดิม)
+    gridDistanceMeters = 100, // distance to 22kV/33kV medium-voltage line
+    landType = 'flat', // 'flat', 'slope', 'pond' (water body), 'agri' (existing farmland)
     hasWaterBody = false,
     waterBodyAreaSqM = 0,
-    hasAgriculturalWaste = false, // มีฟาร์มปศุสัตว์/ของเสียเกษตรใกล้เคียง
+    hasAgriculturalWaste = false, // livestock farm / agricultural waste nearby
     soilStability = 'good', // 'good', 'medium', 'soft'
-    zoningColor = 'green' // 'green' (ชนบทเกษตรกรรม), 'yellow' (ชุมชน), 'purple' (อุตสาหกรรม), 'orange' (การค้า)
+    zoningColor = 'green' // 'green' (rural-agri), 'yellow' (community), 'purple' (industrial), 'orange' (commercial)
   } = landData;
 
   const areaRai = areaSqM / 1600;
@@ -103,7 +103,7 @@ export function evaluateLandFeasibility(landData) {
   if (roadWidthMeters >= 6) solarScore += 5;
   scores['solar-farm'] = Math.min(Math.max(solarScore, 10), 98);
 
-  // 2. Agrivoltaics (เกษตร+โซลาร์)
+  // 2. Agrivoltaics
   let agriScore = 60;
   if (areaRai >= 2 && areaRai <= 20) agriScore += 20;
   else if (areaRai > 20) agriScore += 10;
@@ -148,7 +148,7 @@ export function evaluateLandFeasibility(landData) {
     if (gridDistanceMeters <= 500) floatScore += 15;
     if (ghi >= 5.0) floatScore += 10;
   } else {
-    floatScore = 15; // ไม่มีบ่อน้ำ ไม่แนะนำ
+    floatScore = 15; // no water body — not recommended
   }
   scores['floating-solar'] = Math.min(Math.max(floatScore, 10), 97);
 
@@ -163,93 +163,93 @@ export function evaluateLandFeasibility(landData) {
   return scores;
 }
 
-// --- คำนวณรายละเอียดทางวิศวกรรมไฟฟ้าเฉพาะของแต่ละโครงการ (Deep Engineering Sizing) ---
+// --- Deep engineering sizing per project type ---
 
-// 1. คำนวณ Solar Farm (Ground-Mounted)
+// 1. Solar Farm (Ground-Mounted)
 export function calculateSolarFarmSpecs(landData) {
   const { areaSqM = 1600, provinceData = {} } = landData;
   const ghi = provinceData.ghi || 5.1; // kWh/m2/day
 
-  // [F-02] พื้นที่ใช้ประโยชน์สุทธิ = พื้นที่รวม − พื้นที่ยกเว้น (อาคาร/บ่อ/ต้นไม้ ที่ผู้ใช้ระบุ)
-  // แล้วคิดสัดส่วนใช้งานจริงหลังหักระยะร่น/ถนนภายใน/ลานอุปกรณ์ = 78%
+  // [F-02] Net usable area = total − user-declared exclusions (buildings/pond/trees)
+  // then apply 78% utilization after setbacks / internal roads / equipment pads
   const excludedAreaSqM = Math.max(0, landData.excludedAreaSqM || 0);
   const usableArea = Math.max(0, areaSqM - excludedAreaSqM) * 0.78;
 
-  // แผงโซลาร์เซลล์เกรดอุตสาหกรรม: N-Type TOPCon Bifacial 620W
-  // ขนาดแผง ~2.278m x 1.134m = 2.583 m2
-  // ระยะ Pitch ทางวิศวกรรม (Tilt 15° หันไปทางทิศใต้ เพื่อหลบเงา Shading ช่วง 9:00 - 15:00) = ต้องใช้พื้นที่ ~4.0 m2 ต่อแผง
+  // Industrial-grade module: N-Type TOPCon Bifacial 620W
+  // Module size ~2.278m x 1.134m = 2.583 m2
+  // Engineering pitch (15° tilt facing south to avoid 9:00–15:00 self-shading) ≈ 4.0 m2 per module
   const areaPerModule = 4.0;
-  const moduleCount = Math.floor(usableArea / areaPerModule); // candidate จากพื้นที่ (ยังไม่ผ่าน string check)
+  const moduleCount = Math.floor(usableArea / areaPerModule); // area-based candidate (before string check)
   const moduleWatt = 620; // Watts
 
-  // [F-05] ตรวจ PV String ตามแรงดันเมื่ออุณหภูมิเปลี่ยน (linear approx ตาม datasheet)
+  // [F-05] PV string check against voltage shift with temperature (linear approx per datasheet)
   // Module catalog (Demo): Voc_STC 45.2V, Vmp_STC 38.1V, beta_Voc -0.0025/°C, beta_Vmp -0.0030/°C
   // Inverter catalog (Demo): Vdc,max 1100V, MPPT range 200–1000V
   const PV = { voc: 45.2, vmp: 38.1, betaVoc: -0.0025, betaVmp: -0.0030 };
   const INV = { vdcMax: 1100, mpptMin: 200, mpptMax: 1000 };
-  const T_MIN = 10, T_HIGH = 60; // °C ขอบเขตออกแบบ
+  const T_MIN = 10, T_HIGH = 60; // design bounds °C
   const vocCold = PV.voc * (1 + PV.betaVoc * (T_MIN - 25));
   const vmpHot = PV.vmp * (1 + PV.betaVmp * (T_HIGH - 25));
   const nsMax = Math.floor(INV.vdcMax / vocCold);
   const nsMin = Math.ceil(INV.mpptMin / vmpHot);
-  const stringSize = Math.min(nsMax, 20); // เลือกขนาดสตริงตาม constraint แรงดัน (≤ nsMax, ≥ nsMin)
+  const stringSize = Math.min(nsMax, 20); // string size per voltage constraints (≤ nsMax, ≥ nsMin)
   const stringValid = nsMin <= nsMax;
   const stringCount = stringValid ? Math.floor(moduleCount / stringSize) : 0;
-  const installedPanelCount = stringCount * stringSize; // [F-03] จำนวนแผงติดตั้งจริง (เต็มสตริง)
+  const installedPanelCount = stringCount * stringSize; // [F-03] actually installed panels (whole strings)
   const leftoverPanels = moduleCount - installedPanelCount;
 
   const dcCapacityKWp = (installedPanelCount * moduleWatt) / 1000;
   const dcCapacityMWp = dcCapacityKWp / 1000;
 
-  // Inverter Sizing: DC/AC Ratio (ILR) ออกแบบมาตรฐานที่ 1.25
+  // Inverter Sizing: standard design DC/AC ratio (ILR) of 1.25
   const ilr = 1.25;
-  const acRequiredKW = dcCapacityKWp / ilr; // กำลัง AC ที่ต้องการตาม ILR (ไม่ใช่ nameplate)
+  const acRequiredKW = dcCapacityKWp / ilr; // required AC per ILR (not nameplate)
 
-  // อินเวอร์เตอร์ String Inverter ขนาด 300 kW ต่อตัว (ประสิทธิภาพ 98.8%)
+  // String inverter 300 kW each (98.8% efficiency)
   const inverterCount = Math.max(1, Math.round(acRequiredKW / 300));
-  // [F-06] พิกัด AC จริง = ผลรวม nameplate อินเวอร์เตอร์ที่เลือก
+  // [F-06] actual AC rating = sum of selected inverter nameplates
   const acCapacityMW = (inverterCount * 300) / 1000;
-  // DC/AC จริงหลังปัดจำนวนอินเวอร์เตอร์ เช่น 967.2 kWp / 900 kWac = 1.075
+  // Actual DC/AC after rounding inverter count, e.g. 967.2 kWp / 900 kWac = 1.075
   const actualDcAcRatio = dcCapacityKWp / (inverterCount * 300);
 
-  // Performance Ratio (PR) = 80% (พิจารณา Cable loss, Temp coefficient -0.30%/°C, Inverter loss, Soiling)
+  // Performance Ratio (PR) = 80% (cable loss, temp coefficient -0.30%/°C, inverter loss, soiling)
   const pr = 0.80;
-  // ผลิตไฟฟ้าต่อปี (MWh/year)
+  // Annual energy yield (MWh/year)
   const annualEnergyMWh = (dcCapacityKWp * ghi * 365 * pr) / 1000;
 
-  // หม้อแปลงไฟฟ้า Step-Up Transformer (0.8 kV to 22 kV หรือ 33 kV)
-  // S = P / pf (คิด pf = 0.95 lagging เผื่อ reactive power support)
-  const requiredKVA = ((inverterCount * 300) / 0.95); // [F-14] S = P/PF จากพิกัด AC จริง
-  // ปัดขึ้นตามขนาดมาตรฐานหม้อแปลง (kVA): 500, 1000, 1250, 1600, 2000, 2500, 3150
+  // Step-up transformer (0.8 kV to 22 kV or 33 kV)
+  // S = P / pf (pf = 0.95 lagging to allow reactive support)
+  const requiredKVA = ((inverterCount * 300) / 0.95); // [F-14] S = P/PF from actual AC rating
+  // Round up to standard transformer sizes (kVA)
   const standardTransformerKVA = getNextStandardTransformer(requiredKVA);
 
-  // การคำนวณสายส่งและสวิตช์เกียร์
+  // MV cable and switchgear sizing
   const mvVoltageKV = provinceData.grid === 'MEA' ? 24 : 22; // kV
   const ratedMVCurrentA = ((inverterCount * 300) / (Math.sqrt(3) * mvVoltageKV * 0.95)).toFixed(1);
   const recommendedMvCable = ratedMVCurrentA > 200 
-    ? 'XLPE 24kV 1x300 sq.mm Al (หรือ Cu 185 sq.mm)' 
-    : 'XLPE 24kV 1x185 sq.mm Al (หรือ Cu 95 sq.mm)';
+    ? 'XLPE 24kV 1x300 sq.mm Al (or Cu 185 sq.mm)' 
+    : 'XLPE 24kV 1x185 sq.mm Al (or Cu 95 sq.mm)';
 
-  // การคำนวณด้านเศรษฐศาสตร์ (Techno-Economics)
-  // อัตรา FiT อ้างอิง 2.1679 บาท/หน่วย — เป็นสถานการณ์สมมติ ไม่ใช่สิทธิรับซื้อไฟที่ยืนยัน
+  // Techno-economics
+  // Reference FiT 2.1679 THB/kWh — a hypothetical scenario, not a confirmed power-purchase right
   const tariffPerKWh = 2.1679;
   const capexPerMWp = 21500000;
   const totalCapex = dcCapacityMWp * capexPerMWp;
   const annualRevenue = annualEnergyMWh * 1000 * tariffPerKWh;
   const opexPerYear = totalCapex * 0.015;
 
-  // [F-24]+[F-26] cash flow รายปี 25 ปี (unlevered pre-tax) พร้อม degradation 0.4%/ปี [F-11]
+  // [F-24]+[F-26] annual cash flow over 25 yrs (unlevered pre-tax) with 0.4%/yr degradation [F-11]
   const DEG = 0.004;
   const cashFlows = [-totalCapex];
   for (let y = 1; y <= 25; y++) {
     cashFlows.push(annualRevenue * Math.pow(1 - DEG, y - 1) - opexPerYear);
   }
-  // [F-26]/[F-27]/[F-28] ทั้งหมดมาจาก cashFlows ชุดเดียวกับกราฟ/ตาราง
+  // [F-26]/[F-27]/[F-28] all derived from the same cashFlows array as the chart/table
   const cfFin = financeFromCashFlows(cashFlows);
   const netAnnualCashflow = annualRevenue - opexPerYear;
 
-  // ตัวชี้วัดสิ่งแวดล้อม (ESG)
-  // Grid Emission Factor ไทย ~0.4999 kgCO2/kWh
+  // ESG metrics
+  // Thai grid emission factor ~0.4999 kgCO2/kWh
   const co2AvoidedTonsPerYear = (annualEnergyMWh * 1000 * 0.4999) / 1000;
   const treeEquivalent = Math.round(co2AvoidedTonsPerYear * 60);
 
@@ -263,7 +263,7 @@ export function calculateSolarFarmSpecs(landData) {
       stringSize, stringCount, installedPanelCount, leftoverPanels, stringValid,
       nsMin, nsMax, vocCold: vocCold.toFixed(1), vmpHot: vmpHot.toFixed(1),
       vdcMax: INV.vdcMax, mpptMin: INV.mpptMin, mpptMax: INV.mpptMax,
-      catalogStatus: 'demo', // อุปกรณ์จาก Demo Catalog ไม่ใช่ datasheet จริง
+      catalogStatus: 'demo', // demo-catalog equipment, not a real datasheet
     },
     excludedAreaSqM,
     tariffStatus: 'scenario',
@@ -288,7 +288,7 @@ export function calculateSolarFarmSpecs(landData) {
       irrPercent: cfFin.irrPercent,
       npv25YrMillionTHB: cfFin.npv25YrMillionTHB
     },
-    cashFlowModel: 'CF_y = R_PV,1×(1−0.004)^(y−1) − OPEX — รายได้ไฟฟ้าเสื่อมตาม degradation แผง 0.4%/ปี',
+    cashFlowModel: 'CF_y = R_PV,1×(1−0.004)^(y−1) − OPEX — PV revenue degrades 0.4%/yr with panel degradation',
     esg: {
       co2TonsYear: Math.round(co2AvoidedTonsPerYear).toLocaleString(),
       treesEquivalent: treeEquivalent.toLocaleString()
@@ -296,40 +296,40 @@ export function calculateSolarFarmSpecs(landData) {
   };
 }
 
-// 2. คำนวณ Agrivoltaics (เกษตร+โซลาร์)
+// 2. Agrivoltaics (farming + solar)
 export function calculateAgrivoltaicsSpecs(landData) {
   const baseSolar = calculateSolarFarmSpecs(landData);
   const areaRai = landData.areaSqM / 1600;
 
-  // ระยะห่างแถวเพิ่มขึ้น 40% และยกสูง 3.0 เมตร → จำนวนสตริงลดเหลือ 70% (คงขนาดสตริงเดิม)
+  // Row spacing +40% and 3.0 m clearance → string count drops to 70% (same string size)
   const sd = baseSolar.stringDesign;
   const agriStringCount = Math.floor(sd.stringCount * 0.70);
   const agriInstalledPanels = agriStringCount * sd.stringSize;
-  const dcCapacityMWp = (agriInstalledPanels * 620 / 1e6).toFixed(3); // [F-04] จากจำนวนแผงติดตั้งจริง
+  const dcCapacityMWp = (agriInstalledPanels * 620 / 1e6).toFixed(3); // [F-04] from actually installed panels
   const dcCapacityKWp = agriInstalledPanels * 620 / 1000;
   const dcRatio = parseFloat(dcCapacityMWp) / parseFloat(baseSolar.dcCapacityMWp);
-  const annualEnergyMWh = Math.round(parseFloat(baseSolar.annualEnergyMWh.replace(/,/g, '')) * dcRatio); // F-09A เส้นทางเดียวกับ solar — ไม่คูณ microclimate เพิ่ม
+  const annualEnergyMWh = Math.round(parseFloat(baseSolar.annualEnergyMWh.replace(/,/g, '')) * dcRatio); // F-09A same path as solar — no extra microclimate factor
 
-  // [F-06]/[F-07] คำนวณอินเวอร์เตอร์ใหม่จาก DC ของ agrivoltaics จริง (ห้ามใช้ของ solar farm เดิม)
+  // [F-06]/[F-07] inverters recomputed from real agrivoltaics DC (must not reuse solar farm's)
   const agriInverterCount = Math.max(1, Math.round((dcCapacityKWp / 1.25) / 300));
   const agriAcCapacityMW = (agriInverterCount * 300) / 1000;
   const agriDcAcRatio = dcCapacityKWp / (agriInverterCount * 300);
   const agriTransformerKVA = getNextStandardTransformer((agriInverterCount * 300) / 0.95); // [F-14]
   const agriMvCurrentA = ((agriInverterCount * 300) / (Math.sqrt(3) * 22 * 0.95)).toFixed(1);
 
-  // ต้นทุนโครงสร้างยกสูง 3.0m เสาหนาพิเศษชุบ Hot-Dip Galvanized +25%
+  // Cost of 3.0 m elevated structure with heavier hot-dip galvanized posts +25%
   const capexPerMWp = 25000000;
-  const totalCapex = (dcCapacityKWp / 1000) * capexPerMWp; // ใช้ kWp เต็ม ไม่ใช้ MWp ที่ปัดแล้ว
+  const totalCapex = (dcCapacityKWp / 1000) * capexPerMWp; // use full kWp, not rounded MWp
   
-  // รายได้ค่าไฟฟ้า (FiT 2.1679 บาท)
+  // Electricity revenue (FiT 2.1679 THB)
   const powerRevenue = annualEnergyMWh * 1000 * 2.1679;
-  // รายได้ผลผลิตการเกษตรใต้ร่มเงา (เช่น วานิลลา, ฟ้าทะลายโจร, เห็ดหลินจือ, ผักสลัดออร์แกนิก) ~150,000 บาท/ไร่/ปี
+  // Under-panel crop revenue (e.g., vanilla, andrographis, lingzhi, organic greens) ~160,000 THB/rai/yr
   const agriRevenue = areaRai * 160000;
   const totalAnnualRevenue = powerRevenue + agriRevenue;
-  const opexPerYear = (totalCapex * 0.018) + (areaRai * 30000); // OPEX รวมดูแลพืช
+  const opexPerYear = (totalCapex * 0.018) + (areaRai * 30000); // OPEX incl. crop care
   const netAnnualCashflow = totalAnnualRevenue - opexPerYear;
 
-  // [F-24] cash flow แยกกลไก: รายได้ไฟฟ้าเสื่อมตามแผง (0.4%/ปี) รายได้พืชคงที่ — ไม่หัก degradation กับพืชผล
+  // [F-24] split-mechanism cash flow: PV revenue degrades 0.4%/yr, crop revenue flat — no degradation on crops
   const AGRI_DEG = 0.004;
   const cashFlows = [-totalCapex];
   for (let y = 1; y <= 25; y++) {
@@ -344,18 +344,18 @@ export function calculateAgrivoltaicsSpecs(landData) {
     acCapacityMW: agriAcCapacityMW.toFixed(3),
     inverterCount: agriInverterCount,
     actualDcAcRatio: agriDcAcRatio.toFixed(3),
-    transformerRating: `${agriTransformerKVA} kVA, 22kV/0.4kV, Dyn11, ONAN (ประเมินเบื้องต้น)`,
+    transformerRating: `${agriTransformerKVA} kVA, 22kV/0.4kV, Dyn11, ONAN (preliminary)`,
     transformerKVA: agriTransformerKVA,
     mvCurrentAmp: agriMvCurrentA,
     moduleCount: agriInstalledPanels.toLocaleString(),
     areaCandidatePanelCount: baseSolar.areaCandidatePanelCount,
-    baseStringCount: sd.stringCount, // จำนวนสตริงก่อนหักพื้นที่เกษตร — ใช้อธิบายใน F-03
-    panelSpacingFactor: 0.70, // สมมติฐานการจัดวาง agrivoltaics (ยังไม่ยืนยันพืชจริง)
+    baseStringCount: sd.stringCount, // string count before agri reduction — used in F-03
+    panelSpacingFactor: 0.70, // agrivoltaics layout assumption (crop not yet verified)
     stringDesign: { ...sd, stringCount: agriStringCount, installedPanelCount: agriInstalledPanels, leftoverPanels: 0 },
     annualEnergyMWh: annualEnergyMWh.toLocaleString(),
     capexPerMWpMillionTHB: (capexPerMWp / 1000000).toFixed(1),
-    mountingStructure: 'โครงสร้างยกสูงพิเศษ (Clearance 3.0 m) รองรับรถแทรกเตอร์และการปลูกพืช',
-    cropsRecommended: 'วานิลลา, ฟ้าทะลายโจร, ขมิ้นชัน, เห็ดตระกูลต่างๆ, ผักสลัดไฮโดรโปนิกส์ใต้ร่ม',
+    mountingStructure: 'Elevated mounting structure (3.0 m clearance) for tractors and crop work',
+    cropsRecommended: 'Vanilla, andrographis, turmeric, mushrooms, hydroponic greens under shade',
     dualIncome: {
       powerRevenueMillionTHB: (powerRevenue / 1000000).toFixed(2),
       agriRevenueMillionTHB: (agriRevenue / 1000000).toFixed(2),
@@ -370,66 +370,66 @@ export function calculateAgrivoltaicsSpecs(landData) {
       irrPercent: cfFin.irrPercent,
       npv25YrMillionTHB: cfFin.npv25YrMillionTHB
     },
-    cashFlowModel: 'CF_y = R_PV,1×(1−0.004)^(y−1) + R_crop − OPEX — เสื่อมเฉพาะรายได้ไฟฟ้า รายได้พืชคงที่ (สมมติฐาน demo)',
+    cashFlowModel: 'CF_y = R_PV,1×(1−0.004)^(y−1) + R_crop − OPEX — only PV revenue degrades; crop revenue flat (demo assumption)',
     cashFlows,
   };
 }
 
-// 3. คำนวณ EV Charging Plaza & Solar Canopy & BESS
+// 3. EV Charging Plaza & Solar Canopy & BESS
 export function calculateEVHubSpecs(landData) {
   const { areaSqM = 1600, roadWidthMeters = 8, provinceData = {} } = landData;
   const areaRai = areaSqM / 1600;
 
-  // กำหนดจำนวนช่องชาร์จตามขนาดพื้นที่
-  let dcFastChargerCount = 4; // เริ่มต้น 4 ตู้ (8 หัวชาร์จ)
-  if (areaRai >= 2) dcFastChargerCount = 8; // 16 หัวชาร์จ
-  if (areaRai >= 4) dcFastChargerCount = 12; // 24 หัวชาร์จ
+  // Charger count sized by area
+  let dcFastChargerCount = 4; // base 4 cabinets (8 guns)
+  if (areaRai >= 2) dcFastChargerCount = 8; // 16 guns
+  if (areaRai >= 4) dcFastChargerCount = 12; // 24 guns
 
-  // ตู้ชาร์จแบบ DC Superfast 180kW Dual-gun (CCS2 + CCS2)
+  // DC Superfast 180kW dual-gun cabinets (CCS2 + CCS2)
   const chargerPowerKW = 180;
-  // [F-12] DC charger output → AC input ผ่าน η=0.95
+  // [F-12] DC charger output → AC input via η=0.95
   const totalPeakEVLoadKW = (dcFastChargerCount * chargerPowerKW) / 0.95;
 
-  // Solar Canopy บนหลังคาที่จอดรถ (1 คัน ~ 15 m2 ติดตั้งได้ ~2.5 kWp)
-  const parkingBays = dcFastChargerCount * 2 + 10; // รวมที่จอดพัก
+  // Solar canopy over parking (1 bay ~15 m² fits ~2.5 kWp)
+  const parkingBays = dcFastChargerCount * 2 + 10; // incl. rest bays
   const solarCanopyKWp = Math.round(parkingBays * 2.8);
 
-  // BESS ติดตั้งร่วมเพื่อ Shave Peak Load และลดค่า Demand Charge (ขนาด ~200 - 500 kWh)
+  // Co-located BESS for peak shaving and demand-charge reduction (~200–500 kWh)
   const bessKWh = dcFastChargerCount >= 8 ? 500 : 250;
   const bessPowerKW = bessKWh / 2; // C-rate 0.5C
 
-  // หม้อแปลงไฟฟ้าสำหรับสถานีชาร์จ (คิด Diversity factor = 0.70 เนื่องจากรถไม่ได้ชาร์จเต็ม 100% พร้อมกันตลอดเวลา และมี BESS ช่วยเสริม)
-  // [F-13] DF 0.70 = สมมติฐาน diversity; [F-14] S = P/PF, PF=0.98
+  // Station transformer (diversity factor 0.70 — cars rarely charge at full power simultaneously, plus BESS support)
+  // [F-13] DF 0.70 diversity assumption; [F-14] S = P/PF, PF=0.98
   const transformerKVA = getNextStandardTransformer(((totalPeakEVLoadKW * 0.70) - bessPowerKW) / 0.98);
 
-  // การประเมินทางการเงิน (จำนวนรถเข้าชาร์จเฉลี่ยต่อหัวชาร์จ 6-8 คัน/วัน)
+  // Financial estimate (avg 6–8 cars per gun per day)
   const dailyCars = (dcFastChargerCount * 2) * 7;
-  const avgKWhPerSession = 40; // ชาร์จครั้งละ 40 หน่วย (10% -> 80%)
+  const avgKWhPerSession = 40; // 40 kWh per session (10% → 80%)
   const dailyKWhSold = dailyCars * avgKWhPerSession;
   const annualKWhSold = dailyKWhSold * 365;
 
-  // อัตราค่าบริการชาร์จ (อัตราเฉลี่ย 7.50 บาท/หน่วย)
+  // Charging tariff (avg 7.50 THB/kWh)
   const sellRate = 7.50;
-  // ต้นทุนค่าไฟ TOU กฟภ./กฟน. เฉลี่ย 4.60 บาท/หน่วย (เมื่อบริหารจัดการผ่าน BESS และ Solar Canopy)
+  // TOU electricity cost avg 4.30 THB/kWh with BESS + canopy management
   const costRate = 4.30;
   const marginPerKWh = sellRate - costRate;
 
   const annualChargingRevenue = annualKWhSold * sellRate;
   const annualElectricityCost = annualKWhSold * costRate;
-  // รายได้เสริมจากค่าเช่าร้านกาแฟ / 7-Eleven / ตู้จำหน่ายสินค้า ~35,000 บาท/เดือน
+  // Extra rent income from coffee shop / convenience store ~35,000 THB/month
   const commercialRentalRevenue = 35000 * 12;
-  const netAnnualCashflow = (annualKWhSold * marginPerKWh) + commercialRentalRevenue - 450000; // หักค่าบำรุงรักษา/ระบบ
+  const netAnnualCashflow = (annualKWhSold * marginPerKWh) + commercialRentalRevenue - 450000; // less O&M
 
-  // CAPEX: ตู้ชาร์จ 180kW (~1.1 ลบ./ตู้) + Solar Carport + BESS + หม้อแปลง + ระบบควบคุม
+  // CAPEX: 180kW chargers (~1.1M THB each) + solar carport + BESS + transformer + controls
   const chargersCost = dcFastChargerCount * 1100000;
   const canopyCost = solarCanopyKWp * 28000;
   const bessCost = bessKWh * 9500;
   const transformerAndCivil = 1800000 + (dcFastChargerCount * 150000);
   const totalCapex = chargersCost + canopyCost + bessCost + transformerAndCivil;
 
-  // [F-24] cash flow ตามธรรมชาติธุรกิจชาร์จ: utilization ramp ปี 1–5
-  // (ตลาด EV ค่อย ๆ โต — สมมติฐาน 60→100%) ไม่ใช่ degradation ฝั่งผลิต
-  // + สำรองเปลี่ยน power module ตู้ชาร์จปีที่ 10 (อายุใช้งาน ~10 ปี, ~25% ราคาตู้)
+  // [F-24] cash flow per charging-business nature: utilization ramp years 1–5
+  // (EV market grows — 60→100% assumption) rather than generation degradation
+  // + power-module refresh in year 10 (~10 yr life, ~25% of charger cost)
   const UTIL_RAMP = [0.60, 0.70, 0.80, 0.90, 1.00];
   const chargerMarginYear1 = annualKWhSold * marginPerKWh;
   const opexFixed = 450000;
@@ -461,37 +461,37 @@ export function calculateEVHubSpecs(landData) {
       irrPercent: cfFin.irrPercent,
       npv25YrMillionTHB: cfFin.npv25YrMillionTHB
     },
-    cashFlowModel: 'CF_y = M_charge×U_y + R_rent − OPEX − Refresh(ปี10) — U_y = utilization 60→100% ปีที่ 1–5 (สมมติฐานตลาด EV โต) ไม่ใช่ degradation',
+    cashFlowModel: 'CF_y = M_charge×U_y + R_rent − OPEX − Refresh(yr10) — U_y = utilization 60→100% in years 1–5 (EV-market-growth assumption), not degradation',
     cashFlows,
     electricalFeatures: [
-      'ระบบบริหารจัดการกำลังไฟฟ้าอัจฉริยะ (Dynamic Load Management - DLM)',
-      'ระบบตัดตอนป้องกันไฟดูด ไฟรั่ว Type B RCD และ Surge Protection Class I+II',
-      'รองรับระบบชำระเงินมาตรฐาน OCPP 1.6J / 2.0.1 เชื่อมต่อแอปพลิเคชันทุกค่าย'
+      'Dynamic Load Management (DLM) power control',
+      'Type-B RCD shock/leakage protection and Class I+II surge protection',
+      'OCPP 1.6J / 2.0.1 payment-ready — works with all charging apps'
     ]
   };
 }
 
-// 4. คำนวณ Grid-Scale BESS Farm
+// 4. Grid-Scale BESS Farm
 export function calculateBESSFarmSpecs(landData) {
   const { areaSqM = 1600 } = landData;
   const areaRai = areaSqM / 1600;
 
-  // ตู้คอนเทนเนอร์ 40ft LFP ความจุตู้ละ ~3.72 MWh
-  // 1 ไร่ สามารถวางได้ประมาณ 2-4 ตู้ (รวมระยะปลอดภัย NFPA 855 ระยะเว้น 3 เมตร)
+  // 40 ft LFP containers ~3.72 MWh each
+  // ~2–4 containers per rai incl. NFPA 855 3 m safety clearance
   const containerCount = Math.min(Math.max(1, Math.floor(areaRai * 2)), 8);
   const capacityMWh = containerCount * 3.72;
   const powerMW = capacityMWh / 2; // Duration 2 hours (0.5C)
 
-  // CAPEX BESS ระดับกริด ~10,500,000 บาท/MWh
+  // Grid-scale BESS CAPEX ~10,500,000 THB/MWh
   const totalCapex = capacityMWh * 10500000;
-  // Revenue จากสัญญาเช่าความจุ (Capacity Availability Payment) + ค่าทำ Arbitrage ~1.8 ล้านบาท/MWh/ปี
+  // Revenue from capacity availability + arbitrage ~1.8M THB/MWh/yr
   const annualRevenue = capacityMWh * 1800000;
   const opexPerYear = totalCapex * 0.02;
   const netAnnualCashflow = annualRevenue - opexPerYear;
 
-  // [F-24] cash flow ตามธรรมชาติ BESS: รายได้เสื่อมตาม capacity fade ของ cell LFP
-  // (~2%/ปี สมมติฐาน ต่างจาก degradation แผง PV) + augmentation ปีที่ 15
-  // (~35% ของ CAPEX เดิม เพื่อรักษา capacity — สมมติฐานประกาศไว้)
+  // [F-24] cash flow per BESS nature: revenue fades with LFP cell capacity fade
+  // (~2%/yr assumption, unlike PV degradation) + year-15 augmentation
+  // (~35% of original CAPEX to maintain capacity — declared assumption)
   const BESS_FADE = 0.02;
   const cashFlows = [-totalCapex];
   for (let y = 1; y <= 25; y++) {
@@ -505,8 +505,8 @@ export function calculateBESSFarmSpecs(landData) {
     capacityMWh: capacityMWh.toFixed(1),
     powerMW: powerMW.toFixed(1),
     batteryType: 'Lithium Iron Phosphate (LFP) Grade-A Prism Cells',
-    coolingSystem: 'Liquid Cooling Thermal Management System (รักษาอุณหภูมิ cell delta T < 2.5°C)',
-    fireSuppression: 'Novec 1230 / Aerosol พร้อมระบบตรวจจับควันและแก๊สพิษ 3 ระดับ',
+    coolingSystem: 'Liquid Cooling Thermal Management System (keeps cell ΔT < 2.5°C)',
+    fireSuppression: 'Novec 1230 / Aerosol with 3-stage smoke and gas detection',
     pcsInverter: `Bi-directional PCS ${powerMW.toFixed(1)} MW (Eff > 98.9%)`,
     financials: {
       totalCapexMillionTHB: (totalCapex / 1000000).toFixed(2),
@@ -518,36 +518,36 @@ export function calculateBESSFarmSpecs(landData) {
       irrPercent: cfFin.irrPercent,
       npv25YrMillionTHB: cfFin.npv25YrMillionTHB
     },
-    cashFlowModel: 'CF_y = R_cap×(1−0.02)^(y−1) − OPEX − Augmentation(ปี15 ~35% CAPEX) — fade 2%/ปี ตาม capacity fade ของ cell LFP ไม่ใช่ degradation แผง PV',
+    cashFlowModel: 'CF_y = R_cap×(1−0.02)^(y−1) − OPEX − Augmentation(yr15 ~35% CAPEX) — 2%/yr fade from LFP cell capacity fade, not PV degradation',
     cashFlows,
   };
 }
 
-// 5. คำนวณ Floating Solar
+// 5. Floating Solar
 export function calculateFloatingSolarSpecs(landData) {
   const base = calculateSolarFarmSpecs(landData);
-  // ประสิทธิภาพแผงบนผิวน้ำสูงขึ้น 8% จากผลการระบายความร้อน (Cooling Effect)
+  // Water-surface cooling effect lifts panel yield ~8%
   const annualEnergyMWh = Math.round(parseFloat(base.annualEnergyMWh.replace(/,/g, '')) * 1.08);
-  const totalCapex = parseFloat(base.financials.totalCapexMillionTHB) * 1.15 * 1000000; // ทุ่นลอยน้ำและสายเคเบิลกันน้ำใต้น้ำเพิ่ม 15%
+  const totalCapex = parseFloat(base.financials.totalCapexMillionTHB) * 1.15 * 1000000; // floats and underwater cable +15%
   const annualRevenue = annualEnergyMWh * 1000 * 2.1679;
   const opexPerYear = totalCapex * 0.016;
   const netAnnualCashflow = annualRevenue - opexPerYear;
 
-  // [F-24] cash flow ของ floating เอง — ห้ามใช้ของ solar base (CAPEX/รายได้ต่างกัน)
-  // degradation 0.4%/ปี เหมือน solar เพราะเป็นแผง PV เดียวกัน (มีเหตุผล ไม่ใช่ default สุ่ม)
+  // [F-24] floating's own cash flow — must not reuse solar base (different CAPEX/revenue)
+  // 0.4%/yr degradation same as solar since it uses identical PV modules (reasoned, not a random default)
   const cashFlows = [-totalCapex];
   for (let y = 1; y <= 25; y++) {
     cashFlows.push(annualRevenue * Math.pow(1 - 0.004, y - 1) - opexPerYear);
   }
   const cfFin = financeFromCashFlows(cashFlows);
 
-  // การระเหยของน้ำลดลงเฉลี่ย ~1,200 ลบ.ม./ไร่/ปี
+  // Evaporation saving ~1,200 m³/rai/yr
   const waterSavedCubicMeters = Math.round((landData.areaSqM / 1600) * 1200);
 
   return {
     ...base,
     annualEnergyMWh: annualEnergyMWh.toLocaleString(),
-    pontoonType: 'HDPE Food-grade UV Stabilized (รับประกัน 25 ปี)',
+    pontoonType: 'HDPE Food-grade UV Stabilized (25-yr warranty)',
     waterSavedM3Year: waterSavedCubicMeters.toLocaleString(),
     financials: {
       totalCapexMillionTHB: (totalCapex / 1000000).toFixed(2),
@@ -558,31 +558,31 @@ export function calculateFloatingSolarSpecs(landData) {
       irrPercent: cfFin.irrPercent,
       npv25YrMillionTHB: cfFin.npv25YrMillionTHB
     },
-    cashFlowModel: 'CF_y = R_PV,1×(1−0.004)^(y−1) − OPEX — degradation แผง PV เดียวกับ solar แต่คำนวณจาก CAPEX/รายได้ของ floating เอง (ค่าใช้จ่ายทุ่นลอยสูงกว่า)',
+    cashFlowModel: 'CF_y = R_PV,1×(1−0.004)^(y−1) − OPEX — same PV degradation as solar but computed from floating-solar CAPEX/revenue (higher float cost)',
     cashFlows,
   };
 }
 
-// 6. คำนวณ Biogas / Biomass
+// 6. Biogas / Biomass
 export function calculateBiogasSpecs(landData) {
   const areaRai = landData.areaSqM / 1600;
-  // โรงไฟฟ้าขนาด 1.0 MW (หรือตามขนาดที่เหมาะสม)
+  // ~1.0 MW plant (or size to fit)
   const generatorCapacityKW = Math.min(Math.max(500, Math.round(areaRai * 200)), 2000);
   const generatorCapacityMW = (generatorCapacityKW / 1000).toFixed(2);
   
-  // ผลิตไฟฟ้า 24 ชั่วโมง (Capacity Factor 85%)
+  // 24/7 generation (85% capacity factor)
   const annualEnergyMWh = Math.round(generatorCapacityKW * 8760 * 0.85 / 1000);
-  // ค่า FiT ชีวภาพ/ชีวมวล กกพ. เฉลี่ย ~3.13 บาท/หน่วย (มี FiT Premium)
+  // ERC biogas/biomass FiT avg ~3.13 THB/kWh (with FiT premium)
   const fitRate = 3.13;
-  const capexPerKW = 65000; // ~65,000 บาท/kW
+  const capexPerKW = 65000; // ~65,000 THB/kW
   const totalCapex = generatorCapacityKW * capexPerKW;
   const annualRevenue = annualEnergyMWh * 1000 * fitRate;
-  const opexPerYear = totalCapex * 0.07; // บำรุงรักษาเครื่องยนต์ก๊าซและวัตถุดิบ
+  const opexPerYear = totalCapex * 0.07; // gas-engine maintenance and feedstock
   const netAnnualCashflow = annualRevenue - opexPerYear;
 
-  // [F-24] cash flow ตามธรรมชาติโรงไฟฟ้าฐาน: ผลิตคงที่ตลอดอายุ (ไม่มี degradation
-  // แบบแผง PV — เครื่องยนต์รักษา output ได้ตราบใดที่บำรุงรักษา) แต่มี major overhaul
-  // เครื่องยนต์ก๊าซทุก ~8 ปี (≈60,000 ชม.ทำงาน สมมติฐาน ~8% CAPEX/ครั้ง)
+  // [F-24] baseload-plant cash flow: flat output over life (no PV-style
+  // degradation — engines hold output while maintained) but major gas-engine
+  // overhauls every ~8 yrs (≈60,000 run-hours, assumed ~8% CAPEX each)
   const OVERHAUL_YEARS = new Set([8, 16, 24]);
   const cashFlows = [-totalCapex];
   for (let y = 1; y <= 25; y++) {
@@ -597,7 +597,7 @@ export function calculateBiogasSpecs(landData) {
     generatorType: 'Biogas Lean-Burn Synchronous Gas Engine Generator 1500 RPM',
     digesterVolumeM3: Math.round(generatorCapacityKW * 4.5).toLocaleString(),
     annualEnergyMWh: annualEnergyMWh.toLocaleString(),
-    capacityFactor: '85% (จ่ายไฟต่อเนื่อง 24 ชม. เป็นโรงไฟฟ้าฐาน)',
+    capacityFactor: '85% (continuous 24h output as a baseload plant)',
     financials: {
       totalCapexMillionTHB: (totalCapex / 1000000).toFixed(2),
       annualRevenueMillionTHB: (annualRevenue / 1000000).toFixed(2),
@@ -608,12 +608,12 @@ export function calculateBiogasSpecs(landData) {
       irrPercent: cfFin.irrPercent,
       npv25YrMillionTHB: cfFin.npv25YrMillionTHB
     },
-    cashFlowModel: 'CF_y = R_FiT − OPEX − Overhaul(ปี 8/16/24 ~8% CAPEX) — โรงไฟฟ้าฐานผลิตคงที่ ไม่มี degradation แบบ PV แต่เสียค่า overhaul เครื่องยนต์เป็นช่วง',
+    cashFlowModel: 'CF_y = R_FiT − OPEX − Overhaul(yrs 8/16/24 ~8% CAPEX) — flat baseload output, no PV-style degradation, periodic engine overhauls',
     cashFlows,
   };
 }
 
-// --- ฟังก์ชันช่วยเหลือทางวิศวกรรมและการเงิน ---
+// --- Engineering & finance helpers ---
 function getNextStandardTransformer(requiredKVA) {
   const standardRatings = [160, 250, 315, 400, 500, 630, 800, 1000, 1250, 1600, 2000, 2500, 3150, 4000, 5000];
   for (const rating of standardRatings) {
@@ -622,7 +622,7 @@ function getNextStandardTransformer(requiredKVA) {
   return Math.ceil(requiredKVA / 1000) * 1000;
 }
 
-// NPV จากชุด cash flow จริง [F-27] — ใช้ฐานเดียวกับกราฟ/รายงานเสมอ
+// NPV from the actual cash-flow array [F-27] — same basis as chart/report
 function npvFromCashFlows(cashFlows, discountRate = 0.06) {
   let npv = 0;
   for (let t = 0; t < cashFlows.length; t++) {
@@ -631,7 +631,7 @@ function npvFromCashFlows(cashFlows, discountRate = 0.06) {
   return npv;
 }
 
-// IRR จากชุด cash flow จริง [F-28] — bisection; คืน null ถ้าไม่มี sign change
+// IRR from the actual cash-flow array [F-28] — bisection; null if no sign change
 function irrFromCashFlows(cashFlows) {
   const npv = r => cashFlows.reduce((s, cf, t) => s + cf / Math.pow(1 + r, t), 0);
   if (npv(-0.99) * npv(10) >= 0) return null;
@@ -643,14 +643,14 @@ function irrFromCashFlows(cashFlows) {
   return (lo + hi) / 2 * 100;
 }
 
-// [F-26/27/28] ตัวชี้วัดการเงินทั้งหมดจาก cash flow ชุดเดียว — แชร์กับกราฟ/ตารางเสมอ
+// [F-26/27/28] all financial indicators from one cash-flow array — shared with chart/table
 function financeFromCashFlows(cashFlows) {
   let cum = cashFlows[0], paybackYear = null;
   for (let y = 1; y < cashFlows.length && paybackYear === null; y++) {
     cum += cashFlows[y];
     if (cum >= 0) paybackYear = y;
   }
-  // interpolated payback (linear ระหว่างปี — สมมติเงินสดสม่ำเสมอในปี)
+  // interpolated payback (linear within the year — assumes steady cash)
   let paybackInterp = null;
   if (paybackYear !== null && paybackYear > 0 && cashFlows[paybackYear] > 0) {
     const prevCcf = cashFlows.slice(0, paybackYear).reduce((a, b) => a + b, 0);
@@ -659,7 +659,7 @@ function financeFromCashFlows(cashFlows) {
   const npvValue = npvFromCashFlows(cashFlows);
   const irrValue = irrFromCashFlows(cashFlows);
   return {
-    paybackYears: paybackYear !== null ? String(paybackYear) : 'ไม่คืนทุนภายใน 25 ปี',
+    paybackYears: paybackYear !== null ? String(paybackYear) : 'No payback within 25 yrs',
     paybackInterpolated: paybackInterp !== null ? paybackInterp.toFixed(1) : '—',
     npv25YrMillionTHB: (npvValue / 1000000).toFixed(2),
     irrPercent: irrValue === null ? 'N/A' : irrValue.toFixed(1),

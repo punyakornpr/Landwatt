@@ -58,7 +58,7 @@ export default function SiteLayoutCanvas({ project, specs, landData }) {
     ctx.lineWidth = 2;
     ctx.strokeRect(padX, padY, plotW, plotH);
 
-    // 4 Corner Survey Boundary Marks (หมุดที่ดิน)
+    // 4 corner survey boundary marks
     const corners = [
       [padX, padY],
       [padX + plotW, padY],
@@ -72,7 +72,7 @@ export default function SiteLayoutCanvas({ project, specs, landData }) {
       ctx.fill();
     });
 
-    // 1. Draw Setback Buffer (ระยะร่น 3-5m ตามกฎหมาย)
+    // 1. Setback buffer (3–5 m per regulation)
     const setbackPx = 22;
     if (showSetback) {
       ctx.strokeStyle = '#d97706';
@@ -83,7 +83,7 @@ export default function SiteLayoutCanvas({ project, specs, landData }) {
 
       ctx.fillStyle = '#b45309';
       ctx.font = '10px Prompt, sans-serif';
-      ctx.fillText('ระยะร่น Setback Buffer 3.0 m', padX + setbackPx + 6, padY + setbackPx - 5);
+      ctx.fillText('Setback buffer 3.0 m', padX + setbackPx + 6, padY + setbackPx - 5);
     }
 
     // 2. Frontage Access Road
@@ -91,7 +91,7 @@ export default function SiteLayoutCanvas({ project, specs, landData }) {
     ctx.fillRect(padX - 10, padY + plotH + 8, plotW + 20, 20);
     ctx.fillStyle = '#475569';
     ctx.font = '10px Prompt, sans-serif';
-    ctx.fillText('แนวถนนทางหลวง / ทางสาธารณะ (Access Road)', padX + 20, padY + plotH + 22);
+    ctx.fillText('Public access road', padX + 20, padY + plotH + 22);
 
     // Internal plot usable area
     const innerX = padX + setbackPx + 10;
@@ -141,7 +141,7 @@ export default function SiteLayoutCanvas({ project, specs, landData }) {
       ctx.font = 'bold 9px Inter, sans-serif';
       ctx.fillText('SUBSTATION', padPosX + 5, padPosY + 25);
       ctx.font = '8px Prompt, sans-serif';
-      ctx.fillText('หม้อแปลง & RMU', padPosX + 5, padPosY + 45);
+      ctx.fillText('Transformer & RMU', padPosX + 5, padPosY + 45);
 
       // Underground Cable Trench
       if (showCables) {
@@ -156,7 +156,7 @@ export default function SiteLayoutCanvas({ project, specs, landData }) {
 
         ctx.fillStyle = '#15803d';
         ctx.font = '9px Prompt, sans-serif';
-        ctx.fillText('แนวสายเคเบิลใต้ดิน 22kV ไปยังจุดเชื่อมต่อ กฟภ.', padPosX - 150, padY + plotH + 5);
+        ctx.fillText('22kV underground cable to PEA interconnection', padPosX - 150, padY + plotH + 5);
       }
 
     } else if (project.id === 'ev-charging-hub') {
@@ -185,8 +185,8 @@ export default function SiteLayoutCanvas({ project, specs, landData }) {
       ctx.fillRect(innerX + canopyW + 30, innerY + 20, innerW - canopyW - 40, canopyH);
       ctx.fillStyle = '#ffffff';
       ctx.font = '10px Prompt, sans-serif';
-      ctx.fillText('ร้านกาแฟ / Cafe', innerX + canopyW + 35, innerY + 55);
-      ctx.fillText('& จุดพักผ่อน', innerX + canopyW + 35, innerY + 70);
+      ctx.fillText('Cafe / Rest', innerX + canopyW + 35, innerY + 55);
+      ctx.fillText('area', innerX + canopyW + 35, innerY + 70);
 
       // BESS & Transformer
       ctx.fillStyle = '#334155';
@@ -194,7 +194,7 @@ export default function SiteLayoutCanvas({ project, specs, landData }) {
       ctx.fillStyle = '#ffffff';
       ctx.font = '9px Prompt, sans-serif';
       ctx.fillText('BESS Container 500kWh', innerX + 25, innerY + canopyH + 50);
-      ctx.fillText('& หม้อแปลง 1000kVA', innerX + 25, innerY + canopyH + 65);
+      ctx.fillText('& 1000kVA transformer', innerX + 25, innerY + canopyH + 65);
 
     } else if (project.id === 'grid-bess') {
       const containerW = 120;
@@ -221,14 +221,14 @@ export default function SiteLayoutCanvas({ project, specs, landData }) {
       ctx.fill();
       ctx.fillStyle = '#ffffff';
       ctx.font = '10px Prompt, sans-serif';
-      ctx.fillText('บ่อหมักก๊าซ CSTR', innerX + 85, innerY + 95);
+      ctx.fillText('CSTR digester', innerX + 85, innerY + 95);
       ctx.fillText('Digester Tank', innerX + 90, innerY + 110);
 
       ctx.fillStyle = '#334155';
       ctx.fillRect(innerX + 220, innerY + 40, 110, 80);
       ctx.fillStyle = '#ffffff';
       ctx.font = '10px Prompt, sans-serif';
-      ctx.fillText('โรงกำเนิดไฟฟ้า', innerX + 230, innerY + 70);
+      ctx.fillText('Powerhouse', innerX + 230, innerY + 70);
       ctx.fillText('Gas Engine Gen', innerX + 230, innerY + 85);
     }
 
@@ -237,11 +237,11 @@ export default function SiteLayoutCanvas({ project, specs, landData }) {
       ctx.fillStyle = '#475569';
       ctx.font = '10px Inter, monospace';
 
-      ctx.fillText(`ความกว้างแปลง ≈ ${widthMeters} m`, padX + (plotW / 2) - 40, padY - 12);
+      ctx.fillText(`Width ≈ ${widthMeters} m`, padX + (plotW / 2) - 40, padY - 12);
       ctx.save();
       ctx.translate(padX + plotW + 18, padY + (plotH / 2) + 20);
       ctx.rotate(Math.PI / 2);
-      ctx.fillText(`ความยาวแปลง ≈ ${lengthMeters} m`, 0, 0);
+      ctx.fillText(`Length ≈ ${lengthMeters} m`, 0, 0);
       ctx.restore();
     }
 
@@ -276,10 +276,10 @@ export default function SiteLayoutCanvas({ project, specs, landData }) {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3.5 border-b border-zinc-100 gap-2">
         <div>
           <h3 className="text-base font-bold text-zinc-900">
-            ผังจัดวางพื้นที่จำลอง (2D Site Layout & Setback)
+            Simulated 2D site layout & setback
           </h3>
           <p className="text-xs text-zinc-500 mt-0.5">
-            การจัดวางทิศทางแผงรับแสงอาทิตย์ (Tilt 15° South) อาคารหม้อแปลง และระยะร่นตามกฎหมาย
+            Panel orientation (15° tilt facing south), transformer station and legal setbacks
           </p>
         </div>
 
@@ -291,7 +291,7 @@ export default function SiteLayoutCanvas({ project, specs, landData }) {
               showSetback ? 'bg-zinc-900 text-white border-zinc-900' : 'bg-zinc-100 text-zinc-600 border-zinc-200'
             }`}
           >
-            ระยะร่น 3m
+            Setback 3m
           </button>
           <button
             onClick={() => setShowCables(!showCables)}
@@ -299,7 +299,7 @@ export default function SiteLayoutCanvas({ project, specs, landData }) {
               showCables ? 'bg-zinc-900 text-white border-zinc-900' : 'bg-zinc-100 text-zinc-600 border-zinc-200'
             }`}
           >
-            สายเคเบิล 22kV
+            22kV cable
           </button>
           <button
             onClick={() => setShowDimensions(!showDimensions)}
@@ -307,7 +307,7 @@ export default function SiteLayoutCanvas({ project, specs, landData }) {
               showDimensions ? 'bg-zinc-900 text-white border-zinc-900' : 'bg-zinc-100 text-zinc-600 border-zinc-200'
             }`}
           >
-            มิติขนาด (m)
+            Dimensions (m)
           </button>
         </div>
       </div>
@@ -327,19 +327,19 @@ export default function SiteLayoutCanvas({ project, specs, landData }) {
         <div className="flex items-center space-x-4">
           <span className="flex items-center space-x-1.5">
             <span className="w-3 h-3 bg-sky-700 rounded-sm" />
-            <span>แถวแผง PV (Tilt 15° หันใต้)</span>
+            <span>PV rows (15° tilt, south-facing)</span>
           </span>
           <span className="flex items-center space-x-1.5">
             <span className="w-3 h-3 bg-slate-700 rounded-sm" />
-            <span>สถานีหม้อแปลง & สวิตช์เกียร์</span>
+            <span>Transformer & switchgear</span>
           </span>
           <span className="flex items-center space-x-1.5">
             <span className="w-3 h-0.5 border-t border-dashed border-amber-600" />
-            <span>แนวระยะร่นกฎหมาย 3.0 m</span>
+            <span>3.0 m legal setback line</span>
           </span>
         </div>
         <div className="text-[11px] font-mono text-zinc-400">
-          มาตราส่วนจำลอง 1:{(lengthMeters / 12).toFixed(0)} (North Oriented)
+          Approx. scale 1:{(lengthMeters / 12).toFixed(0)} (north oriented)
         </div>
       </div>
 

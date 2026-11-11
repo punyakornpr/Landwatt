@@ -3,7 +3,7 @@ import { navigate } from '../router';
 import { useApp } from '../state/AppState';
 import { recommendProjects, dataConfidence, projectFriendly, budgetCaution, BUDGET_MAX_THB, BUDGET_OPTIONS } from '../engine/recommend';
 import { getSpecs } from '../engine/specs';
-import { StepProgress, StatusBadge, Note, Collapsible, fmtTHB, DisclaimerStrip } from '../components/ui';
+import { StepProgress, StatusBadge, ProjectIcon, Note, Collapsible, fmtTHB, DisclaimerStrip } from '../components/ui';
 import ProjectArt from '../components/ProjectArt';
 import { useT } from '../i18n';
 import {
@@ -119,8 +119,8 @@ export default function Results() {
           return (
             <div key={r.id} className={`card p-5 sm:p-6 ${idx === 0 ? 'border-brand-300 ring-2 ring-brand-200/70 shadow-lg shadow-brand-600/10' : ''}`}>
               <div className="flex flex-col sm:flex-row gap-4">
-                <ProjectArt id={r.id} className="w-full sm:w-36 aspect-[120/84] self-start" />
-                <div className="flex-1 min-w-0">
+                <ProjectArt id={r.id} className="w-full sm:w-40 aspect-[120/84] self-start sm:order-2" />
+                <div className="flex-1 min-w-0 sm:order-1">
                   <div className="flex flex-wrap items-center gap-2">
                     <h2 className="text-lg font-bold">{meta.name}</h2>
                     <span className="text-sm text-ink-faint font-normal">{meta.sub}</span>

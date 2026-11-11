@@ -9,23 +9,20 @@ import {
 import { STATUS, PROJECT_FRIENDLY } from '../engine/recommend';
 import { useApp } from '../state/AppState';
 import { useT } from '../i18n';
-import geoGrid from '../assets/geo-grid.svg';
+import solarField from '../assets/solar-field.svg';
 
 export function PageBackdrop() {
   return (
     <div aria-hidden="true" className="absolute inset-0 pointer-events-none overflow-hidden">
-      <div className="absolute inset-0" style={{ background: 'linear-gradient(#EDF3FA, #F7FAFD 35%, #FFFFFF 85%)' }} />
+      <div className="absolute inset-0" style={{ background: '#E8F0F9' }} />
       <div className="absolute inset-0" style={{
-        backgroundImage: `url(${geoGrid})`,
-        backgroundRepeat: 'repeat',
-        backgroundSize: '60px 52px',
-        opacity: 0.5,
+        backgroundImage: `url(${solarField})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center top',
+        backgroundRepeat: 'no-repeat',
       }} />
       <div className="absolute inset-0" style={{
-        background:
-          'radial-gradient(65% 45% at 8% -8%, rgba(37,99,235,0.15), transparent 70%),' +
-          'radial-gradient(55% 40% at 96% 4%, rgba(14,165,233,0.13), transparent 70%),' +
-          'radial-gradient(60% 45% at 50% 110%, rgba(37,99,235,0.10), transparent 70%)',
+        background: 'linear-gradient(rgba(255,255,255,0.78), rgba(255,255,255,0.55) 30%, rgba(255,255,255,0.62) 70%, rgba(255,255,255,0.8))',
       }} />
     </div>
   );

@@ -87,4 +87,39 @@ export const PROVIDERS = {
     { name: 'Carbon project developer / VNV Advisory', scale: 'Regional', focus: 'Carbon-credit project developers who co-develop and share revenue', note: 'They handle verification paperwork for a revenue share — compare terms' },
     { name: 'Local forestry office', scale: 'Local', focus: 'Royal Forest Dept / provincial office — species advice and land-use rules', note: 'Confirm the plot can legally be planted as forestry' },
   ],
+  'roadside-cafe': [
+    { name: 'Café Amazon (PTT OR franchise)', scale: 'National', focus: 'Proven roadside café franchise — turnkey brand, supply chain and menu', note: 'Higher upfront fee but tested roadside demand model', website: 'https://www.cafe-amazon.com' },
+    { name: 'Local design-build contractor', scale: 'Local', focus: 'Compact shop fit-out, counter work and parking layout', note: 'Compare 2–3 quotes — ask for food-shop license experience' },
+    { name: 'Makro / equipment suppliers', scale: 'National', focus: 'Espresso machines, refrigeration and kitchen equipment at wholesale', note: 'HoReCa section prices beat retail for equipment', website: 'https://www.makro.pro' },
+  ],
+  'minimart': [
+    { name: 'CJ More / franchise network', scale: 'National', focus: 'Community mini-mart franchise — supply chain, layout and systems included', note: 'Franchise fee trades margin for a proven model — compare with independent' },
+    { name: 'Local design-build contractor', scale: 'Local', focus: 'Shop shell, counters, cold-room piping and parking apron', note: 'Standard commercial build — compare 2–3 quotes' },
+    { name: 'Makro wholesale', scale: 'National', focus: 'Initial stock and ongoing supply at wholesale prices', note: 'Delivery routes cover most provincial areas', website: 'https://www.makro.pro' },
+  ],
+  'self-storage': [
+    { name: 'i-Store Self Storage (benchmark)', scale: 'National', focus: 'Thailand\'s largest self-storage chain — study their unit sizes and pricing', note: 'They don\'t build for you but their spec shows what the market expects', website: 'https://www.i-store.co.th' },
+    { name: 'Prefab / container contractor', scale: 'Regional', focus: 'Steel-frame or container units delivered turnkey', note: 'Compare 2–3 quotes — check roof sealing and ventilation quality' },
+    { name: 'Local gate/CCTV installer', scale: 'Local', focus: 'Automatic gate, cameras and access control — the whole "staff"', note: 'After-sales response time matters more than price' },
+  ],
+  'sports-court': [
+    { name: 'Sports flooring specialist', scale: 'Regional', focus: 'PVC/PU sports flooring, nets, posts and LED court lighting', note: 'Players judge the floor first — ask for a reference court to try' },
+    { name: 'Local steel-structure contractor', scale: 'Local', focus: 'Clear-span hall ~8-9k THB/m² incl. roofing and ventilation', note: 'Confirm the span is truly column-free over courts' },
+    { name: 'SCG Solar Roof Solutions', scale: 'National', focus: 'PV array for the tall roof — covers lighting and fan load', note: 'Big clear-span roofs suit larger packages', website: 'https://www.scgsmartliving.com/th/service/solar-roof-factory', contact: 'Tel 02-586-2222 · contact@scg.com' },
+  ],
+  'homestay-camp': [
+    { name: 'Airbnb / Agoda / Booking.com', scale: 'National', focus: 'Listing platforms — your entire sales channel', note: 'Test-demand with one cabin listed before building more', website: 'https://www.airbnb.com' },
+    { name: 'Local cabin/tent builder', scale: 'Local', focus: 'Prefabricated cabins, glamping tents and deck work', note: 'Visit a finished unit before ordering — insulation quality varies hugely' },
+    { name: 'Solar water-heater supplier', scale: 'Regional', focus: 'Solar thermal + small PV for a low-density electrical load', note: 'Cheaper than electric heaters at this scale' },
+  ],
+  'laundry-shop': [
+    { name: 'Otteri Wash & Dry (franchise)', scale: 'National', focus: 'Thai coin-laundry franchise — machines, layout and brand included', note: 'Franchise fee vs independent margin — compare both models', website: 'https://www.otteri.com' },
+    { name: 'Commercial laundry equipment dealer', scale: 'Regional', focus: 'Washer-extractors and stacked dryers sized to shop throughput', note: 'Buy commercial grade — home machines die in months at this duty' },
+    { name: 'Local licensed installer', scale: 'Local', focus: 'Plumbing, drainage and the PV for dryers/water heating', note: 'Water supply and drain capacity decide machine count' },
+  ],
+  'car-wash': [
+    { name: 'Kärcher Thailand', scale: 'National', focus: 'High-pressure pumps, foam systems and vacuum stations', note: 'Commercial-grade equipment with local service', website: 'https://www.kaercher.com/th' },
+    { name: 'Local steel/canopy contractor', scale: 'Local', focus: 'Wash bays, canopy, aprons and water-recycling pit', note: 'Water-recycling pays back — spec it from day one' },
+    { name: 'Self-service wash equipment importer', scale: 'Regional', focus: 'Coin/QR payment machines and bay controllers', note: 'QR payment is now standard — cashless only is fine' },
+  ],
 };

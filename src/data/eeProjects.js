@@ -376,5 +376,180 @@ export const EE_PROJECTS = [
       'First verified credits typically from year 5 onward',
       'Small solar pump kit covers seedling irrigation off-grid'
     ]
+  },
+  {
+    id: 'roadside-cafe',
+    title: 'Roadside Café & Food Shop',
+    shortTitle: 'Roadside Café',
+    category: 'business',
+    icon: 'Coffee',
+    accentColor: 'orange',
+    tagline: 'Coffee and simple food on a road frontage — the classic Thai land business',
+    suitableAreaMinRai: 0.1,
+    preferredZoning: ['yellow', 'red', 'orange', 'purple'],
+    standards: ['Food-shop license (local authority)', 'Building permit for the shop structure'],
+    description: 'Build a compact café selling coffee, drinks and simple meals to passing traffic and locals. The winning factor is location: visible frontage on a busy road with easy parking. A small rooftop PV array offsets the daytime espresso-machine and air-conditioning load',
+    keyBenefits: [
+      'Direct daily cash income — the most hands-on business on this list',
+      'Scales from a kiosk to a full café as regulars build up',
+      'Rooftop PV cuts the biggest fixed cost (air-con + machines)',
+      'Adds a landmark — raises the whole plot\'s visibility and value'
+    ],
+    technicalHighlights: [
+      'Compact shop ~80-120 m² fit-out ~14-18k THB/m²',
+      'Traffic on the frontage decides daily customer count',
+      'Espresso + air-con load ~5-8 kW — rooftop PV ~8-13 kWp offsets it',
+      'Parking and U-turn ease matter as much as the menu'
+    ]
+  },
+  {
+    id: 'minimart',
+    title: 'Community Mini-mart',
+    shortTitle: 'Mini-mart',
+    category: 'business',
+    icon: 'ShoppingCart',
+    accentColor: 'blue',
+    tagline: 'A neighborhood convenience store — daily necessities for the surrounding community',
+    suitableAreaMinRai: 0.1,
+    preferredZoning: ['yellow', 'red', 'orange', 'purple'],
+    standards: ['Retail license + tobacco/alcohol permits', 'Building permit'],
+    description: 'Open a convenience store serving households within walking/driving distance. Revenue is volume-driven with thin margins — the store works when the community is underserved and the frontage is easy to stop at. Rooftop PV offsets refrigeration and air-con, the largest running costs',
+    keyBenefits: [
+      'Recession-resistant demand — people buy necessities daily',
+      'Franchise options exist, or run independently for higher margin',
+      'PV offsets 24/7 refrigeration — the dominant operating cost',
+      'Combines well with parcel pickup, top-up and bill-pay services'
+    ],
+    technicalHighlights: [
+      'Shop ~100-140 m² + initial stock ~0.7-1.1M THB',
+      'Grocery margin is thin (~15-22%) — volume decides everything',
+      'Fridges/freezers run 24h — PV covers the daytime share',
+      'Underserved community radius is the real feasibility question'
+    ]
+  },
+  {
+    id: 'self-storage',
+    title: 'Self-storage Rental Units',
+    shortTitle: 'Self-storage',
+    category: 'business',
+    icon: 'Boxes',
+    accentColor: 'violet',
+    tagline: 'Container-style storage rooms for rent — the quiet property business with almost no staff',
+    suitableAreaMinRai: 0.25,
+    preferredZoning: ['yellow', 'orange', 'purple', 'red'],
+    standards: ['Building permit for storage structures', 'Fire-access lane around units'],
+    description: 'Install prefab storage units (3×6 m class) and rent them monthly to households, online sellers and small businesses. Demand follows e-commerce sellers and condo dwellers needing overflow space. Runs nearly staff-free: CCTV, a gate and monthly billing. Unit roofs carry PV for the common load',
+    keyBenefits: [
+      'Almost staff-free — gate, CCTV and billing, no shop hours',
+      'E-commerce sellers drive steady unit demand',
+      'Modular — add units row by row as occupancy proves out',
+      'Secondary roads work fine; customers visit only occasionally'
+    ],
+    technicalHighlights: [
+      'Prefab units ~3×6 m rent ~2,000-2,800 THB/month each',
+      'Occupancy ~70-75% is the honest planning figure',
+      'Unit roofs carry PV for lighting/CCTV/EV-cart charging',
+      'Fire lanes and turning radius decide how many units fit'
+    ]
+  },
+  {
+    id: 'sports-court',
+    title: 'Badminton / Futsal Court Rental',
+    shortTitle: 'Sports Court',
+    category: 'business',
+    icon: 'Dumbbell',
+    accentColor: 'teal',
+    tagline: 'A covered court hall rented by the hour — evening income from the local community',
+    suitableAreaMinRai: 0.3,
+    preferredZoning: ['yellow', 'red', 'orange', 'purple'],
+    standards: ['Building permit for the covered hall', 'Public-venue health permit (local authority)'],
+    description: 'Build a covered badminton or futsal court and rent it by the hour — evenings and weekends are peak. Courts need a community of players nearby, not tourist traffic. The tall roof is a natural fit for a larger PV array covering the big lighting and ventilation load',
+    keyBenefits: [
+      'Hourly rental income, evenings and weekends — fits a day job',
+      'Repeat customers — clubs book the same slot weekly',
+      'Tall clear-span roof = excellent PV surface, big savings',
+      'Community anchor — pairs naturally with drinks/gear sales'
+    ],
+    technicalHighlights: [
+      'One badminton court needs ~170-190 m² incl. clearances',
+      'Court rent ~120-200 THB/hour, peak after 17:00',
+      'Sports flooring ~60-80k per court — quality matters to players',
+      'Hall lighting ~10-15 W/m² — PV covers daytime bookings'
+    ]
+  },
+  {
+    id: 'homestay-camp',
+    title: 'Homestay & Camping Ground',
+    shortTitle: 'Homestay/Camp',
+    category: 'business',
+    icon: 'Tent',
+    accentColor: 'green',
+    tagline: 'Tents, cabins or a small homestay — income from scenery and quiet, not traffic',
+    suitableAreaMinRai: 0.3,
+    preferredZoning: ['green', 'light_green', 'yellow', 'rural'],
+    standards: ['Homestay/ lodging rules per local authority (non-hotel class)', 'Wastewater and waste management basics'],
+    description: 'Turn a scenic or quiet plot into a small homestay, glamping tents or a campground. This is the one business here where a main road matters less than atmosphere — trees, water views and quiet sell the booking. Solar water heating and small PV cut running costs in a low-density build',
+    keyBenefits: [
+      'Works where other businesses fail — quiet, scenic, off-main-road',
+      'Low-density build keeps the land beautiful and flexible',
+      'Weekend/holiday demand from Bangkok and nearby cities',
+      'Pairs with camping, café or farm-stay experiences'
+    ],
+    technicalHighlights: [
+      'Cabins/tents ~150-350k THB per key incl. fit-out',
+      'Occupancy ~25-35% is honest for rural stays (weekend-heavy)',
+      'ADR ~800-1,500 THB/night depending on view and finish',
+      'Solar water heater + PV covers a low-density electrical load'
+    ]
+  },
+  {
+    id: 'laundry-shop',
+    title: 'Coin Laundry Shop',
+    shortTitle: 'Laundry Shop',
+    category: 'business',
+    icon: 'WashingMachine',
+    accentColor: 'sky',
+    tagline: 'Self-service washers and dryers — recurring income from renters, students and workers nearby',
+    suitableAreaMinRai: 0.05,
+    preferredZoning: ['yellow', 'red', 'orange', 'purple'],
+    standards: ['Shop license + water supply/drainage connection'],
+    description: 'Set up a row of coin/QR-operated washers and dryers. Demand is hyper-local: renters, dorm residents and workers within ~1 km who lack machines. Runs with a part-time attendant. The heavy water-heater and dryer loads make rooftop PV genuinely useful here',
+    keyBenefits: [
+      'Recurring weekly demand — everyone washes clothes',
+      'Small plot works — even a 60-80 m² shopfront suffices',
+      'Semi-passive — a part-time attendant, not full staffing',
+      'PV trims the dryer/water-heater load — the main cost driver'
+    ],
+    technicalHighlights: [
+      'Commercial washers ~35-45k THB each, 8-12 machines typical',
+      'A machine earns ~9-11 loads/day at ~40-45 THB/load',
+      'Water + power ~50-58% of revenue — the deciding cost line',
+      'Catchment is ~1 km of renters/dorms — survey before building'
+    ]
+  },
+  {
+    id: 'car-wash',
+    title: 'Self-service Car Wash',
+    shortTitle: 'Car Wash',
+    category: 'business',
+    icon: 'Car',
+    accentColor: 'cyan',
+    tagline: 'Coin/QR wash bays plus vacuum — steady income on any busy road',
+    suitableAreaMinRai: 0.15,
+    preferredZoning: ['yellow', 'red', 'orange', 'purple'],
+    standards: ['Wastewater drainage to a proper system', 'Shop/venue license per local authority'],
+    description: 'Build 2-4 self-service wash bays with high-pressure machines, foam and vacuum stations. Customers serve themselves in 10-15 minutes — the model needs visible road frontage and easy in/out, but almost no staff. Water recycling and a PV canopy trim the two running costs',
+    keyBenefits: [
+      'Self-service — customers do the work, staff is minimal',
+      'Steady demand wherever traffic and residences overlap',
+      'Fast build — bays are simple structures, quick to open',
+      'PV canopy over bays shades cars and cuts the power bill'
+    ],
+    technicalHighlights: [
+      'A bay (equipment + structure) ~250-300k THB turnkey',
+      'A busy bay grosses ~1,200-2,500 THB/day',
+      'Water + power ~45-50% of revenue — recycling pays back',
+      'Ingress/egress speed decides repeat visits'
+    ]
   }
 ];

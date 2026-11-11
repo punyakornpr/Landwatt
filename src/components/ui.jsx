@@ -4,6 +4,7 @@ import {
   TrendingUp, PiggyBank, Lightbulb, ChevronDown,
   CheckCircle2, AlertTriangle, Info, HelpCircle,
   Store, Snowflake, Package, Handshake, Server, Warehouse, Trees,
+  Coffee, ShoppingCart, Boxes, Dumbbell, Tent, WashingMachine, Car,
 } from 'lucide-react';
 import { STATUS, PROJECT_FRIENDLY } from '../engine/recommend';
 import { useApp } from '../state/AppState';
@@ -13,6 +14,7 @@ export const ICONS = {
   Sun, Sprout, Zap, BatteryCharging, Waves, Flame,
   TrendingUp, PiggyBank, Lightbulb, Store, Snowflake, Package,
   Handshake, Server, Warehouse, Trees,
+  Coffee, ShoppingCart, Boxes, Dumbbell, Tent, WashingMachine, Car,
 };
 
 export function Reveal({ children, delay = 0, className = '' }) {

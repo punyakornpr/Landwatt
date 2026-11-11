@@ -259,6 +259,88 @@ export function evaluateLandFeasibility(landData) {
   if (zoningColor === 'green' || zoningColor === 'light_green') cfScore += 10;
   scores['carbon-forest'] = Math.min(Math.max(cfScore, 10), 88);
 
+  // 11-17. General businesses — driven by frontage/community, not the sun
+  // 11. Roadside café — passing traffic is everything
+  let cafeScore = 38;
+  if (roadType === 'main') cafeScore += 32;
+  else if (roadType === 'secondary') cafeScore += 8;
+  else cafeScore -= 30; // nobody detours down a dirt track for coffee
+  if (roadWidthMeters >= 8) cafeScore += 8;
+  if (areaSqM >= 200 && areaSqM <= 3200) cafeScore += 10;
+  else if (areaSqM < 120) cafeScore -= 25;
+  if (landType === 'pond') cafeScore -= 30;
+  if (zoningColor === 'yellow' || zoningColor === 'orange' || zoningColor === 'red') cafeScore += 8;
+  scores['roadside-cafe'] = Math.min(Math.max(cafeScore, 10), 92);
+
+  // 12. Mini-mart — community catchment + stopping ease
+  let martScore = 40;
+  if (roadType === 'main') martScore += 22;
+  else if (roadType === 'secondary') martScore += 12;
+  else martScore -= 28;
+  if (areaSqM >= 150 && areaSqM <= 2000) martScore += 12;
+  else if (areaSqM < 100) martScore -= 25;
+  if (landType === 'pond') martScore -= 30;
+  if (zoningColor === 'yellow' || zoningColor === 'orange' || zoningColor === 'red') martScore += 10;
+  scores['minimart'] = Math.min(Math.max(martScore, 10), 90);
+
+  // 13. Self-storage — least road-critical; customers visit rarely
+  let storScore = 45;
+  if (roadType === 'main' || roadType === 'secondary') storScore += 15;
+  else storScore -= 22;
+  if (areaSqM >= 400 && areaSqM <= 4800) storScore += 15;
+  else if (areaSqM < 300) storScore -= 15;
+  if (landType === 'pond') storScore -= 30;
+  if (zoningColor === 'yellow' || zoningColor === 'orange' || zoningColor === 'purple') storScore += 8;
+  scores['self-storage'] = Math.min(Math.max(storScore, 10), 90);
+
+  // 14. Sports court — members drive to it; needs plot size + nearby community
+  let sportScore = 40;
+  if (roadType === 'secondary') sportScore += 15;
+  else if (roadType === 'main') sportScore += 10;
+  else sportScore -= 20;
+  if (areaSqM >= 800) sportScore += 18;
+  else if (areaSqM >= 400) sportScore += 8;
+  else sportScore -= 25; // under ~300 m² fits nothing
+  if (landType === 'flat') sportScore += 8;
+  if (landType === 'pond') sportScore -= 30;
+  if (zoningColor === 'yellow' || zoningColor === 'orange' || zoningColor === 'red') sportScore += 8;
+  scores['sports-court'] = Math.min(Math.max(sportScore, 10), 88);
+
+  // 15. Homestay/camp — scenery and quiet beat traffic
+  let stayScore = 42;
+  if (roadType === 'secondary') stayScore += 12;
+  else if (roadType === 'main') stayScore += 6;
+  else stayScore -= 10; // tourists still need to reach you
+  if (areaSqM >= 800) stayScore += 15;
+  else if (areaSqM >= 400) stayScore += 8;
+  else stayScore -= 18;
+  if (landType === 'agri' || landType === 'slope') stayScore += 8; // farm views, hill views
+  if (landType === 'pond') stayScore -= 10; // buildable area shrinks (though views help)
+  if (zoningColor === 'green' || zoningColor === 'light_green') stayScore += 10;
+  scores['homestay-camp'] = Math.min(Math.max(stayScore, 10), 88);
+
+  // 16. Coin laundry — hyper-local catchment, needs renters/dorms nearby
+  let washScore = 40;
+  if (roadType === 'secondary') washScore += 18;
+  else if (roadType === 'main') washScore += 12;
+  else washScore -= 25;
+  if (areaSqM >= 60 && areaSqM <= 800) washScore += 12;
+  else if (areaSqM < 60) washScore -= 30;
+  if (landType === 'pond') washScore -= 25;
+  if (zoningColor === 'yellow' || zoningColor === 'orange' || zoningColor === 'red') washScore += 10;
+  scores['laundry-shop'] = Math.min(Math.max(washScore, 10), 88);
+
+  // 17. Self-service car wash — traffic + easy in/out
+  let cwScore = 40;
+  if (roadType === 'main') cwScore += 30;
+  else if (roadType === 'secondary') cwScore += 8;
+  else cwScore -= 30;
+  if (roadWidthMeters >= 8) cwScore += 10;
+  if (areaSqM >= 200 && areaSqM <= 1600) cwScore += 12;
+  else if (areaSqM < 150) cwScore -= 25;
+  if (landType === 'pond') cwScore -= 30;
+  scores['car-wash'] = Math.min(Math.max(cwScore, 10), 90);
+
   return scores;
 }
 
@@ -1298,5 +1380,354 @@ function financeFromCashFlows(cashFlows) {
     paybackInterpolated: paybackInterp !== null ? paybackInterp.toFixed(1) : '—',
     npv25YrMillionTHB: (npvValue / 1000000).toFixed(2),
     irrPercent: irrValue === null ? 'N/A' : irrValue.toFixed(1),
+  };
+}
+
+
+// --- General land businesses (retail/service) — market models, not power plants ---
+// Each still carries a small rooftop PV: the shop's biggest fixed cost is electricity.
+
+// 11. Roadside café — traffic decides customers
+export function calculateRoadsideCafeSpecs(landData) {
+  const { areaSqM = 1600, provinceData = {}, roadType = 'secondary' } = landData;
+  const ghi = provinceData.ghi || 5.1;
+  const excludedAreaSqM = Math.max(0, landData.excludedAreaSqM || 0);
+  const usable = Math.max(0, areaSqM - excludedAreaSqM);
+
+  const shopM2 = Math.min(usable * 0.25, 120);          // kitchen + counter + seating
+  const roofKWp = Math.min(shopM2 * 0.5 / 4.5, 13);      // offsets espresso + air-con
+  const totalCapex = shopM2 * 16000 + roofKWp * 35000 + 550000; // fit-out + PV + equipment/permits/parking
+
+  const traffic = roadType === 'main' ? 1 : roadType === 'secondary' ? 0.5 : 0.18;
+  const dailyCustomers = Math.round(110 * traffic);
+  const grossYear = dailyCustomers * 70 * 365;           // ~70 THB average ticket
+  const solarSavings = roofKWp * ghi * 0.75 * 365 * 4.5;
+  const opex = grossYear * 0.72 + 18000;                 // COGS + staff + utilities (owner wage excluded)
+
+  const cashFlows = [-totalCapex];
+  for (let y = 1; y <= 25; y++) {
+    const refurb = y === 8 ? 200000 : 0;                 // re-fit to stay fresh
+    cashFlows.push((grossYear - opex) * Math.pow(1.015, y - 1) + solarSavings * Math.pow(0.996, y - 1) - refurb);
+  }
+  const cfFin = financeFromCashFlows(cashFlows);
+  const co2 = (roofKWp * ghi * 0.75 * 365 * 0.4999) / 1000;
+
+  return {
+    shopM2: Math.round(shopM2),
+    dailyCustomers,
+    roofSolarKWp: roofKWp.toFixed(1),
+    dcCapacityKWp: roofKWp.toFixed(1),
+    moduleCount: Math.round(roofKWp / 0.62),
+    inverterCount: 1,
+    inverterUnitKW: Math.max(5, Math.round(roofKWp)),
+    excludedAreaSqM,
+    tariffStatus: 'scenario',
+    cashFlows,
+    financials: {
+      totalCapexTHB: Math.round(totalCapex),
+      totalCapexMillionTHB: (totalCapex / 1000000).toFixed(2),
+      annualRevenueMillionTHB: (grossYear / 1000000).toFixed(2),
+      netAnnualCashflowMillionTHB: ((grossYear - opex + solarSavings) / 1000000).toFixed(2),
+      paybackYears: cfFin.paybackYears,
+      paybackInterpolated: cfFin.paybackInterpolated,
+      irrPercent: cfFin.irrPercent,
+      npv25YrMillionTHB: cfFin.npv25YrMillionTHB
+    },
+    cashFlowModel: 'CF_y = (customers/day × ฿70 × 365 − 72% OPEX)×1.015^(y−1) + S_solar − Refurb(y8) — F&B margin model',
+    esg: { co2TonsYear: co2.toFixed(1), treesEquivalent: Math.round(co2 * 60).toLocaleString() }
+  };
+}
+
+// 12. Community mini-mart — thin margin, volume game
+export function calculateMinimartSpecs(landData) {
+  const { areaSqM = 1600, provinceData = {}, roadType = 'secondary' } = landData;
+  const ghi = provinceData.ghi || 5.1;
+  const excludedAreaSqM = Math.max(0, landData.excludedAreaSqM || 0);
+  const usable = Math.max(0, areaSqM - excludedAreaSqM);
+
+  const shopM2 = Math.min(usable * 0.3, 140);
+  const roofKWp = Math.min(shopM2 * 0.5 / 4.5, 15);       // offsets 24h refrigeration share
+  const totalCapex = shopM2 * 15000 + roofKWp * 35000 + 1100000; // shop + PV + stock & equipment
+
+  const dailyGross = roadType === 'main' ? 20000 : roadType === 'secondary' ? 11000 : 4500;
+  const grossYear = dailyGross * 365;
+  const solarSavings = roofKWp * ghi * 0.75 * 365 * 4.5;
+  const opex = grossYear * 0.81 + 420000;                 // COGS ~81% + staff
+
+  const cashFlows = [-totalCapex];
+  for (let y = 1; y <= 25; y++) {
+    const refurb = y === 10 ? 150000 : 0;
+    cashFlows.push((grossYear - opex) * Math.pow(1.01, y - 1) + solarSavings * Math.pow(0.996, y - 1) - refurb);
+  }
+  const cfFin = financeFromCashFlows(cashFlows);
+  const co2 = (roofKWp * ghi * 0.75 * 365 * 0.4999) / 1000;
+
+  return {
+    shopM2: Math.round(shopM2),
+    dailyGrossTHB: dailyGross,
+    roofSolarKWp: roofKWp.toFixed(1),
+    dcCapacityKWp: roofKWp.toFixed(1),
+    moduleCount: Math.round(roofKWp / 0.62),
+    inverterCount: 1,
+    inverterUnitKW: Math.max(5, Math.round(roofKWp)),
+    excludedAreaSqM,
+    tariffStatus: 'scenario',
+    cashFlows,
+    financials: {
+      totalCapexTHB: Math.round(totalCapex),
+      totalCapexMillionTHB: (totalCapex / 1000000).toFixed(2),
+      annualRevenueMillionTHB: (grossYear / 1000000).toFixed(2),
+      netAnnualCashflowMillionTHB: ((grossYear - opex + solarSavings) / 1000000).toFixed(2),
+      paybackYears: cfFin.paybackYears,
+      paybackInterpolated: cfFin.paybackInterpolated,
+      irrPercent: cfFin.irrPercent,
+      npv25YrMillionTHB: cfFin.npv25YrMillionTHB
+    },
+    cashFlowModel: 'CF_y = (daily gross × 365 × 19% margin − staff)×1.01^(y−1) + S_solar − Refurb(y10) — retail margin model',
+    esg: { co2TonsYear: co2.toFixed(1), treesEquivalent: Math.round(co2 * 60).toLocaleString() }
+  };
+}
+
+// 13. Self-storage — near staff-free rental units
+export function calculateSelfStorageSpecs(landData) {
+  const { areaSqM = 1600, provinceData = {} } = landData;
+  const ghi = provinceData.ghi || 5.1;
+  const excludedAreaSqM = Math.max(0, landData.excludedAreaSqM || 0);
+  const usable = Math.max(0, areaSqM - excludedAreaSqM) * 0.8;
+
+  const unitCount = Math.min(Math.floor(usable / 35), 40); // 18 m² unit + aisle/fire-lane share
+  const roofKWp = Math.min(unitCount * 18 * 0.4 / 4.5, 20); // unit roofs carry PV for common load
+  const totalCapex = unitCount * 48000 + roofKWp * 35000 + 300000; // units + PV + fence/gate/CCTV/office
+
+  const annualRevenue = unitCount * 2400 * 12 * 0.7;      // ฿2,400/unit/mo at 70% occupancy
+  const solarSavings = roofKWp * ghi * 0.75 * 365 * 4.5;
+  const opex = annualRevenue * 0.15 + 80000;              // admin 15% + security/upkeep
+
+  const cashFlows = [-totalCapex];
+  for (let y = 1; y <= 25; y++) {
+    const refurb = y === 12 ? unitCount * 8000 : 0;       // doors/locks/roof seal
+    cashFlows.push(annualRevenue * Math.pow(1.02, y - 1) + solarSavings * Math.pow(0.996, y - 1) - opex - refurb);
+  }
+  const cfFin = financeFromCashFlows(cashFlows);
+  const co2 = (roofKWp * ghi * 0.75 * 365 * 0.4999) / 1000;
+
+  return {
+    storageUnits: unitCount,
+    roofSolarKWp: roofKWp.toFixed(1),
+    dcCapacityKWp: roofKWp.toFixed(1),
+    moduleCount: Math.round(roofKWp / 0.62),
+    inverterCount: 1,
+    inverterUnitKW: Math.max(5, Math.round(roofKWp)),
+    excludedAreaSqM,
+    tariffStatus: 'scenario',
+    cashFlows,
+    financials: {
+      totalCapexTHB: Math.round(totalCapex),
+      totalCapexMillionTHB: (totalCapex / 1000000).toFixed(2),
+      annualRevenueMillionTHB: (annualRevenue / 1000000).toFixed(2),
+      netAnnualCashflowMillionTHB: ((annualRevenue - opex + solarSavings) / 1000000).toFixed(2),
+      paybackYears: cfFin.paybackYears,
+      paybackInterpolated: cfFin.paybackInterpolated,
+      irrPercent: cfFin.irrPercent,
+      npv25YrMillionTHB: cfFin.npv25YrMillionTHB
+    },
+    cashFlowModel: 'CF_y = (units × ฿2,400 × 12 × 0.70)×1.02^(y−1) + S_solar − OPEX − Refurb(y12) — rental model',
+    esg: { co2TonsYear: co2.toFixed(1), treesEquivalent: Math.round(co2 * 60).toLocaleString() }
+  };
+}
+
+// 14. Sports court — covered hall rented by the hour
+export function calculateSportsCourtSpecs(landData) {
+  const { areaSqM = 1600, provinceData = {} } = landData;
+  const ghi = provinceData.ghi || 5.1;
+  const excludedAreaSqM = Math.max(0, landData.excludedAreaSqM || 0);
+  const usable = Math.max(0, areaSqM - excludedAreaSqM) * 0.8;
+
+  const courtCount = Math.min(Math.floor(usable / 190), 6); // court + clearances ≈ 190 m²
+  const hallM2 = courtCount * 170;
+  const roofKWp = Math.min(hallM2 * 0.55 / 4.5, 40);        // tall clear-span roof = big PV
+  const totalCapex = hallM2 * 8500 + courtCount * 80000 + roofKWp * 35000 + 300000; // hall + flooring/nets/lights + PV + site
+
+  const annualRevenue = courtCount * 3.5 * 160 * 340;     // 3.5h avg/day/court × ฿160/h × 340 days
+  const solarSavings = roofKWp * ghi * 0.75 * 365 * 4.5;
+  const opex = annualRevenue * 0.45 + 240000;             // attendant + utilities + maintenance
+
+  const cashFlows = [-totalCapex];
+  for (let y = 1; y <= 25; y++) {
+    const refurb = y === 8 ? courtCount * 60000 : 0;      // floor resurfacing
+    cashFlows.push(annualRevenue * Math.pow(1.015, y - 1) + solarSavings * Math.pow(0.996, y - 1) - opex - refurb);
+  }
+  const cfFin = financeFromCashFlows(cashFlows);
+  const co2 = (roofKWp * ghi * 0.75 * 365 * 0.4999) / 1000;
+
+  return {
+    courtCount,
+    hallM2: Math.round(hallM2),
+    roofSolarKWp: roofKWp.toFixed(1),
+    dcCapacityKWp: roofKWp.toFixed(1),
+    moduleCount: Math.round(roofKWp / 0.62),
+    inverterCount: 1,
+    inverterUnitKW: Math.max(10, Math.round(roofKWp)),
+    excludedAreaSqM,
+    tariffStatus: 'scenario',
+    cashFlows,
+    financials: {
+      totalCapexTHB: Math.round(totalCapex),
+      totalCapexMillionTHB: (totalCapex / 1000000).toFixed(2),
+      annualRevenueMillionTHB: (annualRevenue / 1000000).toFixed(2),
+      netAnnualCashflowMillionTHB: ((annualRevenue - opex + solarSavings) / 1000000).toFixed(2),
+      paybackYears: cfFin.paybackYears,
+      paybackInterpolated: cfFin.paybackInterpolated,
+      irrPercent: cfFin.irrPercent,
+      npv25YrMillionTHB: cfFin.npv25YrMillionTHB
+    },
+    cashFlowModel: 'CF_y = (courts × 3.5h × ฿160 × 340d)×1.015^(y−1) + S_solar − OPEX − Refurb(y8) — hourly rental',
+    esg: { co2TonsYear: co2.toFixed(1), treesEquivalent: Math.round(co2 * 60).toLocaleString() }
+  };
+}
+
+// 15. Homestay/camp — occupancy-driven hospitality model
+export function calculateHomestaySpecs(landData) {
+  const { areaSqM = 1600, provinceData = {} } = landData;
+  const ghi = provinceData.ghi || 5.1;
+  const excludedAreaSqM = Math.max(0, landData.excludedAreaSqM || 0);
+  const usable = Math.max(0, areaSqM - excludedAreaSqM) * 0.75; // keep the land open/scenic
+
+  const roomCount = Math.min(Math.floor(usable / 150), 8); // cabins/tents spaced for atmosphere
+  const roofKWp = Math.min(roomCount * 2.5, 15);          // small PV across cabins + solar water heating
+  const totalCapex = roomCount * 280000 + roofKWp * 35000 + 350000; // keys + PV + reception/utilities
+
+  const occupancy = 0.26;                                 // weekend-heavy rural stay — honest
+  const annualRevenue = roomCount * 950 * 365 * occupancy; // ฿950 ADR
+  const solarSavings = roofKWp * ghi * 0.75 * 365 * 4.5;
+  const opex = annualRevenue * 0.42 + 120000;             // cleaning, platform fees, utilities
+
+  const cashFlows = [-totalCapex];
+  for (let y = 1; y <= 25; y++) {
+    const refurb = y === 10 ? roomCount * 40000 : 0;      // soft-goods + bathroom refresh
+    cashFlows.push(annualRevenue * Math.pow(1.02, y - 1) + solarSavings * Math.pow(0.996, y - 1) - opex - refurb);
+  }
+  const cfFin = financeFromCashFlows(cashFlows);
+  const co2 = (roofKWp * ghi * 0.75 * 365 * 0.4999) / 1000;
+
+  return {
+    roomCount,
+    occupancyPct: Math.round(occupancy * 100),
+    roofSolarKWp: roofKWp.toFixed(1),
+    dcCapacityKWp: roofKWp.toFixed(1),
+    moduleCount: Math.round(roofKWp / 0.62),
+    inverterCount: 1,
+    inverterUnitKW: Math.max(5, Math.round(roofKWp)),
+    excludedAreaSqM,
+    tariffStatus: 'scenario',
+    cashFlows,
+    financials: {
+      totalCapexTHB: Math.round(totalCapex),
+      totalCapexMillionTHB: (totalCapex / 1000000).toFixed(2),
+      annualRevenueMillionTHB: (annualRevenue / 1000000).toFixed(2),
+      netAnnualCashflowMillionTHB: ((annualRevenue - opex + solarSavings) / 1000000).toFixed(2),
+      paybackYears: cfFin.paybackYears,
+      paybackInterpolated: cfFin.paybackInterpolated,
+      irrPercent: cfFin.irrPercent,
+      npv25YrMillionTHB: cfFin.npv25YrMillionTHB
+    },
+    cashFlowModel: 'CF_y = (keys × ฿950 × 365 × 26% occ)×1.02^(y−1) + S_solar − OPEX − Refurb(y10) — ADR/occupancy model',
+    esg: { co2TonsYear: co2.toFixed(1), treesEquivalent: Math.round(co2 * 60).toLocaleString() }
+  };
+}
+
+// 16. Coin laundry — hyper-local recurring demand
+export function calculateLaundrySpecs(landData) {
+  const { areaSqM = 1600, provinceData = {} } = landData;
+  const ghi = provinceData.ghi || 5.1;
+  const excludedAreaSqM = Math.max(0, landData.excludedAreaSqM || 0);
+  const usable = Math.max(0, areaSqM - excludedAreaSqM) * 0.8;
+
+  const machineCount = Math.min(Math.floor(usable / 12), 12); // ~12 m² per machine incl. folding space
+  const roofKWp = 8;                                       // dryers + water heaters are the load
+  const totalCapex = machineCount * 42000 + 280000 + roofKWp * 35000; // machines + shop fit/plumbing + PV
+
+  const annualRevenue = machineCount * 9 * 45 * 365;      // 9 loads/machine/day × ฿45
+  const solarSavings = roofKWp * ghi * 0.75 * 365 * 4.5;
+  const opex = annualRevenue * 0.55 + 96000;              // water + power ~55% + part-time attendant
+
+  const cashFlows = [-totalCapex];
+  for (let y = 1; y <= 25; y++) {
+    const refurb = y === 7 ? machineCount * 12000 : 0;    // machine overhaul
+    cashFlows.push(annualRevenue * Math.pow(1.01, y - 1) + solarSavings * Math.pow(0.996, y - 1) - opex - refurb);
+  }
+  const cfFin = financeFromCashFlows(cashFlows);
+  const co2 = (roofKWp * ghi * 0.75 * 365 * 0.4999) / 1000;
+
+  return {
+    machineCount,
+    roofSolarKWp: roofKWp.toFixed(1),
+    dcCapacityKWp: roofKWp.toFixed(1),
+    moduleCount: Math.round(roofKWp / 0.62),
+    inverterCount: 1,
+    inverterUnitKW: 8,
+    excludedAreaSqM,
+    tariffStatus: 'scenario',
+    cashFlows,
+    financials: {
+      totalCapexTHB: Math.round(totalCapex),
+      totalCapexMillionTHB: (totalCapex / 1000000).toFixed(2),
+      annualRevenueMillionTHB: (annualRevenue / 1000000).toFixed(2),
+      netAnnualCashflowMillionTHB: ((annualRevenue - opex + solarSavings) / 1000000).toFixed(2),
+      paybackYears: cfFin.paybackYears,
+      paybackInterpolated: cfFin.paybackInterpolated,
+      irrPercent: cfFin.irrPercent,
+      npv25YrMillionTHB: cfFin.npv25YrMillionTHB
+    },
+    cashFlowModel: 'CF_y = (machines × 9 loads × ฿45 × 365)×1.01^(y−1) + S_solar − OPEX − Refurb(y7) — per-load model',
+    esg: { co2TonsYear: co2.toFixed(1), treesEquivalent: Math.round(co2 * 60).toLocaleString() }
+  };
+}
+
+// 17. Self-service car wash — bays + vacuum on a frontage
+export function calculateCarWashSpecs(landData) {
+  const { areaSqM = 1600, provinceData = {} } = landData;
+  const ghi = provinceData.ghi || 5.1;
+  const excludedAreaSqM = Math.max(0, landData.excludedAreaSqM || 0);
+  const usable = Math.max(0, areaSqM - excludedAreaSqM) * 0.8;
+
+  const bayCount = Math.min(Math.floor(usable / 70), 4);  // bay + apron ≈ 70 m²
+  const roofKWp = Math.min(bayCount * 3, 12);             // PV canopy over the bays
+  const totalCapex = bayCount * 280000 + roofKWp * 35000 + 220000; // bays + canopy PV + vacuum/recycle/paving
+
+  const annualRevenue = bayCount * 1200 * 365;            // ~฿1,200/day/bay gross
+  const solarSavings = roofKWp * ghi * 0.75 * 365 * 4.5;
+  const opex = annualRevenue * 0.48 + 80000;              // water + power + consumables ~48%
+
+  const cashFlows = [-totalCapex];
+  for (let y = 1; y <= 25; y++) {
+    const refurb = y === 9 ? bayCount * 40000 : 0;        // pump/nozzle rebuild
+    cashFlows.push(annualRevenue * Math.pow(1.015, y - 1) + solarSavings * Math.pow(0.996, y - 1) - opex - refurb);
+  }
+  const cfFin = financeFromCashFlows(cashFlows);
+  const co2 = (roofKWp * ghi * 0.75 * 365 * 0.4999) / 1000;
+
+  return {
+    bayCount,
+    roofSolarKWp: roofKWp.toFixed(1),
+    dcCapacityKWp: roofKWp.toFixed(1),
+    moduleCount: Math.round(roofKWp / 0.62),
+    inverterCount: 1,
+    inverterUnitKW: Math.max(5, Math.round(roofKWp)),
+    excludedAreaSqM,
+    tariffStatus: 'scenario',
+    cashFlows,
+    financials: {
+      totalCapexTHB: Math.round(totalCapex),
+      totalCapexMillionTHB: (totalCapex / 1000000).toFixed(2),
+      annualRevenueMillionTHB: (annualRevenue / 1000000).toFixed(2),
+      netAnnualCashflowMillionTHB: ((annualRevenue - opex + solarSavings) / 1000000).toFixed(2),
+      paybackYears: cfFin.paybackYears,
+      paybackInterpolated: cfFin.paybackInterpolated,
+      irrPercent: cfFin.irrPercent,
+      npv25YrMillionTHB: cfFin.npv25YrMillionTHB
+    },
+    cashFlowModel: 'CF_y = (bays × ฿1,200 × 365)×1.015^(y−1) + S_solar − OPEX − Refurb(y9) — per-bay model',
+    esg: { co2TonsYear: co2.toFixed(1), treesEquivalent: Math.round(co2 * 60).toLocaleString() }
   };
 }

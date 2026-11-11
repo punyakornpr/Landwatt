@@ -307,6 +307,229 @@ export default function SiteLayoutCanvas({ project, specs, landData }) {
       ctx.font = '9px Prompt, sans-serif';
       ctx.fillText('Fiber route to corridor', innerX + 40 + dcW / 2 - 55, padY + plotH + 5);
 
+    } else if (project.id === 'roadside-cafe') {
+      // Shop block with PV roof + parking bays facing the road
+      const shW = innerW * 0.42;
+      const shH = innerH * 0.42;
+      ctx.fillStyle = '#b45309';
+      ctx.strokeStyle = '#78350f';
+      ctx.lineWidth = 1.5;
+      ctx.fillRect(innerX + 24, innerY + 20, shW, shH);
+      ctx.strokeRect(innerX + 24, innerY + 20, shW, shH);
+      // PV rows on the shop roof
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.45)';
+      ctx.lineWidth = 1;
+      for (let ry = innerY + 28; ry < innerY + 20 + shH - 8; ry += 12) {
+        ctx.beginPath();
+        ctx.moveTo(innerX + 32, ry);
+        ctx.lineTo(innerX + 24 + shW - 8, ry);
+        ctx.stroke();
+      }
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '10px Prompt, sans-serif';
+      ctx.fillText(`CAFE SHOP ${specs.shopM2 || '?'} m2`, innerX + 34, innerY + 38);
+      ctx.fillText(`Roof PV ~${specs.roofSolarKWp || '?'} kWp`, innerX + 34, innerY + 52);
+      // Parking bays (toward road at bottom)
+      ctx.strokeStyle = '#8e8e93';
+      ctx.lineWidth = 1.5;
+      const pkY = innerY + innerH - 60;
+      for (let p = 0; p < 5; p++) {
+        ctx.strokeRect(innerX + 30 + p * 52, pkY, 44, 34);
+      }
+      ctx.fillStyle = '#48484a';
+      ctx.font = '9px Prompt, sans-serif';
+      ctx.fillText('Parking / drive-in', innerX + 30, pkY + 48);
+      // Trees at the back
+      ctx.fillStyle = '#15803d';
+      for (let tx = innerX + innerW - 110; tx < innerX + innerW - 30; tx += 30) {
+        ctx.beginPath();
+        ctx.arc(tx, innerY + 40, 12, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+    } else if (project.id === 'minimart') {
+      // Store block + PV roof + parking strip
+      const stW = innerW * 0.5;
+      const stH = innerH * 0.45;
+      ctx.fillStyle = '#1d4ed8';
+      ctx.strokeStyle = '#1e3a8a';
+      ctx.lineWidth = 1.5;
+      ctx.fillRect(innerX + 20, innerY + 20, stW, stH);
+      ctx.strokeRect(innerX + 20, innerY + 20, stW, stH);
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.45)';
+      ctx.lineWidth = 1;
+      for (let ry = innerY + 28; ry < innerY + 20 + stH - 8; ry += 12) {
+        ctx.beginPath();
+        ctx.moveTo(innerX + 28, ry);
+        ctx.lineTo(innerX + 20 + stW - 8, ry);
+        ctx.stroke();
+      }
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '10px Prompt, sans-serif';
+      ctx.fillText(`MINI-MART ${specs.shopM2 || '?'} m2`, innerX + 30, innerY + 38);
+      ctx.fillText(`Roof PV ~${specs.roofSolarKWp || '?'} kWp`, innerX + 30, innerY + 52);
+      // Shopfront (awning line) + parking
+      ctx.fillStyle = '#f5f5f7';
+      ctx.fillRect(innerX + 20, innerY + 20 + stH, stW, 8);
+      const pkY = innerY + innerH - 55;
+      ctx.strokeStyle = '#8e8e93';
+      for (let p = 0; p < 4; p++) ctx.strokeRect(innerX + 24 + p * 50, pkY, 42, 32);
+      ctx.fillStyle = '#48484a';
+      ctx.font = '9px Prompt, sans-serif';
+      ctx.fillText('Parking', innerX + 24, pkY + 45);
+
+    } else if (project.id === 'self-storage') {
+      // Rows of prefab storage units + gate at road side
+      const cols = Math.min(specs.storageUnits || 6, 6);
+      const unitW = (innerW - 60) / cols;
+      ctx.strokeStyle = '#5b21b6';
+      ctx.fillStyle = '#7c3aed';
+      for (let r = 0; r < 3; r++) {
+        for (let c = 0; c < cols; c++) {
+          const ux = innerX + 24 + c * unitW;
+          const uy = innerY + 24 + r * 52;
+          ctx.fillStyle = r === 0 ? '#7c3aed' : '#a78bfa';
+          ctx.fillRect(ux, uy, unitW - 8, 40);
+          ctx.strokeRect(ux, uy, unitW - 8, 40);
+          // unit door line
+          ctx.strokeStyle = '#5b21b6';
+          ctx.strokeRect(ux + (unitW - 8) / 2 - 8, uy + 8, 16, 24);
+        }
+      }
+      ctx.fillStyle = '#2c2c2e';
+      ctx.font = '10px Prompt, sans-serif';
+      ctx.fillText(`${specs.storageUnits || '?'} units · PV on unit roofs`, innerX + 24, innerY + 190);
+      // Gate + fence at bottom
+      ctx.fillStyle = '#48484a';
+      ctx.fillRect(innerX + innerW / 2 - 30, padY + plotH - 6, 60, 6);
+      ctx.font = '9px Prompt, sans-serif';
+      ctx.fillText('Gate + CCTV', innerX + innerW / 2 - 30, padY + plotH + 16);
+
+    } else if (project.id === 'sports-court') {
+      // Covered hall with court lines + PV roof
+      const hW = innerW * 0.72;
+      const hH = innerH * 0.62;
+      ctx.fillStyle = '#0f766e';
+      ctx.strokeStyle = '#115e59';
+      ctx.lineWidth = 1.5;
+      ctx.fillRect(innerX + 30, innerY + 20, hW, hH);
+      ctx.strokeRect(innerX + 30, innerY + 20, hW, hH);
+      // Court grid lines (white)
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+      ctx.lineWidth = 1;
+      for (let cy = innerY + 40; cy < innerY + 20 + hH - 10; cy += 36) {
+        ctx.beginPath();
+        ctx.moveTo(innerX + 40, cy);
+        ctx.lineTo(innerX + 30 + hW - 10, cy);
+        ctx.stroke();
+      }
+      ctx.strokeRect(innerX + 40, innerY + 30, hW - 20, hH - 30);
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '10px Prompt, sans-serif';
+      ctx.fillText(`${specs.courtCount || '?'} COURTS · HALL ~${specs.hallM2 || '?'} m2`, innerX + 42, innerY + 46);
+      ctx.fillText(`Roof PV ~${specs.roofSolarKWp || '?'} kWp`, innerX + 42, innerY + 60);
+      // Parking row at bottom
+      ctx.strokeStyle = '#8e8e93';
+      const pkY = innerY + innerH - 40;
+      for (let p = 0; p < 5; p++) ctx.strokeRect(innerX + 34 + p * 48, pkY, 40, 28);
+
+    } else if (project.id === 'homestay-camp') {
+      // Scattered cabins among trees — low density
+      const cabins = Math.min(specs.roomCount || 4, 8);
+      for (let i = 0; i < cabins; i++) {
+        const cx = innerX + 30 + (i % 4) * ((innerW - 60) / 4) + (i % 2) * 14;
+        const cy = innerY + 40 + Math.floor(i / 4) * 80;
+        ctx.fillStyle = '#92400e';
+        ctx.strokeStyle = '#78350f';
+        ctx.fillRect(cx, cy, 54, 34);
+        ctx.strokeRect(cx, cy, 54, 34);
+        // gable roof line
+        ctx.beginPath();
+        ctx.moveTo(cx - 4, cy);
+        ctx.lineTo(cx + 27, cy - 14);
+        ctx.lineTo(cx + 58, cy);
+        ctx.stroke();
+      }
+      // Trees between cabins
+      ctx.fillStyle = '#15803d';
+      for (let tx = innerX + 50; tx < innerX + innerW - 30; tx += 55) {
+        ctx.beginPath();
+        ctx.arc(tx, innerY + innerH - 45, 11, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.fillStyle = '#166534';
+      ctx.font = '10px Prompt, sans-serif';
+      ctx.fillText(`${specs.roomCount || '?'} cabins/tents · solar water heaters`, innerX + 30, innerY + innerH - 12);
+      // Reception near road
+      ctx.fillStyle = '#0369a1';
+      ctx.fillRect(innerX + 24, innerY + innerH - 24, 40, 16);
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '8px Prompt, sans-serif';
+      ctx.fillText('Recept.', innerX + 28, innerY + innerH - 13);
+
+    } else if (project.id === 'laundry-shop') {
+      // Shophouse row with machine slots + PV roof
+      const lw = innerW * 0.55;
+      const lh = innerH * 0.45;
+      ctx.fillStyle = '#0284c7';
+      ctx.strokeStyle = '#075985';
+      ctx.lineWidth = 1.5;
+      ctx.fillRect(innerX + 24, innerY + 20, lw, lh);
+      ctx.strokeRect(innerX + 24, innerY + 20, lw, lh);
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.45)';
+      ctx.lineWidth = 1;
+      for (let ry = innerY + 28; ry < innerY + 20 + lh - 8; ry += 12) {
+        ctx.beginPath();
+        ctx.moveTo(innerX + 32, ry);
+        ctx.lineTo(innerX + 24 + lw - 8, ry);
+        ctx.stroke();
+      }
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '10px Prompt, sans-serif';
+      ctx.fillText(`LAUNDRY ${specs.machineCount || '?'} machines`, innerX + 34, innerY + 38);
+      // Machine slots along the front
+      ctx.fillStyle = '#f5f5f7';
+      const mx = Math.min(specs.machineCount || 8, 10);
+      for (let mi = 0; mi < mx; mi++) {
+        ctx.beginPath();
+        ctx.arc(innerX + 36 + mi * 22, innerY + 20 + lh - 16, 8, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = '#075985';
+        ctx.stroke();
+      }
+      // Queue/parking
+      ctx.strokeStyle = '#8e8e93';
+      for (let p = 0; p < 3; p++) ctx.strokeRect(innerX + 24 + p * 48, innerY + innerH - 42, 40, 28);
+
+    } else if (project.id === 'car-wash') {
+      // Wash bays under PV canopy + vacuum + queuing
+      const bays = Math.min(specs.bayCount || 2, 4);
+      const bayW = (innerW * 0.62) / bays;
+      // canopy slab (PV)
+      ctx.fillStyle = '#0369a1';
+      ctx.fillRect(innerX + 24, innerY + 20, innerW * 0.62, innerH * 0.5);
+      ctx.strokeStyle = '#0c4a6e';
+      ctx.strokeRect(innerX + 24, innerY + 20, innerW * 0.62, innerH * 0.5);
+      // bay divisions + cars
+      for (let b = 0; b < bays; b++) {
+        const bx = innerX + 24 + b * bayW;
+        ctx.strokeStyle = '#ffffff';
+        ctx.strokeRect(bx + 6, innerY + 28, bayW - 12, innerH * 0.5 - 16);
+        ctx.fillStyle = '#93c5fd';
+        ctx.fillRect(bx + bayW / 2 - 12, innerY + 40, 24, 34); // car silhouette
+      }
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '10px Prompt, sans-serif';
+      ctx.fillText(`${bays} WASH BAYS · PV canopy ~${specs.roofSolarKWp || '?'} kWp`, innerX + 34, innerY + innerH * 0.5 + 8);
+      // Vacuum area + queue
+      ctx.fillStyle = '#48484a';
+      ctx.fillRect(innerX + 30 + innerW * 0.62, innerY + 24, 60, 36);
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '8px Prompt, sans-serif';
+      ctx.fillText('Vacuum', innerX + 36 + innerW * 0.62, innerY + 44);
+      ctx.strokeStyle = '#8e8e93';
+      for (let p = 0; p < 2; p++) ctx.strokeRect(innerX + 28 + p * 50, innerY + innerH - 40, 42, 28);
+
     } else if (project.id === 'carbon-forest') {
       // Tree rows + small solar pump corner
       ctx.fillStyle = '#15803d';

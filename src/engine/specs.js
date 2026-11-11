@@ -15,6 +15,13 @@ import {
   calculateDataCenterLeaseSpecs,
   calculateSolarWarehouseSpecs,
   calculateCarbonForestSpecs,
+  calculateRoadsideCafeSpecs,
+  calculateMinimartSpecs,
+  calculateSelfStorageSpecs,
+  calculateSportsCourtSpecs,
+  calculateHomestaySpecs,
+  calculateLaundrySpecs,
+  calculateCarWashSpecs,
 } from '../utils/engineeringCalculations.js';
 
 function computeSpecs(projectId, safeLand) {
@@ -34,6 +41,13 @@ function computeSpecs(projectId, safeLand) {
     case 'data-center-lease': return calculateDataCenterLeaseSpecs(safeLand);
     case 'solar-warehouse': return calculateSolarWarehouseSpecs(safeLand);
     case 'carbon-forest': return calculateCarbonForestSpecs(safeLand);
+    case 'roadside-cafe': return calculateRoadsideCafeSpecs(safeLand);
+    case 'minimart': return calculateMinimartSpecs(safeLand);
+    case 'self-storage': return calculateSelfStorageSpecs(safeLand);
+    case 'sports-court': return calculateSportsCourtSpecs(safeLand);
+    case 'homestay-camp': return calculateHomestaySpecs(safeLand);
+    case 'laundry-shop': return calculateLaundrySpecs(safeLand);
+    case 'car-wash': return calculateCarWashSpecs(safeLand);
     default: return calculateSolarFarmSpecs(safeLand);
   }
 }
@@ -50,7 +64,7 @@ export function getSpecs(projectId, land, budgetMaxTHB = null) {
   // linear guess can overshoot. 0.92 margin per pass; floor ≈ the smallest area that
   // still yields a nonzero build per design (agrivoltaics drops 30% of base strings,
   // so it needs ≥2 base strings ≈ 220 m²).
-  const minAreaSqM = { 'small-solar': 34, 'agrivoltaics': 220, 'solar-utility-kit': 15, 'ev-moto-swap': 40, 'solar-coldroom': 70, 'solar-dryer': 100, 'solar-warehouse': 300, 'carbon-forest': 800, 'solar-lease': 1600, 'data-center-lease': 1600 }[projectId] || 120;
+  const minAreaSqM = { 'small-solar': 34, 'agrivoltaics': 220, 'solar-utility-kit': 15, 'ev-moto-swap': 40, 'solar-coldroom': 70, 'solar-dryer': 100, 'solar-warehouse': 300, 'carbon-forest': 800, 'solar-lease': 1600, 'data-center-lease': 1600, 'roadside-cafe': 120, 'minimart': 100, 'self-storage': 300, 'sports-court': 400, 'homestay-camp': 300, 'laundry-shop': 60, 'car-wash': 150 }[projectId] || 120;
   let areaSqM = safeLand.areaSqM, specs2 = specs, capex2 = capex, prevCapex = Infinity;
   for (let i = 0; i < 16 && capex2 > budgetMaxTHB; i++) {
     // Stuck at a size cap → CAPEX flat → budget ratio shrinks too slowly; halve instead.
@@ -157,6 +171,41 @@ export function friendlySummary(projectId, specs, land, lang = 'en') {
       benefit = R(`~${specs.treeCount.toLocaleString()} trees → ~${specs.creditTonsYr} tCO2/yr credits + timber`,
                   `ต้นไม้ ~${specs.treeCount.toLocaleString()} ต้น → คาร์บอนเครดิต ~${specs.creditTonsYr} ตัน/ปี + ไม้`);
       break;
+    case 'roadside-cafe':
+      areaUsed = `${plotShare} (${R(`café ~${specs.shopM2} m² + parking`, `คาเฟ่ ~${specs.shopM2} ตร.ม. + ที่จอด`)})`;
+      benefit = R(`Serves ~${specs.dailyCustomers} customers/day at this frontage`,
+                  `รองรับลูกค้า ~${specs.dailyCustomers} คน/วันบนหน้าทางนี้`);
+      break;
+    case 'minimart':
+      areaUsed = `${plotShare} (${R(`store ~${specs.shopM2} m²`, `ร้าน ~${specs.shopM2} ตร.ม.`)})`;
+      benefit = R(`Est. daily sales ~${(specs.dailyGrossTHB || 0).toLocaleString()} THB`,
+                  `ยอดขายประเมิน ~${(specs.dailyGrossTHB || 0).toLocaleString()} บาท/วัน`);
+      break;
+    case 'self-storage':
+      areaUsed = `${plotShare} (${R(`${specs.storageUnits} storage units`, `ห้องเก็บของ ${specs.storageUnits} ห้อง`)})`;
+      benefit = R(`${specs.storageUnits} units × ~2,400 THB/mo at ~70% occupancy`,
+                  `${specs.storageUnits} ห้อง × ~2,400 บาท/เดือน ที่เข้าพัก ~70%`);
+      break;
+    case 'sports-court':
+      areaUsed = `${plotShare} (${R(`${specs.courtCount} court hall ~${specs.hallM2} m²`, `โรงสนาม ${specs.courtCount} คอร์ท ~${specs.hallM2} ตร.ม.`)})`;
+      benefit = R(`${specs.courtCount} courts rented ~160 THB/hour, evenings peak`,
+                  `${specs.courtCount} คอร์ทให้เช่า ~160 บาท/ชม. พีคช่วงเย็น`);
+      break;
+    case 'homestay-camp':
+      areaUsed = `${plotShare} (${R(`${specs.roomCount} cabins/tents`, `กระท่อม/เต็นท์ ${specs.roomCount} หลัง`)})`;
+      benefit = R(`~${specs.roomCount} keys at ~950 THB/night, ~${specs.occupancyPct}% occupancy`,
+                  `~${specs.roomCount} หลัง คืนละ ~950 บาท เข้าพัก ~${specs.occupancyPct}%`);
+      break;
+    case 'laundry-shop':
+      areaUsed = `${plotShare} (${R(`${specs.machineCount} machines`, `เครื่องซัก ${specs.machineCount} เครื่อง`)})`;
+      benefit = R(`${specs.machineCount} washers × ~9 loads/day at ~45 THB`,
+                  `เครื่องซัก ${specs.machineCount} เครื่อง × ~9 รอบ/วัน รอบละ ~45 บาท`);
+      break;
+    case 'car-wash':
+      areaUsed = `${plotShare} (${R(`${specs.bayCount} wash bays`, `ช่องล้าง ${specs.bayCount} ช่อง`)})`;
+      benefit = R(`${specs.bayCount} bays ~1,200 THB/day each + vacuum`,
+                  `${specs.bayCount} ช่อง ~1,200 บาท/วันต่อช่อง + เครื่องดูดฝุ่น`);
+      break;
     default:
       areaUsed = '—'; benefit = '—';
   }
@@ -186,6 +235,13 @@ export function realityChecklist(projectId, lang = 'en') {
     'data-center-lease': ['เช็คไฟเบอร์ออปติกและกำลังสายส่งใกล้แปลง — เป็นตัวชี้ขาดหลัก', 'คาดการณ์ 6–12 เดียวก่อนได้สัญญา — ไม่ใช่รายได้ทันที'],
     'solar-warehouse': ['สำรวจคู่แข่งและความต้องการเช่าในพื้นที่ — อัตราเข้าพัก 85% เป็นแค่สมมติ', 'เช็คผังเมืองให้สร้างโกดังได้และทางเข้ารถบรรทุก'],
     'carbon-forest': ['ปรึกษา TGO/ผู้ลงทะเบียน T-VER — ขั้นตอนรับรองใช้เวลาหลายปี', 'รายได้หลักคือไม้ตอนตัด — คาร์บอนเครดิตยังให้เงินน้อยต่อไร่'],
+    'roadside-cafe': ['นับรถและคู่แข่งบนหน้าทางจริงทั้งเช้า/เที่ยง/เย็น — ตัวเลขลูกค้าเป็นตัวกำหนดทั้งหมด', 'ขออนุญาตร้านอาหารและเช็คที่จอด/ทางกลับรถก่อนเซ็นสัญญาผู้รับเหมา'],
+    'minimart': ['สำรวจคู่แข่งในรัศมี 1 กม. — เซเว่นใกล้ ๆ ตัดยอดขายครึ่งหนึ่งได้', 'นับครัวเรือน/หอพักรอบแปลง กำไรข้ามชาติบางมาก ยอดขายคือทุกอย่าง'],
+    'self-storage': ['สำรวจดีมานด์: ร้านออนไลน์ คอนโด หอพักใกล้เคียง — 70% เข้าพักคือสมมติ', 'วางแผนทางไฟและทางกลับรถก่อนซื้อยูนิต จำนวนห้องติดกฎระยะห่าง'],
+    'sports-court': ['เช็คว่ามีชุมชน/โรงงาน/โรงเรียนที่เล่นแบดหรือฟุตซอลในรัศมี 3-5 กม.', 'คุณภาพพื้นสนามคือสิ่งที่นักกีฬาจ่าย — อย่าประหยัดตรงนี้'],
+    'homestay-camp': ['ทดสอบลง Airbnb/Agoda ก่อนลงทุนหนัก — 26% เข้าพักคือตัวเลขพอใช้', 'เช็คน้ำประปา/น้ำบาดาลและระบบน้ำเสีย — จุดตายของที่พักชนบท'],
+    'laundry-shop': ['นับหอพัก/ที่เช่าในรัศมี 1 กม. — ถ้าไม่มีกลุ่มผู้เช่า ร้านไม่รอด', 'เช็คน้ำประปาแรงดันและท่อระบาย — เครื่องซักใช้น้ำมาก'],
+    'car-wash': ['ดูคู่แข่งล้างรถในรัศมี 3 กม. และปริมาณรถผ่านจริง', 'วางระบบน้ำเสีย/ดักตะกอนให้ถูก — เทศบาลเข้มเรื่องนี้'],
   } : {
     'solar-farm': ['Check zoning / land-use rules with the local authority', 'Apply for construction / land-grading permits under local law'],
     'small-solar': ['Check the roof/structure can bear panel weight and has no daytime shading', 'Ask the utility (PEA/MEA) about small-system connection rules and metering'],
@@ -202,6 +258,13 @@ export function realityChecklist(projectId, lang = 'en') {
     'data-center-lease': ['Check fiber routes and substation capacity near the plot — they decide feasibility', 'Expect 6–12 months of due diligence before any lease is signed'],
     'solar-warehouse': ['Survey local rental competition — the 85% occupancy is an assumption', 'Verify zoning allows a warehouse and that trucks can reach the site'],
     'carbon-forest': ['Talk to TGO / a T-VER verifier early — registration takes years', 'Timber is the real revenue — carbon credits still pay little per rai'],
+    'roadside-cafe': ['Count real traffic and competitors morning/noon/evening — the customer estimate decides everything', 'Get the food-shop license path and parking/U-turn right before signing a contractor'],
+    'minimart': ['Survey competitors within 1 km — a nearby 7-Eleven can halve sales', 'Count households/dorms around the plot — margins are thin, volume is everything'],
+    'self-storage': ['Check demand drivers: online sellers, condos, dorms nearby — 70% occupancy is an assumption', 'Plan fire lanes and truck turning before ordering units — count depends on clearances'],
+    'sports-court': ['Verify a player community within 3-5 km — factories, schools, neighborhoods', 'Players pay for floor quality — do not economize on the court surface'],
+    'homestay-camp': ['List on Airbnb/Agoda before building big — 26% occupancy is a fair guess, not a promise', 'Verify water supply and wastewater handling — the rural-lodging killer'],
+    'laundry-shop': ['Count dorms/rentals within 1 km — without a renter base the shop fails', 'Check water pressure and drainage capacity — machines are thirsty'],
+    'car-wash': ['Watch competitor washes and real traffic within 3 km', 'Settle wastewater drainage/oil traps properly — municipalities enforce this'],
   };
   return [...common, ...(per[projectId] || [])];
 }

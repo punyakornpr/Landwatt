@@ -132,6 +132,55 @@ export const PROJECT_FRIENDLY = {
     oneLiner: 'Plant fast-growing trees, register T-VER credits — lowest capital entry, slow ESG income',
     oneLinerTh: 'ปลูกไม้โตเร็ว ขึ้นทะเบียนเครดิต T-VER — ลงทุนต่ำสุด รายได้ช้าแต่ยั่งยืน',
   },
+  'roadside-cafe': {
+    name: 'Roadside café & food', nameTh: 'ร้านกาแฟ/อาหารริมถนน',
+    sub: 'F&B Business', subTh: 'ธุรกิจร้านอาหาร',
+    icon: 'Coffee',
+    oneLiner: 'Coffee and simple food for passing traffic — the classic frontage business, PV cuts the air-con bill',
+    oneLinerTh: 'กาแฟและอาหารจานง่ายสำหรับรถผ่าน — ธุรกิจริมถนนคลาสสิก โซลาร์ช่วยค่าแอร์',
+  },
+  'minimart': {
+    name: 'Community mini-mart', nameTh: 'ร้านสะดวกซื้อชุมชน',
+    sub: 'Retail Business', subTh: 'ธุรกิจค้าปลีก',
+    icon: 'ShoppingCart',
+    oneLiner: 'A small convenience store for the surrounding community — thin margin, steady daily demand',
+    oneLinerTh: 'ร้านขายของชำเล็กรับชุมชนรอบแปลง — กำไรบางแต่ความต้องการรายวัน',
+  },
+  'self-storage': {
+    name: 'Self-storage rental', nameTh: 'ห้องเก็บของให้เช่า',
+    sub: 'Storage Business', subTh: 'ธุรกิจห้องเก็บของ',
+    icon: 'Boxes',
+    oneLiner: 'Prefab storage rooms rented monthly — almost staff-free, e-commerce sellers drive demand',
+    oneLinerTh: 'ห้องเก็บของสำเร็จรูปให้เช่ารายเดือน — แทบไม่ต้องมีพนักงาน ร้านออนไลน์คือลูกค้าหลัก',
+  },
+  'sports-court': {
+    name: 'Badminton / futsal court', nameTh: 'สนามแบด/ฟุตซอลให้เช่า',
+    sub: 'Sports Business', subTh: 'ธุรกิจกีฬา',
+    icon: 'Dumbbell',
+    oneLiner: 'A covered court hall rented by the hour — evening income from local players',
+    oneLinerTh: 'โรงสนามในร่มให้เช่าเป็นรายชั่วโมง — รายได้ช่วงเย็นจากนักกีฬาในพื้นที่',
+  },
+  'homestay-camp': {
+    name: 'Homestay & camping', nameTh: 'โฮมสเตย์/ที่พักแคมป์ปิ้ง',
+    sub: 'Hospitality Business', subTh: 'ธุรกิจที่พัก',
+    icon: 'Tent',
+    oneLiner: 'Cabins or tents where scenery and quiet are the product — works off the main road',
+    oneLinerTh: 'กระท่อมหรือเต็นท์ที่ขายบรรยากาศและความเงียบ — ใช้ได้แม้ไม่ติดถนนใหญ่',
+  },
+  'laundry-shop': {
+    name: 'Coin laundry shop', nameTh: 'ร้านสะดวกซัก',
+    sub: 'Laundry Business', subTh: 'ธุรกิจซักรีด',
+    icon: 'WashingMachine',
+    oneLiner: 'Self-service washers for renters and workers within ~1 km — recurring weekly demand',
+    oneLinerTh: 'เครื่องซักบริการตนเองรับผู้เช่า/หอพักรัศมี ~1 กม. — ความต้องการซ้ำทุกสัปดาห์',
+  },
+  'car-wash': {
+    name: 'Self-service car wash', nameTh: 'คาร์แคร์ล้างรถอัตโนมัติ',
+    sub: 'Car Care Business', subTh: 'ธุรกิจดูแลรถ',
+    icon: 'Car',
+    oneLiner: 'Coin/QR wash bays on a busy frontage — customers do the work, minimal staff',
+    oneLinerTh: 'ช่องล้างรถหยอดเหรียญ/QR บนหน้าทางคึกคัก — ลูกค้าบริการตัวเอง พนักงานน้อย',
+  },
 };
 
 // Localized friendly meta: returns EN fields, or Th fields when lang==='th' (falls back to EN per field)
@@ -257,6 +306,56 @@ function reasonsFor(projectId, land, lang = 'en') {
       cautions.push(R('Carbon credits alone pay little per rai — timber at harvest is the real return', 'คาร์บอนเครดิตอย่างเดียวให้เงินน้อยต่อไร่ — รายได้จริงอยู่ที่ไม้ตอนตัด'));
       cautions.push(R('T-VER registration and verification take years — talk to TGO or a verifier early', 'การขึ้นทะเบียนและรับรอง T-VER ใช้เวลาหลายปี — ปรึกษา TGO หรือผู้รับรองตั้งแต่เนิ่น'));
       break;
+    case 'roadside-cafe':
+      if (land.roadType === 'main') reasons.push(R('Main-road frontage — passing traffic is exactly what a café needs', 'หน้ากว้างติดถนนใหญ่ — รถผ่านคือลูกค้าของคาเฟ่เลย'));
+      reasons.push(R('The classic land business — direct daily cash income, hands-on', 'ธุรกิจที่ดินคลาสสิก — เงินสดรายวัน บริหารเองได้'));
+      reasons.push(R('Rooftop PV offsets espresso machines and air-con — the biggest fixed cost', 'โซลาร์หลังคาช่วยต้นทุนเครื่องชงกับแอร์ — ค่าใช้จ่ายหลักของร้าน'));
+      if (land.roadType !== 'main') cautions.push(R('Not on a main road — daily customer count drops hard without passing traffic', 'ไม่ติดถนนใหญ่ — ลูกค้ารายวันตกมากถ้าไม่มีรถผ่าน'));
+      cautions.push(R('F&B is staffing-heavy — someone must run it daily; count your own time honestly', 'ร้านอาหารต้องมีคนดูแลทุกวัน — นับเวลาตัวเองให้ครบ'));
+      cautions.push(R('Customer estimate assumes visible frontage and easy parking — verify on site', 'ประมาณลูกค้าสมมติหน้าร้านเห็นชัดและจอดง่าย — เช็คหน้างานจริง'));
+      break;
+    case 'minimart':
+      reasons.push(R('Daily necessities sell through any economy — recession-resistant demand', 'ของใช้จำเป็นขายได้ทุกสภาพเศรษฐกิจ — ดีมานด์ทนภาวะชะลอ'));
+      if (land.roadType !== 'dirt') reasons.push(R('Reachable road — customers can stop and park easily', 'ถนนเข้าถึงได้ — ลูกค้าจอดแวะง่าย'));
+      reasons.push(R('Rooftop PV offsets 24/7 refrigeration — the dominant operating cost', 'โซลาร์หลังคาช่วยตู้เย็น 24 ชม. — ค่าใช้จ่ายที่ใหญ่สุด'));
+      cautions.push(R('Grocery margin is thin (~19%) — a nearby 7-Eleven or CJ More can halve your volume', 'กำไรข้ามชาบาง (~19%) — เซเว่นหรือซีเจใกล้ ๆ หารยอดขายครึ่งได้'));
+      cautions.push(R('Needs real households/dorms around — count the catchment before building', 'ต้องมีครัวเรือน/หอพักรอบจริง — นับวงล้อมลูกค้าก่อนสร้าง'));
+      break;
+    case 'self-storage':
+      reasons.push(R('E-commerce sellers and condo dwellers drive storage demand — a growing segment', 'ร้านออนไลน์กับคนคอนโดดันดีมานด์ห้องเก็บของ — ตลาดที่โตเรื่อย ๆ'));
+      reasons.push(R('Nearly staff-free — gate, CCTV and billing; no shop hours, no daily operations', 'แทบไม่ต้องมีพนักงาน — ประตู กล้อง และเรียกเก็บเงิน ไม่ต้องเปิดร้านทุกวัน'));
+      if (land.roadType !== 'dirt') reasons.push(R('Reachable road suffices — customers visit only occasionally', 'ถนนเข้าถึงได้ก็พอ — ลูกค้ามาใช้แค่เป็นครั้งคราว'));
+      if (areaRai < 0.5) cautions.push(R('Small plot limits unit count — income scales directly with units', 'แปลงเล็กจำกัดจำนวนห้อง — รายได้สเกลตามจำนวนห้องตรง ๆ'));
+      cautions.push(R('70% occupancy is a planning assumption — survey local sellers and housing density', 'เข้าพัก 70% เป็นสมมติฐานวางแผน — สำรวจร้านออนไลน์และความหนาแน่นบ้านจริง'));
+      break;
+    case 'sports-court':
+      reasons.push(R('Hourly rental with repeat weekly bookings — clubs reserve the same slots', 'เช่ารายชั่วโมง ลูกค้าซ้ำจองเวลาเดิมทุกสัปดาห์'));
+      reasons.push(R('Big clear-span roof = excellent PV surface — lights and fans are the main load', 'หลังคาโปร่งสูงเป็นผิวโซลาร์ดีเยี่ยม — ไฟและพัดลมคือโหลดหลัก'));
+      if (land.areaSqM >= 800) reasons.push(R('Plot fits multiple courts plus parking', 'แปลงรองรับหลายคอร์ทพร้อมที่จอด'));
+      cautions.push(R('Needs a player base within ~5 km — no community, no bookings', 'ต้องมีฐานผู้เล่นในรัศมี ~5 กม. — ไม่มีชุมชนก็ไม่มีการจอง'));
+      cautions.push(R('Evening-heavy income — daytime slots sit empty; model assumes ~3.5h/day per court', 'รายได้หนักช่วงเย็น — ช่วงกลางวันว่าง โมเดลสมมติ ~3.5 ชม./วัน/คอร์ท'));
+      break;
+    case 'homestay-camp':
+      reasons.push(R('The one business where quiet beats traffic — scenery and atmosphere sell the booking', 'ธุรกิจเดียวที่ความเงียบชนะรถผ่าน — บรรยากาศคือสิ่งที่ขาย'));
+      if (land.landType === 'agri' || land.landType === 'slope') reasons.push(R('Farm or hill views add real booking appeal', 'วิวไร่หรือวิวเขาเพิ่มเสน่ห์การจองจริง'));
+      reasons.push(R('Low-density build keeps the land flexible — easy to add or remove keys', 'สร้างห่าง ๆ ที่ดินยังยืดหยุ่น — เพิ่มหรือถอดหลังพักง่าย'));
+      cautions.push(R('Weekend-heavy income — ~26% occupancy is honest for rural stays, not guaranteed', 'รายได้หนักวันหยุด — เข้าพัก ~26% คือตัวเลขซื่อสัตย์สำหรับที่พักชนบท ไม่ใช่การันตี'));
+      cautions.push(R('Platform fees (Airbnb/Agoda ~15-18%) and cleaning costs are already thin-margin items', 'ค่าแพลตฟอร์ม (Airbnb/Agoda ~15-18%) และค่าทำความสะอาดเป็นรายจ่ายที่กินกำไรบาง ๆ'));
+      break;
+    case 'laundry-shop':
+      reasons.push(R('Everyone washes clothes weekly — the most recurring demand on this list', 'ทุกคนซักผ้าทุกสัปดาห์ — ดีมานด์ซ้ำที่สุดในลิสต์นี้'));
+      if (land.areaSqM < 400) reasons.push(R('Works on a small plot — a 60-80 m² shopfront suffices', 'ใช้แปลงเล็กได้ — หน้าร้าน 60-80 ตร.ม. ก็พอ'));
+      reasons.push(R('Semi-passive — part-time attendant, machines do the work', 'กึ่งพาสซีฟ — พนักงานพาร์ทไทม์ เครื่องทำงานแทน'));
+      cautions.push(R('Zero renters or dorms within ~1 km = zero business — verify the catchment first', 'ไม่มีผู้เช่า/หอพักในรัศมี ~1 กม. = ไม่มีธุรกิจ — เช็ควงล้อมก่อน'));
+      cautions.push(R('Water + power eat ~55% of revenue — PV helps but check water supply capacity too', 'น้ำ+ไฟกิน ~55% ของยอดขาย — โซลาร์ช่วย แต่เช็คน้ำประปาด้วย'));
+      break;
+    case 'car-wash':
+      if (land.roadType === 'main') reasons.push(R('Busy frontage — cars already pass; they just need a reason to pull in', 'หน้าทางคึกคัก — รถผ่านอยู่แล้ว แค่ให้เหตุผลแวะ'));
+      reasons.push(R('Self-service — customers wash their own cars, staffing is minimal', 'บริการตนเอง — ลูกค้าล้างเอง พนักงานน้อยมาก'));
+      reasons.push(R('PV canopy shades the bays and cuts the pump/equipment load', 'หลังคาโซลาร์บังแดดช่องล้างและช่วยค่าไฟปั๊ม/อุปกรณ์'));
+      if (land.roadType !== 'main') cautions.push(R('Off the main road, bay utilization falls fast — this is a visibility business', 'ออกจากถนนใหญ่ ช่องล้างว่างเร็ว — ธุรกิจนี้ขายการมองเห็น'));
+      cautions.push(R('Wastewater drainage and oil traps are enforced — budget for a proper system', 'น้ำเสียและดักคราบน้ำมันถูกบังคับใช้ — ตั้งงบระบบจัดการให้ถูก'));
+      break;
   }
   return { reasons, cautions };
 }
@@ -364,6 +463,60 @@ function screening(projectId, land, goals, lang = 'en') {
       if (areaRai < 1)
         return { status: 'insufficient', blockReason: R('Under 1 rai — credit volume too small to justify T-VER registration', 'น้อยกว่า 1 ไร่ — ปริมาณเครดิตน้อยเกินไปสำหรับการขึ้นทะเบียน T-VER') };
       return null;
+    case 'roadside-cafe':
+      if (land.landType === 'pond')
+        return { status: 'insufficient', blockReason: R('Mostly water — a café needs dry buildable frontage', 'ส่วนใหญ่เป็นน้ำ — คาเฟ่ต้องอยู่บนหน้าทางแห้ง') };
+      if (land.roadType === 'dirt')
+        return { status: 'no', blockReason: R('Dirt/track road — customers will not detour for coffee', 'ถนนดิน — ลูกค้าไม่อ้อมมาหากาแฟ') };
+      if (land.areaSqM < 120)
+        return { status: 'no', blockReason: R('Too small for a shop plus parking', 'เล็กเกินสำหรับร้านบวกที่จอด') };
+      return null;
+    case 'minimart':
+      if (land.landType === 'pond')
+        return { status: 'insufficient', blockReason: R('Mostly water — a store needs dry buildable land', 'ส่วนใหญ่เป็นน้ำ — ร้านต้องอยู่บนที่แห้ง') };
+      if (land.roadType === 'dirt')
+        return { status: 'insufficient', blockReason: R('Dirt road cuts daily footfall badly — a minimart needs passing trade', 'ถนนดินตัดลูกค้ารายวันมาก — ร้านชำต้องการคนผ่านหน้าร้าน') };
+      if (land.areaSqM < 100)
+        return { status: 'no', blockReason: R('Too small for a store plus parking', 'เล็กเกินสำหรับร้านบวกที่จอด') };
+      return null;
+    case 'self-storage':
+      if (land.landType === 'pond')
+        return { status: 'no', blockReason: R('Mostly water — storage units need dry land and drainage', 'ส่วนใหญ่เป็นน้ำ — ห้องเก็บของต้องอยู่บนที่แห้งและระบายน้ำได้') };
+      if (land.roadType === 'dirt')
+        return { status: 'insufficient', blockReason: R('Dirt road — customers hauling goods need a decent route', 'ถนนดิน — ลูกค้าขนของต้องการทางที่ดี') };
+      if (land.areaSqM < 300)
+        return { status: 'insufficient', blockReason: R('Under 300 m² fits too few units to justify the gate/fence setup', 'น้อยกว่า 300 ตร.ม. วางห้องได้น้อยเกินไปสำหรับประตู/รั้ว/CCTV') };
+      return null;
+    case 'sports-court':
+      if (land.landType === 'pond')
+        return { status: 'no', blockReason: R('Mostly water — a court hall needs dry land', 'ส่วนใหญ่เป็นน้ำ — โรงสนามต้องอยู่บนที่แห้ง') };
+      if (land.roadType === 'dirt')
+        return { status: 'insufficient', blockReason: R('Dirt road — evening players need decent access', 'ถนนดิน — นักกีฬาตอนเย็นต้องการทางเข้าที่ดี') };
+      if (land.areaSqM < 300)
+        return { status: 'no', blockReason: R('Too small for even one court with parking', 'เล็กเกินแม้แต่คอร์ทเดียวกับที่จอด') };
+      return null;
+    case 'homestay-camp':
+      if (land.landType === 'pond')
+        return { status: 'insufficient', blockReason: R('Mostly water — views help but cabins need dry ground', 'ส่วนใหญ่เป็นน้ำ — วิวช่วยแต่ที่พักต้องอยู่บนที่แห้ง') };
+      if (land.areaSqM < 300)
+        return { status: 'insufficient', blockReason: R('Under 300 m² — too few keys to run as a stay', 'น้อยกว่า 300 ตร.ม. — หลังพักน้อยเกินไปสำหรับเปิดที่พัก') };
+      return null;
+    case 'laundry-shop':
+      if (land.landType === 'pond')
+        return { status: 'insufficient', blockReason: R('Mostly water — the shop needs dry land and drainage', 'ส่วนใหญ่เป็นน้ำ — ร้านต้องอยู่บนที่แห้งและระบายน้ำได้') };
+      if (land.roadType === 'dirt')
+        return { status: 'insufficient', blockReason: R('Dirt road — customers carry laundry bags; access matters', 'ถนนดิน — ลูกค้าหิ้วผ้ามาซัก ทางเข้าสำคัญ') };
+      if (land.areaSqM < 60)
+        return { status: 'no', blockReason: R('Too small for even a compact laundry row', 'เล็กเกินแม้แต่แถวเครื่องซักเล็ก') };
+      return null;
+    case 'car-wash':
+      if (land.landType === 'pond')
+        return { status: 'no', blockReason: R('Mostly water — wash bays need dry paved ground', 'ส่วนใหญ่เป็นน้ำ — ช่องล้างต้องอยู่บนพื้นแห้ง') };
+      if (land.roadType === 'dirt')
+        return { status: 'no', blockReason: R('Dirt road — nobody washes a car after driving a dirt track', 'ถนนดิน — ไม่มีใครล้างรถหลังขับทางดิน') };
+      if (land.areaSqM < 150)
+        return { status: 'no', blockReason: R('Too small for a wash bay plus queuing', 'เล็กเกินสำหรับช่องล้างบวกที่รอคิว') };
+      return null;
   }
   return null;
 }
@@ -386,6 +539,13 @@ function goalBoost(projectId, aims) {
     'data-center-lease': ['income'],
     'solar-warehouse': ['income', 'ev'],
     'carbon-forest': ['income', 'farm', 'unsure'],
+    'roadside-cafe': ['business', 'income'],
+    'minimart': ['business', 'income'],
+    'self-storage': ['business', 'income', 'unsure'],
+    'sports-court': ['business', 'income'],
+    'homestay-camp': ['business', 'income', 'unsure'],
+    'laundry-shop': ['business', 'income'],
+    'car-wash': ['business', 'income'],
   };
   if (!aims.length) return 0;
   const matched = (map[projectId] || []).some(a => aims.includes(a));
@@ -433,6 +593,7 @@ export const GOAL_OPTIONS = [
   { id: 'income', label: 'Earn income from my land', labelTh: 'หารายได้จากที่ดิน', icon: 'TrendingUp' },
   { id: 'save', label: 'Cut electricity bills for home or business', labelTh: 'ลดค่าไฟบ้านหรือกิจการ', icon: 'PiggyBank' },
   { id: 'ev', label: 'Start a new business like EV charging', labelTh: 'เปิดธุรกิจใหม่ เช่น จุดชาร์จ EV', icon: 'Zap' },
+  { id: 'business', label: 'Run a general business (shop, gym, lodging)', labelTh: 'เปิดกิจการทั่วไป — ร้านค้า ฟิตเนส ที่พัก', icon: 'Store' },
   { id: 'farm', label: 'Keep farming the land too', labelTh: 'ยังอยากทำเกษตรควบไปด้วย', icon: 'Sprout' },
   { id: 'backup', label: 'Have my own power / backup supply', labelTh: 'มีไฟใช้เอง/สำรอง', icon: 'BatteryCharging' },
   { id: 'unsure', label: 'No idea yet — show me options', labelTh: 'ยังไม่มีไอเดีย — ให้ระบบแนะนำ', icon: 'Lightbulb' },

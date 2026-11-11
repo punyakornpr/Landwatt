@@ -93,6 +93,13 @@ export default function PlanDetail({ projectId }) {
     specs.leasableRai && `~${specs.leasableRai} ${t('rai leased')} (~${(specs.annualLeaseTHB || 0).toLocaleString()} ${t('THB/yr rent')})`,
     specs.warehouseM2 && `${t('Warehouse')} ~${specs.warehouseM2} ${t('m²')} + ${t('rooftop PV')} ~${specs.roofSolarKWp} ${t('kWp')}`,
     specs.treeCount && `~${specs.treeCount.toLocaleString()} ${t('trees')} (~${specs.creditTonsYr} ${t('tCO2/yr')})`,
+    specs.dailyCustomers && `${t('Café shop')} ~${specs.shopM2} ${t('m²')} (~${specs.dailyCustomers} ${t('customers/day')})`,
+    specs.dailyGrossTHB && `${t('Store')} ~${specs.shopM2} ${t('m²')} (~${specs.dailyGrossTHB.toLocaleString()} ${t('THB/day est.')})`,
+    specs.storageUnits && `${specs.storageUnits} ${t('storage units')} + ${t('rooftop PV')} ~${specs.roofSolarKWp} ${t('kWp')}`,
+    specs.courtCount && `${specs.courtCount} ${t('courts')} (${t('hall')} ~${specs.hallM2} ${t('m²')})`,
+    specs.roomCount && `${specs.roomCount} ${t('cabins/tents')} (~${specs.occupancyPct}% ${t('occupancy')})`,
+    specs.machineCount && `${specs.machineCount} ${t('washers/dryers')}`,
+    specs.bayCount && `${specs.bayCount} ${t('wash bays')} + ${t('PV canopy')}`,
   ].filter(Boolean) : [
     specs.moduleCount && `~${specs.moduleCount} solar panels`,
     specs.inverterCount && `${specs.inverterCount} inverters`,
@@ -110,6 +117,13 @@ export default function PlanDetail({ projectId }) {
     specs.leasableRai && `~${specs.leasableRai} rai leased (~${(specs.annualLeaseTHB || 0).toLocaleString()} THB/yr rent)`,
     specs.warehouseM2 && `Warehouse ~${specs.warehouseM2} m² + rooftop PV ~${specs.roofSolarKWp} kWp`,
     specs.treeCount && `~${specs.treeCount.toLocaleString()} trees (~${specs.creditTonsYr} tCO2/yr)`,
+    specs.dailyCustomers && `Café shop ~${specs.shopM2} m² (~${specs.dailyCustomers} customers/day)`,
+    specs.dailyGrossTHB && `Store ~${specs.shopM2} m² (~${specs.dailyGrossTHB.toLocaleString()} THB/day est.)`,
+    specs.storageUnits && `${specs.storageUnits} storage units + rooftop PV ~${specs.roofSolarKWp} kWp`,
+    specs.courtCount && `${specs.courtCount} courts (hall ~${specs.hallM2} m²)`,
+    specs.roomCount && `${specs.roomCount} cabins/tents (~${specs.occupancyPct}% occupancy)`,
+    specs.machineCount && `${specs.machineCount} washers/dryers`,
+    specs.bayCount && `${specs.bayCount} wash bays + PV canopy`,
   ].filter(Boolean);
 
   return (

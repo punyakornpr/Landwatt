@@ -7,8 +7,8 @@ export default function SingleLineDiagram({ project, specs, landData }) {
   const isEV = project.id === 'ev-charging-hub';
   const isBESS = project.id === 'grid-bess';
   const isBiogas = project.id === 'biomass-biogas';
-  const isSmallSolar = project.id === 'small-solar';
-  const isKit = project.id === 'solar-utility-kit';
+  const isSmallSolar = project.id === 'small-solar' || project.id === 'solar-coldroom' || project.id === 'ev-moto-swap';
+  const isKit = project.id === 'solar-utility-kit' || project.id === 'solar-dryer';
   const isSolar = !isEV && !isBESS && !isBiogas;
 
   const gridVoltage = landData.provinceData?.grid === 'MEA' ? '24 kV' : '22 kV';

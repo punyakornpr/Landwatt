@@ -123,6 +123,34 @@ export function evaluateLandFeasibility(landData) {
   if (landType === 'pond') kitScore -= 15;
   scores['solar-utility-kit'] = Math.min(Math.max(kitScore, 10), 88);
 
+  // 1d. Service businesses — e-moto swap, cold room rental, crop drying
+  let swapScore = 50;
+  if (roadType === 'main') swapScore += 20;
+  if (roadWidthMeters >= 8) swapScore += 10;
+  if (gridDistanceMeters <= 300) swapScore += 15; // near town/grid — riders and power close by
+  if (landType === 'pond') swapScore -= 20;
+  if (areaSqM < 40) swapScore -= 30;
+  scores['ev-moto-swap'] = Math.min(Math.max(swapScore, 10), 90);
+
+  let coldScore = 50;
+  if (landType === 'agri') coldScore += 15;
+  if (roadWidthMeters >= 6) coldScore += 10;
+  if (ghi >= 5.0) coldScore += 10;
+  if (gridDistanceMeters <= 500) coldScore += 5;
+  if (landType === 'pond') coldScore -= 25;
+  if (roadType === 'dirt') coldScore -= 10;
+  if (areaSqM < 70) coldScore -= 30;
+  scores['solar-coldroom'] = Math.min(Math.max(coldScore, 10), 88);
+
+  let dryScore = 60;
+  if (landType === 'agri') dryScore += 15;
+  if (landType === 'flat') dryScore += 5;
+  if (ghi >= 5.0) dryScore += 10;
+  if (areaRai >= 0.25) dryScore += 5;
+  if (landType === 'pond') dryScore -= 30;
+  if (areaSqM < 100) dryScore -= 35;
+  scores['solar-dryer'] = Math.min(Math.max(dryScore, 10), 90);
+
   // 2. Agrivoltaics
   let agriScore = 60;
   if (areaRai >= 2 && areaRai <= 20) agriScore += 20;
@@ -488,6 +516,168 @@ export function calculateSolarKitSpecs(landData) {
       co2TonsYear: co2AvoidedTonsPerYear.toFixed(1),
       treesEquivalent: Math.round(co2AvoidedTonsPerYear * 60).toLocaleString()
     }
+  };
+}
+
+// 1d. E-motorcycle battery swap kiosk — per-transaction service business
+export function calculateMotoSwapSpecs(landData) {
+  const { areaSqM = 1600, provinceData = {} } = landData;
+  const ghi = provinceData.ghi || 5.1;
+  const excludedAreaSqM = Math.max(0, landData.excludedAreaSqM || 0);
+  const usableArea = Math.max(0, areaSqM - excludedAreaSqM) * 0.78;
+
+  // Cabinet: 12-slot swap cabinet ~8 m² + canopy/queuing ~32 m² → 40 m² per unit, cap 4
+  const swapCabinets = Math.min(Math.max(1, Math.floor(usableArea / 40)), 4);
+  const swapSlots = swapCabinets * 12;
+  const solarKWp = Math.min(swapCabinets * 3, 12); // canopy offsets cabinet load
+  const totalCapex = swapCabinets * 350000 + solarKWp * 42000 + 120000;
+
+  // Revenue: ~20 swaps/day/cabinet at 40 THB, ~70% realized demand
+  const swapsPerDay = swapCabinets * 20;
+  const annualRevenue = swapsPerDay * 365 * 40 * 0.70;
+  const solarSavings = solarKWp * ghi * 0.75 * 365 * 4.5;
+  // OPEX: upkeep 3% + power/network royalty ~12% of revenue
+  const opexPerYear = totalCapex * 0.03 + annualRevenue * 0.12;
+
+  const cashFlows = [-totalCapex];
+  for (let y = 1; y <= 25; y++) {
+    const refresh = (y === 8 || y === 16) ? swapCabinets * 350000 * 0.5 : 0;
+    cashFlows.push(annualRevenue + solarSavings - opexPerYear - refresh);
+  }
+  const cfFin = financeFromCashFlows(cashFlows);
+  const co2AvoidedTonsPerYear = (swapsPerDay * 365 * 0.7 * 2 * 0.4999) / 1000; // ~2 kWh per swap
+
+  return {
+    swapCabinets,
+    swapSlots,
+    swapsPerDay,
+    dcCapacityKWp: solarKWp,
+    dcCapacityMWp: (solarKWp / 1000).toFixed(3),
+    acCapacityKW: 3,
+    moduleCount: Math.round(solarKWp / 0.62),
+    inverterCount: 1,
+    inverterUnitKW: 3,
+    inverterModel: 'Small hybrid inverter 3 kW + swap-cabinet PSU',
+    excludedAreaSqM,
+    tariffStatus: 'scenario',
+    retailRateTHB: 4.5,
+    cashFlows,
+    financials: {
+      totalCapexTHB: Math.round(totalCapex), // unrounded — display value below loses ≤5k at 2 decimals
+      totalCapexMillionTHB: (totalCapex / 1000000).toFixed(2),
+      annualRevenueMillionTHB: ((annualRevenue + solarSavings) / 1000000).toFixed(2),
+      netAnnualCashflowMillionTHB: ((annualRevenue + solarSavings - opexPerYear) / 1000000).toFixed(2),
+      paybackYears: cfFin.paybackYears,
+      paybackInterpolated: cfFin.paybackInterpolated,
+      irrPercent: cfFin.irrPercent,
+      npv25YrMillionTHB: cfFin.npv25YrMillionTHB
+    },
+    cashFlowModel: 'CF_y = (swaps/day × 365 × ฿40 × 0.70) + S_solar − OPEX − Cabinet(y8,y16) — service fees, demand-dependent',
+    esg: { co2TonsYear: co2AvoidedTonsPerYear.toFixed(1), treesEquivalent: Math.round(co2AvoidedTonsPerYear * 60).toLocaleString() }
+  };
+}
+
+// 1e. Solar cold-room rental — farmers pay to keep produce fresh
+export function calculateColdroomSpecs(landData) {
+  const { areaSqM = 1600, provinceData = {} } = landData;
+  const ghi = provinceData.ghi || 5.1;
+  const excludedAreaSqM = Math.max(0, landData.excludedAreaSqM || 0);
+  const usableArea = Math.max(0, areaSqM - excludedAreaSqM) * 0.78;
+
+  // Cold room 20 m³ ~25 m² + plant/access ~45 m² → 70 m² per room, cap 3
+  const coldRooms = Math.min(Math.max(1, Math.floor(usableArea / 70)), 3);
+  const coldStorageM3 = coldRooms * 20;
+  const solarKWp = coldRooms * 10; // offsets compressor load
+  const totalCapex = coldRooms * 520000 + solarKWp * 40000 + 120000;
+
+  // Revenue: rent ~18k THB/month/room at ~80% seasonal occupancy
+  const annualRevenue = coldRooms * 18000 * 12 * 0.80;
+  // Compressor ~8 kW avg 9 h/day; PV offsets part of it
+  const elecGross = coldRooms * 8 * 9 * 365 * 4.5;
+  const solarSavings = solarKWp * ghi * 0.75 * 365 * 4.5;
+  const opexPerYear = elecGross + totalCapex * 0.03;
+
+  const cashFlows = [-totalCapex];
+  for (let y = 1; y <= 25; y++) {
+    const refresh = (y === 10 || y === 20) ? coldRooms * 80000 : 0; // compressor overhaul
+    cashFlows.push(annualRevenue + solarSavings * Math.pow(0.996, y - 1) - opexPerYear - refresh);
+  }
+  const cfFin = financeFromCashFlows(cashFlows);
+  const co2AvoidedTonsPerYear = (solarKWp * ghi * 0.75 * 365 * 0.4999) / 1000;
+
+  return {
+    coldRooms,
+    coldStorageM3,
+    dcCapacityKWp: solarKWp,
+    dcCapacityMWp: (solarKWp / 1000).toFixed(3),
+    acCapacityKW: solarKWp * 0.8,
+    moduleCount: Math.round(solarKWp / 0.62),
+    inverterCount: coldRooms,
+    inverterUnitKW: 8,
+    inverterModel: 'Grid-tied string inverter 8–10 kW per room',
+    excludedAreaSqM,
+    tariffStatus: 'scenario',
+    retailRateTHB: 4.5,
+    cashFlows,
+    financials: {
+      totalCapexTHB: Math.round(totalCapex), // unrounded — display value below loses ≤5k at 2 decimals
+      totalCapexMillionTHB: (totalCapex / 1000000).toFixed(2),
+      annualRevenueMillionTHB: ((annualRevenue + solarSavings) / 1000000).toFixed(2),
+      netAnnualCashflowMillionTHB: ((annualRevenue + solarSavings - opexPerYear) / 1000000).toFixed(2),
+      paybackYears: cfFin.paybackYears,
+      paybackInterpolated: cfFin.paybackInterpolated,
+      irrPercent: cfFin.irrPercent,
+      npv25YrMillionTHB: cfFin.npv25YrMillionTHB
+    },
+    cashFlowModel: 'CF_y = (rooms × ฿18k/mo × 0.80) + S_solar×0.996^(y−1) − OPEX − Compressor(y10,y20) — rental income',
+    esg: { co2TonsYear: co2AvoidedTonsPerYear.toFixed(1), treesEquivalent: Math.round(co2AvoidedTonsPerYear * 60).toLocaleString() }
+  };
+}
+
+// 1f. Solar crop-drying service — dry produce for neighboring farms
+export function calculateSolarDryerSpecs(landData) {
+  const { areaSqM = 1600 } = landData;
+  const excludedAreaSqM = Math.max(0, landData.excludedAreaSqM || 0);
+  const usableArea = Math.max(0, areaSqM - excludedAreaSqM) * 0.78;
+
+  // Tunnel dryer 6×14 m ≈ 84 m² + working space → 100 m² each, cap 6
+  const dryerTunnels = Math.min(Math.max(1, Math.floor(usableArea / 100)), 6);
+  const dryCapacityKgDay = dryerTunnels * 600;
+  const totalCapex = dryerTunnels * 320000 + 80000; // tunnel + DC fans/solar kit + site prep
+
+  // Revenue: drying fee ~4 THB/kg wet × ~120 operating days at 70% demand
+  const annualRevenue = dryCapacityKgDay * 4 * 120 * 0.70;
+  const opexPerYear = annualRevenue * 0.25 + totalCapex * 0.03; // labor share + upkeep
+
+  const cashFlows = [-totalCapex];
+  for (let y = 1; y <= 25; y++) {
+    const refurb = (y === 8 || y === 16) ? dryerTunnels * 80000 : 0; // cover/fan refurb
+    cashFlows.push(annualRevenue - opexPerYear - refurb);
+  }
+  const cfFin = financeFromCashFlows(cashFlows);
+  const co2AvoidedTonsPerYear = (dryerTunnels * 12) / 1.4; // displaces diesel/wood drying ~ rough proxy
+
+  return {
+    dryerTunnels,
+    dryCapacityKgDay,
+    dcCapacityKWp: dryerTunnels * 1.2, // small PV for DC fans
+    acCapacityKW: 0,
+    moduleCount: dryerTunnels * 2,
+    excludedAreaSqM,
+    tariffStatus: 'scenario',
+    cashFlows,
+    financials: {
+      totalCapexTHB: Math.round(totalCapex), // unrounded — display value below loses ≤5k at 2 decimals
+      totalCapexMillionTHB: (totalCapex / 1000000).toFixed(2),
+      annualRevenueMillionTHB: (annualRevenue / 1000000).toFixed(2),
+      netAnnualCashflowMillionTHB: ((annualRevenue - opexPerYear) / 1000000).toFixed(2),
+      paybackYears: cfFin.paybackYears,
+      paybackInterpolated: cfFin.paybackInterpolated,
+      irrPercent: cfFin.irrPercent,
+      npv25YrMillionTHB: cfFin.npv25YrMillionTHB
+    },
+    cashFlowModel: 'CF_y = (kg/day × ฿4 × 120d × 0.70) − OPEX − Refurb(y8,y16) — service fees, seasonal',
+    esg: { co2TonsYear: co2AvoidedTonsPerYear.toFixed(1), treesEquivalent: Math.round(co2AvoidedTonsPerYear * 60).toLocaleString() }
   };
 }
 

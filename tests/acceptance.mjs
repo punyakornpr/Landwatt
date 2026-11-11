@@ -1,7 +1,7 @@
 // LandWatt acceptance — ตรวจ F-01..F-14, F-24..F-28, F-03, SLD fields, Cash Flow,
 // เปลี่ยนพื้นที่ 2 กรณี, และ save/load + import ผ่าน localStorage mock
 import assert from 'node:assert/strict';
-import { calculateSolarFarmSpecs, calculateAgrivoltaicsSpecs, calculateEVHubSpecs, calculateBESSFarmSpecs, calculateFloatingSolarSpecs, calculateBiogasSpecs } from '../src/utils/engineeringCalculations.js';
+import { calculateSolarFarmSpecs, calculateAgrivoltaicsSpecs, calculateEVHubSpecs, calculateBESSFarmSpecs, calculateFloatingSolarSpecs, calculateBiogasSpecs, calculateMotoSwapSpecs, calculateColdroomSpecs, calculateSolarDryerSpecs } from '../src/utils/engineeringCalculations.js';
 
 // ---- localStorage mock สำหรับ storage.js ----
 const store = {};
@@ -189,9 +189,28 @@ const fl = calculateFloatingSolarSpecs(L1);
 }
 checkFinConsistency(fl, 'Floating@2072');
 
+// ===== ธุรกิจบริการ — swap/coldroom/dryer มี cashFlows + model เฉพาะของตัวเอง =====
+const swap = calculateMotoSwapSpecs({ areaSqM: 1600, roadType: 'main', provinceData: { ghi: GHI } });
+assert.equal(swap.swapCabinets, Math.min(Math.max(1, Math.floor(1600 * 0.78 / 40)), 4), 'swap: cabinets=⌊usable/40⌋ cap4');
+assert.equal(swap.swapSlots, swap.swapCabinets * 12, 'swap: 12 slots/cabinet');
+assert.ok(swap.cashFlows[8] < swap.cashFlows[7], 'swap: cabinet refresh dip ปี8');
+checkFinConsistency(swap, 'Swap@1600');
+
+const cold = calculateColdroomSpecs({ areaSqM: 1600, provinceData: { ghi: GHI } });
+assert.equal(cold.coldRooms, Math.min(Math.max(1, Math.floor(1600 * 0.78 / 70)), 3), 'cold: rooms=⌊usable/70⌋ cap3');
+assert.equal(cold.coldStorageM3, cold.coldRooms * 20, 'cold: 20 m³/room');
+assert.ok(cold.cashFlows[10] < cold.cashFlows[9], 'cold: compressor overhaul dip ปี10');
+checkFinConsistency(cold, 'Cold@1600');
+
+const dry = calculateSolarDryerSpecs({ areaSqM: 1600 });
+assert.equal(dry.dryerTunnels, Math.min(Math.max(1, Math.floor(1600 * 0.78 / 100)), 6), 'dryer: tunnels=⌊usable/100⌋ cap6');
+assert.equal(dry.dryCapacityKgDay, dry.dryerTunnels * 600, 'dryer: 600 kg/day/tunnel');
+assert.ok(dry.cashFlows[8] < dry.cashFlows[7], 'dryer: refurb dip ปี8');
+checkFinConsistency(dry, 'Dryer@1600');
+
 // ===== ทุกประเภทต้องมี cashFlows ผ่าน getSpecs ด้วย =====
 const { getSpecs } = await import('../src/engine/specs.js');
-for (const pid of ['solar-farm', 'small-solar', 'solar-utility-kit', 'agrivoltaics', 'floating-solar', 'ev-charging-hub', 'grid-bess', 'biomass-biogas']) {
+for (const pid of ['solar-farm', 'small-solar', 'solar-utility-kit', 'agrivoltaics', 'floating-solar', 'ev-charging-hub', 'grid-bess', 'biomass-biogas', 'ev-moto-swap', 'solar-coldroom', 'solar-dryer']) {
   const sp = getSpecs(pid, pid === 'ev-charging-hub' ? { areaSqM: 5000, roadWidthMeters: 8, provinceData: { ghi: GHI } } : L1);
   assert.ok(sp.cashFlows?.length === 26, `getSpecs(${pid}): cashFlows ครบ 26 จุด`);
   assert.ok(sp.cashFlowModel, `getSpecs(${pid}): มี cashFlowModel`);
@@ -245,6 +264,19 @@ assert.ok(kit50.kitUnits >= 1 && kit50.cashFlows.length === 26, 'kit: ≥1 unit 
 for (const [pid, max] of [['agrivoltaics', 50000], ['agrivoltaics', 150000], ['agrivoltaics', 500000], ['solar-farm', 50000], ['floating-solar', 50000]]) {
   const s = getSpecs(pid, { ...L1, landType: pid === 'floating-solar' ? 'pond' : 'agri', hasWaterBody: pid === 'floating-solar' }, max);
   assert.ok(parseFloat(s.financials.totalCapexMillionTHB) > 0, `${pid} @${max}: CAPEX ต้องไม่เป็น 0`);
+}
+// ธุรกิจบริการ: dryer ~400k fit 150–500k; swap/coldroom resize ให้อยู่ในงบ 2M
+const dry500 = getSpecs('solar-dryer', L1, BUDGET_MAX_THB['150-500k']);
+assert.ok(!dry500.budgetFit?.stillOverBudget && num(dry500.financials.totalCapexMillionTHB) * 1e6 <= 500000, 'solar-dryer 1 tunnel fit งบ 150–500k');
+const dry150 = getSpecs('solar-dryer', L1, BUDGET_MAX_THB['50-150k']);
+assert.ok(dry150.budgetFit?.stillOverBudget, 'งบ ≤150k: dryer min ~400k ต้อง over-budget');
+const swap2m = getSpecs('ev-moto-swap', L1, BUDGET_MAX_THB['0.5-2m']);
+assert.ok(swap2m.budgetFit?.resized && !swap2m.budgetFit.stillOverBudget && swap2m.swapCabinets >= 1, 'swap kiosk resize ให้อยู่งบ 2M');
+const cold2m = getSpecs('solar-coldroom', L1, BUDGET_MAX_THB['0.5-2m']);
+assert.ok(cold2m.budgetFit?.resized && !cold2m.budgetFit.stillOverBudget && cold2m.coldRooms >= 1, 'cold room resize ให้อยู่งบ 2M');
+for (const pid of ['ev-moto-swap', 'solar-coldroom', 'solar-dryer']) {
+  const s = getSpecs(pid, { ...L1, landType: 'agri' }, BUDGET_MAX_THB['under-50k']);
+  assert.ok(parseFloat(s.financials.totalCapexMillionTHB) > 0, `${pid} @<50k: CAPEX ต้องไม่เป็น 0`);
 }
 
 // ===== TH_ADMIN (ชุดอำเภอสำหรับค้นหา/เลือกอำเภอ) =====

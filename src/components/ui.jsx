@@ -3,12 +3,15 @@ import {
   Sun, Sprout, Zap, BatteryCharging, Waves, Flame,
   TrendingUp, PiggyBank, Lightbulb, ChevronDown,
   CheckCircle2, AlertTriangle, Info, HelpCircle,
+  Store, Snowflake, Package,
 } from 'lucide-react';
 import { STATUS, PROJECT_FRIENDLY } from '../engine/recommend';
+import { useApp } from '../state/AppState';
+import { useT } from '../i18n';
 
 export const ICONS = {
   Sun, Sprout, Zap, BatteryCharging, Waves, Flame,
-  TrendingUp, PiggyBank, Lightbulb,
+  TrendingUp, PiggyBank, Lightbulb, Store, Snowflake, Package,
 };
 
 export function Reveal({ children, delay = 0, className = '' }) {
@@ -51,11 +54,12 @@ export function PageHead({ title, sub, children }) {
 }
 
 export function StatusBadge({ status }) {
+  const { lang } = useApp();
   const s = STATUS[status] || STATUS.insufficient;
   return (
     <span className={`chip border ${s.color}`}>
       <span className={`w-1.5 h-1.5 rounded-full ${s.dot}`} />
-      {s.label}
+      {lang === 'th' ? s.labelTh : s.label}
     </span>
   );
 }
@@ -192,12 +196,12 @@ export function fmtTHB(millionTHB) {
 }
 
 export function DisclaimerStrip() {
+  const t = useT();
   return (
     <div className="rounded-xl bg-[#F5F5F7] border border-[#E8E8ED] px-4 py-3 text-xs text-ink-soft leading-relaxed flex items-start gap-2">
       <Info className="w-4 h-4 flex-shrink-0 mt-0.5 text-ink-faint" />
       <span>
-        All results are <strong>preliminary estimates</strong> from the data provided and system assumptions —
-        not a guarantee of land rights, permits, or actual prices/income. Survey the site and confirm with the authorities before investing
+        {t('All results are preliminary estimates from the data provided and system assumptions — not a guarantee of land rights, permits, or actual prices/income. Survey the site and confirm with the authorities before investing')}
       </span>
     </div>
   );

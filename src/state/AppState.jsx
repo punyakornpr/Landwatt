@@ -6,12 +6,21 @@ const AppCtx = createContext(null);
 export function AppStateProvider({ children }) {
   const [draft, setDraft] = useState(loadDraft);
   const [projects, setProjects] = useState(loadProjects);
+  // Default language follows the browser — Thai speakers get Thai, others get English
+  const [lang, setLang] = useState(() => {
+    const saved = localStorage.getItem('landwatt-lang');
+    if (saved) return saved;
+    return (navigator.language || '').toLowerCase().startsWith('th') ? 'th' : 'en';
+  });
 
   useEffect(() => { saveDraft(draft); }, [draft]);
   useEffect(() => { saveProjects(projects); }, [projects]);
+  useEffect(() => { localStorage.setItem('landwatt-lang', lang); }, [lang]);
 
   const api = useMemo(() => ({
     draft,
+    lang,
+    toggleLang: () => setLang(l => (l === 'th' ? 'en' : 'th')),
     land: draft.land,
     goals: draft.goals,
     compareIds: draft.compareIds,
@@ -54,7 +63,7 @@ export function AppStateProvider({ children }) {
     },
     deleteProject: (id) => setProjects(list => list.filter(x => x.id !== id)),
     addProject: (p) => setProjects(list => [p, ...list]),
-  }), [draft, projects]);
+  }), [draft, projects, lang]);
 
   return <AppCtx.Provider value={api}>{children}</AppCtx.Provider>;
 }

@@ -9,7 +9,8 @@ import Compare from './pages/Compare';
 import MyProjects from './pages/MyProjects';
 import Help from './pages/Help';
 import Report from './pages/Report';
-import { Sun, Menu, X } from 'lucide-react';
+import { Sun, Menu, X, Languages } from 'lucide-react';
+import { useT } from './i18n';
 
 const NAV_ITEMS = [
   { path: '', label: 'Home' },
@@ -20,7 +21,8 @@ const NAV_ITEMS = [
 
 function NavBar() {
   const { path } = useRoute();
-  const { projects } = useApp();
+  const { projects, lang, toggleLang } = useApp();
+  const t = useT();
   const [open, setOpen] = React.useState(false);
 
   const linkCls = (p) => `px-3 py-2 rounded-lg text-sm font-medium transition ${
@@ -36,23 +38,32 @@ function NavBar() {
           </div>
           <div className="text-left">
             <div className="font-bold text-base tracking-tight leading-none">LandWatt</div>
-            <div className="text-[10px] text-ink-faint leading-tight mt-0.5 hidden sm:block">Land-energy planning assistant</div>
+            <div className="text-[10px] text-ink-faint leading-tight mt-0.5 hidden sm:block">{t('Land-energy planning assistant')}</div>
           </div>
         </button>
 
         <nav className="hidden md:flex items-center gap-1">
           {NAV_ITEMS.map(n => (
             <button key={n.path} onClick={() => navigate(`/${n.path}`)} className={linkCls(n.path)}>
-              {n.label}{n.path === 'projects' && projects.length > 0 && (
+              {t(n.label)}{n.path === 'projects' && projects.length > 0 && (
                 <span className="ml-1.5 text-[10px] bg-brand-700 text-white rounded-full px-1.5 py-0.5">{projects.length}</span>
               )}
             </button>
           ))}
         </nav>
 
-        <button className="md:hidden p-2" onClick={() => setOpen(o => !o)} aria-label="Menu">
-          {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-        </button>
+        <div className="flex items-center gap-1">
+          <button
+            onClick={toggleLang}
+            className="flex items-center gap-1 px-2.5 py-1.5 rounded-full border border-[#D2D2D7] text-xs font-semibold text-ink-soft hover:border-brand-400 hover:text-brand-800 transition"
+            aria-label="Switch language / เปลี่ยนภาษา">
+            <Languages className="w-3.5 h-3.5" />
+            {lang === 'th' ? 'EN' : 'ไทย'}
+          </button>
+          <button className="md:hidden p-2" onClick={() => setOpen(o => !o)} aria-label="Menu">
+            {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
+        </div>
       </div>
 
       {open && (
@@ -61,7 +72,7 @@ function NavBar() {
             <button key={n.path}
               onClick={() => { setOpen(false); navigate(`/${n.path}`); }}
               className={`block w-full text-left ${linkCls(n.path)}`}>
-              {n.label}
+              {t(n.label)}
             </button>
           ))}
         </nav>
@@ -72,6 +83,7 @@ function NavBar() {
 
 function RoutedApp() {
   const { path, param } = useRoute();
+  const t = useT();
 
   let page;
   switch (path) {
@@ -92,8 +104,7 @@ function RoutedApp() {
       <main key={path} className="flex-1 animate-in">{page}</main>
       <footer className="border-t border-[#E8E8ED] py-8 px-4 sm:px-6 text-center no-print">
         <p className="text-xs text-ink-faint">
-          LandWatt — results are preliminary estimates, not legal or price guarantees ·
-          Your data is stored only in this browser
+          {t('LandWatt — results are preliminary estimates, not legal or price guarantees · Your data is stored only in this browser')}
         </p>
       </footer>
     </div>

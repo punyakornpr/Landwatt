@@ -51,4 +51,17 @@ export const PROVIDERS = {
     { name: 'EnviTec Biogas', scale: 'National', focus: 'International biogas plant builder with Thai projects', note: 'SE-Asia office is in Jakarta — check for a Thai representative', website: 'https://www.envitec-biogas.com', contact: 'asia@envitec-biogas.com (SE-Asia office)' },
     { name: 'Regional agro-EPC', scale: 'Regional', focus: 'Local contractors near feedstock clusters (cassava, palm, livestock)', note: 'Essential to visit a working reference plant first' },
   ],
+  'ev-moto-swap': [
+    { name: 'Battery-swap network operator', scale: 'National', focus: 'Swap networks supply cabinets, payment app and branding under partner terms', note: 'They set the fee per swap — compare partner agreements before buying any hardware' },
+    { name: 'Local licensed installer', scale: 'Local', focus: 'Kiosk electrical supply, canopy and grounding work', note: 'Standard low-voltage work — compare 2–3 quotes' },
+  ],
+  'solar-coldroom': [
+    { name: 'Local refrigeration contractor', scale: 'Local', focus: 'Insulated cold rooms, compressors and maintenance contracts', note: 'After-sales service distance matters more than price — pick someone within ~100 km' },
+    { name: 'SCG Solar Roof Solutions', scale: 'National', focus: 'PV system for the compressor load — the largest running cost', note: 'Standardized packages with after-sales service', website: 'https://www.scgsmartliving.com/th/service/solar-roof-factory', contact: 'Tel 02-586-2222 · contact@scg.com' },
+    { name: 'Banpu NEXT', scale: 'National', focus: 'Solar plus storage — useful if the room must stay cold through the night', note: 'Ask about PV+BESS sizing for refrigeration duty', website: 'https://www.banpunext.co.th', contact: 'Tel 02-095-6599 · contact@banpunext.co.th' },
+  ],
+  'solar-dryer': [
+    { name: 'Agri-equipment fabricator', scale: 'Regional', focus: 'Tunnel dryers, racks and food-grade covers built locally', note: 'Ask the DOAE regional office for approved solar-dryer designs before building' },
+    { name: 'Local licensed installer', scale: 'Local', focus: 'Small PV + DC fans for tunnel ventilation', note: 'Only a few kW — any competent installer can do it' },
+  ],
 };

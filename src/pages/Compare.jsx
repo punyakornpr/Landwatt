@@ -1,50 +1,55 @@
 import React, { useMemo } from 'react';
 import { navigate } from '../router';
 import { useApp } from '../state/AppState';
-import { recommendProjects, PROJECT_FRIENDLY, BUDGET_MAX_THB } from '../engine/recommend';
+import { recommendProjects, projectFriendly, BUDGET_MAX_THB } from '../engine/recommend';
 import { getSpecs, friendlySummary } from '../engine/specs';
 import { StatusBadge, ProjectIcon, Note, fmtTHB, DisclaimerStrip, PageHead } from '../components/ui';
+import { useT } from '../i18n';
 import { ArrowLeft, ArrowRight, X } from 'lucide-react';
 
 export default function Compare() {
-  const { land, goals, compareIds, toggleCompare, setChosenPlan } = useApp();
-  const results = useMemo(() => recommendProjects(land, goals), [land, goals]);
+  const { land, goals, compareIds, toggleCompare, setChosenPlan, lang } = useApp();
+  const t = useT();
+  const results = useMemo(() => recommendProjects(land, goals, lang), [land, goals, lang]);
   const plans = compareIds.map(id => {
     const specs = getSpecs(id, land, BUDGET_MAX_THB[goals?.budget]);
-    return { id, rec: results.find(r => r.id === id), specs, summary: friendlySummary(id, specs, land) };
+    return { id, rec: results.find(r => r.id === id), specs, summary: friendlySummary(id, specs, land, lang) };
   }).filter(p => p.rec);
 
   if (plans.length < 2) {
     return (
       <div className="max-w-xl mx-auto px-4 py-24 text-center">
-        <h1 className="text-xl font-bold">Pick at least 2 plans to compare</h1>
-        <p className="text-sm text-ink-soft mt-2">On the results page, press "Add to compare" on options you like</p>
+        <h1 className="text-xl font-bold">{t('Pick at least 2 plans to compare')}</h1>
+        <p className="text-sm text-ink-soft mt-2">{t('On the results page, press "Add to compare" on options you like')}</p>
         <button onClick={() => navigate('/results')} className="btn-primary mt-6">
-          Go to results <ArrowRight className="w-4 h-4" />
+          {t('Go to results')} <ArrowRight className="w-4 h-4" />
         </button>
       </div>
     );
   }
 
   const rows = [
-    { label: 'Suitability status', get: p => <StatusBadge status={p.rec.status} /> },
-    { label: 'Fits your goals?', get: p => p.rec.reasons[0] || '—' },
-    { label: 'Rough investment', get: p => p.summary.capex ? `${fmtTHB(p.summary.capex.low)} – ${fmtTHB(p.summary.capex.high)}` : 'not estimable yet' },
-    { label: 'Area used', get: p => p.summary.areaUsed },
-    { label: 'Energy benefit', get: p => p.summary.benefit },
-    { label: 'Rough payback', get: p => p.summary.payback },
-    { label: 'Missing data', get: p => (p.rec.confidence.missing.length ? p.rec.confidence.missing.join(' ') : 'complete at this level') },
-    { label: 'Check before investing', get: p => p.rec.cautions[0] || '—' },
+    { label: t('Suitability status'), get: p => <StatusBadge status={p.rec.status} /> },
+    { label: t('Fits your goals?'), get: p => p.rec.reasons[0] || '—' },
+    { label: t('Rough investment'), get: p => p.summary.capex ? `${fmtTHB(p.summary.capex.low)} – ${fmtTHB(p.summary.capex.high)}` : t('not estimable') },
+    { label: t('Area used'), get: p => p.summary.areaUsed },
+    { label: t('Energy benefit'), get: p => p.summary.benefit },
+    { label: t('Rough payback'), get: p => p.summary.payback },
+    { label: t('Missing data'), get: p => (p.rec.confidence.missing.length ? p.rec.confidence.missing.join(', ') : t('complete at this level')) },
+    { label: t('Check before investing'), get: p => p.rec.cautions[0] || '—' },
   ];
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8">
       <button onClick={() => navigate('/results')} className="btn-ghost text-sm mb-4 -ml-2 no-print">
-        <ArrowLeft className="w-4 h-4" /> Back to options
+        <ArrowLeft className="w-4 h-4" /> {t('Back to options')}
       </button>
       <PageHead
-        title="Compare plans side by side"
-        sub={`${plans.length} plans on ${land.provinceData?.nameEn || land.provinceData?.name || 'the pinned land'} ${(land.areaSqM / 1600).toFixed(2)} rai — each plan's numbers come from assumptions that may differ`}
+        title={t('Compare plans side by side')}
+        sub={t('{n} plans on {loc} {rai} rai — each plan’s numbers come from assumptions that may differ')
+          .replace('{n}', plans.length)
+          .replace('{loc}', land.provinceData?.nameEn || land.provinceData?.name || t('the pinned land'))
+          .replace('{rai}', (land.areaSqM / 1600).toFixed(2))}
       />
 
       {/* Desktop table */}
@@ -53,15 +58,15 @@ export default function Compare() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-[#EBEBEF]">
-                <th className="text-left p-4 text-ink-faint font-medium w-44">Topic</th>
+                <th className="text-left p-4 text-ink-faint font-medium w-44">{t('Topic')}</th>
                 {plans.map(p => (
                   <th key={p.id} className="text-left p-4 min-w-[200px]">
                     <div className="flex items-center gap-2.5">
                       <ProjectIcon id={p.id} />
                       <div>
-                        <div className="font-bold">{PROJECT_FRIENDLY[p.id].name}</div>
+                        <div className="font-bold">{projectFriendly(p.id, lang).name}</div>
                         <button onClick={() => toggleCompare(p.id)} className="text-[11px] text-ink-faint hover:text-red-600 font-normal flex items-center gap-0.5 mt-0.5">
-                          <X className="w-3 h-3" /> Remove
+                          <X className="w-3 h-3" /> {t('Remove')}
                         </button>
                       </div>
                     </div>
@@ -83,7 +88,7 @@ export default function Compare() {
                 {plans.map(p => (
                   <td key={p.id} className="p-4">
                     <button onClick={() => { setChosenPlan(p.id); navigate(`/plan/${p.id}`); }} className="btn-primary w-full text-xs px-3 py-2.5">
-                      View plan
+                      {t('View plan')}
                     </button>
                   </td>
                 ))}
@@ -99,7 +104,7 @@ export default function Compare() {
           <div key={p.id} className="card p-5">
             <div className="flex items-center gap-3 mb-4">
               <ProjectIcon id={p.id} />
-              <div className="flex-1 font-bold">{PROJECT_FRIENDLY[p.id].name}</div>
+              <div className="flex-1 font-bold">{projectFriendly(p.id, lang).name}</div>
               <button onClick={() => toggleCompare(p.id)} className="text-ink-faint hover:text-red-600"><X className="w-4 h-4" /></button>
             </div>
             <dl className="space-y-3">
@@ -111,14 +116,14 @@ export default function Compare() {
               ))}
             </dl>
             <button onClick={() => { setChosenPlan(p.id); navigate(`/plan/${p.id}`); }} className="btn-primary w-full mt-4 text-xs">
-              View plan
+              {t('View plan')}
             </button>
           </div>
         ))}
       </div>
 
       <div className="mt-6 space-y-4">
-        <Note>We do not declare any plan "the best" — key limits still need a real site check. Use this table when talking to experts or contractors</Note>
+        <Note>{t('We do not declare any plan "the best" — key limits still need a real site check. Use this table when talking to experts or contractors')}</Note>
         <DisclaimerStrip />
       </div>
     </div>

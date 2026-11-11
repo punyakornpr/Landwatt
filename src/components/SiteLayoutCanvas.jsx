@@ -100,7 +100,7 @@ export default function SiteLayoutCanvas({ project, specs, landData }) {
     const innerH = plotH - (setbackPx * 2) - 20;
 
     // 3. Draw Equipment Layout based on Project
-    if (project.id === 'solar-farm' || project.id === 'agrivoltaics' || project.id === 'floating-solar' || project.id === 'small-solar' || project.id === 'solar-utility-kit') {
+    if (project.id === 'solar-farm' || project.id === 'agrivoltaics' || project.id === 'floating-solar' || project.id === 'small-solar' || project.id === 'solar-utility-kit' || project.id === 'solar-dryer') {
       const rowCount = 7;
       const rowHeight = 16;
       const rowSpacing = (innerH - 60) / rowCount;
@@ -159,7 +159,28 @@ export default function SiteLayoutCanvas({ project, specs, landData }) {
         ctx.fillText('22kV underground cable to PEA interconnection', padPosX - 150, padY + plotH + 5);
       }
 
-    } else if (project.id === 'ev-charging-hub') {
+    } else if (project.id === 'solar-coldroom') {
+      // Insulated rooms + compressor yard
+      for (let r = 0; r < (specs.coldRooms || 1); r++) {
+        const rx = innerX + 30;
+        const ry = innerY + 25 + r * 85;
+        ctx.fillStyle = '#0e7490';
+        ctx.strokeStyle = '#164e63';
+        ctx.lineWidth = 1.5;
+        ctx.fillRect(rx, ry, 160, 70);
+        ctx.strokeRect(rx, ry, 160, 70);
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '10px monospace';
+        ctx.fillText(`COLD ROOM #${r + 1} (20 m3)`, rx + 10, ry + 38);
+      }
+      ctx.fillStyle = '#334155';
+      ctx.fillRect(innerX + 220, innerY + 25, 120, 60);
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '9px Prompt, sans-serif';
+      ctx.fillText('Compressors +', innerX + 230, innerY + 48);
+      ctx.fillText(`${specs.dcCapacityKWp || 10} kWp PV`, innerX + 230, innerY + 62);
+
+    } else if (project.id === 'ev-charging-hub' || project.id === 'ev-moto-swap') {
       const canopyW = innerW * 0.75;
       const canopyH = innerH * 0.6;
 

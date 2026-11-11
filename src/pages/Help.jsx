@@ -1,6 +1,7 @@
 import React from 'react';
 import { navigate } from '../router';
 import { PageHead, GlossaryHint, Note } from '../components/ui';
+import { useT } from '../i18n';
 import {
   MapPin, Ruler, Target, Sparkles, Save, HelpCircle, ArrowRight, Info,
 } from 'lucide-react';
@@ -58,11 +59,12 @@ const GLOSSARY = [
 ];
 
 export default function Help() {
+  const t = useT();
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8">
       <PageHead
-        title="How to use"
-        sub="LandWatt is made for people with no electrical background — just knowing where the land is and roughly how big it is is enough to start"
+        title={t('How to use')}
+        sub={t('LandWatt is made for people with no electrical background — just knowing where the land is and roughly how big it is is enough to start')}
       />
 
       <div className="space-y-4">
@@ -72,11 +74,11 @@ export default function Help() {
               <s.icon className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="font-semibold text-sm">{s.t}</h2>
+              <h2 className="font-semibold text-sm">{t(s.t)}</h2>
               <ul className="mt-2 space-y-1.5">
                 {s.items.map((it, j) => (
                   <li key={j} className="text-sm text-ink-soft leading-relaxed flex items-start gap-2">
-                    <span className="text-brand-600 mt-1">•</span> {it}
+                    <span className="text-brand-600 mt-1">•</span> {t(it)}
                   </li>
                 ))}
               </ul>
@@ -87,13 +89,13 @@ export default function Help() {
 
       <div className="card p-5 mt-6">
         <h2 className="font-semibold flex items-center gap-2">
-          <HelpCircle className="w-4 h-4 text-brand-600" /> Terms you may see
+          <HelpCircle className="w-4 h-4 text-brand-600" /> {t('Terms you may see')}
         </h2>
         <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3">
           {GLOSSARY.map(([term, def], i) => (
             <div key={i}>
-              <div className="text-sm font-medium">{term}</div>
-              <div className="text-xs text-ink-faint leading-relaxed mt-0.5">{def}</div>
+              <div className="text-sm font-medium">{t(term)}</div>
+              <div className="text-xs text-ink-faint leading-relaxed mt-0.5">{t(def)}</div>
             </div>
           ))}
         </div>
@@ -101,13 +103,11 @@ export default function Help() {
 
       <div className="mt-6 space-y-4">
         <Note>
-          <strong>Limitations to know:</strong> LandWatt results are preliminary estimates from your inputs and system assumptions.
-          The system has no live data feeds (real grid positions, current installation prices, purchase quotas) —
-          so it does not certify feasibility or real prices/income. Survey the site and consult experts before deciding
+          {t('Limitations to know:') + ' ' + t('LandWatt results are preliminary estimates from your inputs and system assumptions. The system has no live data feeds (real grid positions, current installation prices, purchase quotas) — so it does not certify feasibility or real prices/income. Survey the site and consult experts before deciding')}
         </Note>
         <div className="text-center">
           <button onClick={() => navigate('/start')} className="btn-primary px-8">
-            Ready — analyze my land <ArrowRight className="w-4 h-4" />
+            {t('Ready — analyze my land')} <ArrowRight className="w-4 h-4" />
           </button>
         </div>
       </div>

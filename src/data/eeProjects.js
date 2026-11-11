@@ -201,5 +201,80 @@ export const EE_PROJECTS = [
       'All-in-one off-grid inverter 1.5–3 kW with built-in MPPT charger',
       'DC fuse, battery breaker and Class II surge protection'
     ]
+  },
+  {
+    id: 'ev-moto-swap',
+    title: 'E-Motorcycle Battery Swap Kiosk',
+    shortTitle: 'Swap Kiosk',
+    category: 'business',
+    icon: 'Store',
+    accentColor: 'violet',
+    tagline: 'Small road-frontage kiosk where e-motorcycles swap batteries — a fee per swap',
+    suitableAreaMinRai: 0.02,
+    preferredZoning: ['yellow', 'red', 'rural'],
+    standards: ['Low-voltage supply + kiosk electrical safety', 'Swap-network operator requirements (cabinet spec, payment, branding)'],
+    description: 'A compact battery-swap kiosk for electric motorcycles: 1–4 twelve-slot cabinets on a small canopy with a 3 kW solar top-up. Riders pull in, swap a flat battery for a charged one in under a minute, and pay per swap — a genuine per-transaction micro-business for a road frontage',
+    keyBenefits: [
+      'Real recurring revenue — a fee on every swap, not just power sales',
+      'Fits a frontage corner (~40 m² per cabinet incl. queuing)',
+      'Scales cabinet-by-cabinet as rider demand proves out',
+      'Solar canopy trims the cabinet charging load'
+    ],
+    technicalHighlights: [
+      '12-slot swap cabinet (~350k THB installed) with canopy and queuing space',
+      '3 kWp solar top-up per cabinet trims grid draw',
+      'Small hybrid inverter + cabinet PSU — no MV works needed',
+      'Cabinet refresh provisioned at ~50% cost in years 8/16'
+    ]
+  },
+  {
+    id: 'solar-coldroom',
+    title: 'Solar Cold Room Rental',
+    shortTitle: 'Cold Room Rental',
+    category: 'business',
+    icon: 'Snowflake',
+    accentColor: 'cyan',
+    tagline: 'Cold rooms farmers rent to keep produce fresh — solar covers the compressor, your biggest cost',
+    suitableAreaMinRai: 0.05,
+    preferredZoning: ['green', 'light_green', 'yellow', 'rural'],
+    standards: ['Food-contact room hygiene basics', 'Refrigeration contractor warranty and service terms'],
+    description: 'One to three 20 m³ cold rooms plus ~10 kWp solar each. Growers nearby rent space to keep fruit, vegetables or flowers fresh between harvest and market. The compressor is the dominant running cost, so the PV system directly widens the margin',
+    keyBenefits: [
+      'Recurring rental income — demand spikes every harvest season',
+      'PV offsets the compressor, the main operating expense',
+      'Adds local value: less post-harvest loss for neighbors',
+      'Expandable room-by-room as occupancy proves out'
+    ],
+    technicalHighlights: [
+      '20 m³ insulated room (~520k THB) + 8–10 kW compressor',
+      '~10 kWp PV per room feeding a grid-tied string inverter',
+      'Compressor overhaul provisioned in years 10/20',
+      '~70 m² footprint per room including plant and access'
+    ]
+  },
+  {
+    id: 'solar-dryer',
+    title: 'Solar Crop Drying Service',
+    shortTitle: 'Crop Drying Service',
+    category: 'business',
+    icon: 'Package',
+    accentColor: 'orange',
+    tagline: 'Dry chili, herbs and fruit for neighboring farms — the cheapest business entry on this list',
+    suitableAreaMinRai: 0.06,
+    preferredZoning: ['green', 'light_green', 'rural'],
+    standards: ['Food-grade hygiene for premium produce markets', 'Local small-enterprise registration'],
+    description: 'Solar tunnel dryers (6×14 m) with DC ventilation fans dry up to ~600 kg of wet produce per day each. Neighboring farms pay a per-kilogram fee during harvest season — a working business even on the smallest plot, with the simplest engineering on the list',
+    keyBenefits: [
+      'Lowest startup cost of any plan here — ~400k THB per tunnel',
+      'Service income during every harvest, no power-sale license needed',
+      'Almost no moving parts — passive heat plus small DC fans',
+      'Fast payback potential where drying demand exists'
+    ],
+    technicalHighlights: [
+      'Tunnel dryer ~84 m² footprint + small PV for DC fans',
+      '~600 kg/day wet capacity per tunnel, ~120 season days/yr',
+      'Cover/fan refurbishment provisioned in years 8/16',
+      'Up to 6 tunnels scale with plot and demand'
+    ]
   }
 ];

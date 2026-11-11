@@ -7,6 +7,7 @@ import {
   HelpCircle, CheckCircle2, PlayCircle,
 } from 'lucide-react';
 import { DisclaimerStrip, Reveal } from '../components/ui';
+import { useT } from '../i18n';
 import heroBg from '../assets/hero-landscape.svg';
 
 const EXAMPLES = [
@@ -61,6 +62,7 @@ const FAQS = [
 
 export default function Landing() {
   const { updateLand, updateGoals } = useApp();
+  const t = useT();
 
   const useExample = (ex) => {
     updateLand(ex.patch.land);
@@ -78,29 +80,28 @@ export default function Landing() {
         <div className="absolute inset-0 bg-gradient-to-b from-white/60 via-white/10 to-white pointer-events-none" />
         <div className="relative max-w-6xl mx-auto px-4 sm:px-6 pt-16 sm:pt-24 pb-36 sm:pb-48 text-center">
           <span className="chip bg-white border border-brand-200 text-brand-800 mb-6 animate-in">
-            <Sun className="w-3.5 h-3.5" /> Land-use energy planning assistant
+            <Sun className="w-3.5 h-3.5" /> {t('Land-use energy planning assistant')}
           </span>
           <h1 className="text-4xl sm:text-6xl font-bold tracking-tight leading-[1.08] animate-in" style={{ animationDelay: '90ms' }}>
-            Your vacant land can<br className="sm:hidden" />{' '}
+            {t('Your vacant land can')}<br className="sm:hidden" />{' '}
             <span className="bg-gradient-to-r from-brand-700 via-brand-600 to-electric-500 bg-clip-text text-transparent">
-              do more than you think
+              {t('do more than you think')}
             </span>
           </h1>
           <p className="mt-5 text-base sm:text-xl text-ink-soft max-w-2xl mx-auto leading-relaxed animate-in" style={{ animationDelay: '180ms' }}>
-            Tell us where your land is and what you want — LandWatt compares energy options
-            and estimates area, investment and returns in plain terms
+            {t('Tell us where your land is and what you want — LandWatt compares energy options and estimates area, investment and returns in plain terms')}
           </p>
           <div className="mt-7 flex flex-col sm:flex-row items-center justify-center gap-3 animate-in" style={{ animationDelay: '270ms' }}>
             <button onClick={() => navigate('/start')} className="btn-primary text-base px-7 py-3.5 w-full sm:w-auto">
-              Plan my land <ArrowRight className="w-4 h-4" />
+              {t('Plan my land')} <ArrowRight className="w-4 h-4" />
             </button>
             <button onClick={() => useExample(EXAMPLES[0])} className="btn-secondary text-base px-7 py-3.5 w-full sm:w-auto">
-              <PlayCircle className="w-4 h-4" /> Try an example
+              <PlayCircle className="w-4 h-4" /> {t('Try an example')}
             </button>
           </div>
           <p className="mt-4 animate-in" style={{ animationDelay: '360ms' }}>
             <span className="inline-flex items-center gap-1.5 rounded-full bg-white/75 backdrop-blur px-4 py-1.5 text-xs text-ink-soft shadow-sm">
-              No sign-up · no electrical knowledge needed · under 2 minutes
+              {t('No sign-up · no electrical knowledge needed · under 2 minutes')}
             </span>
           </p>
         </div>
@@ -119,8 +120,8 @@ export default function Landing() {
                 <div className="w-11 h-11 rounded-xl bg-brand-50 text-brand-700 flex items-center justify-center mb-4">
                   <c.icon className="w-6 h-6" />
                 </div>
-                <h3 className="font-semibold">{c.title}</h3>
-                <p className="mt-1.5 text-sm text-ink-soft leading-relaxed">{c.desc}</p>
+                <h3 className="font-semibold">{t(c.title)}</h3>
+                <p className="mt-1.5 text-sm text-ink-soft leading-relaxed">{t(c.desc)}</p>
               </div>
             </Reveal>
           ))}
@@ -130,8 +131,8 @@ export default function Landing() {
       {/* How it works */}
       <section className="bg-[#F5F5F7]">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-14">
-        <h2 className="text-xl sm:text-2xl font-bold text-center">How it works</h2>
-        <p className="text-sm text-ink-faint text-center mt-1">4 easy steps, done in a few minutes</p>
+        <h2 className="text-xl sm:text-2xl font-bold text-center">{t('How it works')}</h2>
+        <p className="text-sm text-ink-faint text-center mt-1">{t('4 easy steps, done in a few minutes')}</p>
         <div className="mt-8 grid grid-cols-2 lg:grid-cols-4 gap-4">
           {[
             { icon: MapPin, t: 'Describe your land', d: 'Location, size and terrain' },
@@ -141,12 +142,12 @@ export default function Landing() {
           ].map((s, i) => (
             <Reveal key={i} delay={i * 60}>
             <div className="relative card p-5 text-center h-full">
-              <span className="absolute top-3 left-4 text-xs font-bold text-brand-600">Step {i + 1}</span>
+              <span className="absolute top-3 left-4 text-xs font-bold text-brand-600">{t('Step')} {i + 1}</span>
               <div className="w-11 h-11 rounded-full bg-brand-700 text-white flex items-center justify-center mx-auto mt-2 mb-3">
                 <s.icon className="w-5 h-5" />
               </div>
-              <div className="text-sm font-semibold">{s.t}</div>
-              <div className="text-xs text-ink-faint mt-1 leading-relaxed">{s.d}</div>
+              <div className="text-sm font-semibold">{t(s.t)}</div>
+              <div className="text-xs text-ink-faint mt-1 leading-relaxed">{t(s.d)}</div>
             </div>
             </Reveal>
           ))}
@@ -156,8 +157,8 @@ export default function Landing() {
 
       {/* Examples */}
       <section className="max-w-6xl mx-auto px-4 sm:px-6 py-10">
-        <h2 className="text-xl sm:text-2xl font-bold text-center">Try an example</h2>
-        <p className="text-sm text-ink-faint text-center mt-1">Click to fill the real form with sample data, then adjust to your land</p>
+        <h2 className="text-xl sm:text-2xl font-bold text-center">{t('Try an example')}</h2>
+        <p className="text-sm text-ink-faint text-center mt-1">{t('Click to fill the real form with sample data, then adjust to your land')}</p>
         <div className="mt-7 grid grid-cols-1 sm:grid-cols-3 gap-4">
           {EXAMPLES.map((ex, i) => {
             const icons = [Sun, Zap, Sprout];
@@ -170,12 +171,12 @@ export default function Landing() {
                   <div className="w-10 h-10 rounded-xl bg-[#F5F5F7] text-ink-soft flex items-center justify-center group-hover:bg-brand-700 group-hover:text-white transition">
                     <Icon className="w-5 h-5" />
                   </div>
-                  <span className="chip bg-volt-100 text-volt-800 border border-volt-200">Demo data</span>
+                  <span className="chip bg-volt-100 text-volt-800 border border-volt-200">{t('Demo data')}</span>
                 </div>
-                <h3 className="mt-4 font-semibold">{ex.label}</h3>
-                <p className="mt-1 text-sm text-ink-soft leading-relaxed">{ex.desc}</p>
+                <h3 className="mt-4 font-semibold">{t(ex.label)}</h3>
+                <p className="mt-1 text-sm text-ink-soft leading-relaxed">{t(ex.desc)}</p>
                 <span className="mt-3 inline-flex items-center text-sm font-medium text-brand-700">
-                  Use this example <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-0.5 transition" />
+                  {t('Use this example')} <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-0.5 transition" />
                 </span>
               </button>
               </Reveal>
@@ -191,25 +192,25 @@ export default function Landing() {
 
       {/* FAQ */}
       <section className="max-w-3xl mx-auto px-4 sm:px-6 py-10">
-        <h2 className="text-xl sm:text-2xl font-bold text-center mb-6">Frequently asked questions</h2>
+        <h2 className="text-xl sm:text-2xl font-bold text-center mb-6">{t('Frequently asked questions')}</h2>
         <div className="space-y-3">
           {FAQS.map((f, i) => (
             <Reveal key={i} delay={i * 50}>
             <details className="card group open:bg-white">
               <summary className="flex items-center justify-between gap-3 px-5 py-4 cursor-pointer list-none">
                 <span className="flex items-center gap-2.5 text-sm font-medium">
-                  <HelpCircle className="w-4 h-4 text-brand-600 flex-shrink-0" /> {f.q}
+                  <HelpCircle className="w-4 h-4 text-brand-600 flex-shrink-0" /> {t(f.q)}
                 </span>
                 <span className="text-ink-faint group-open:rotate-45 transition text-lg leading-none">+</span>
               </summary>
-              <p className="px-5 pb-4 pl-[42px] text-sm text-ink-soft leading-relaxed">{f.a}</p>
+              <p className="px-5 pb-4 pl-[42px] text-sm text-ink-soft leading-relaxed">{t(f.a)}</p>
             </details>
             </Reveal>
           ))}
         </div>
         <div className="text-center mt-10">
           <button onClick={() => navigate('/start')} className="btn-primary px-8 py-3.5">
-            Analyze my land <CheckCircle2 className="w-4 h-4" />
+            {t('Analyze my land')} <CheckCircle2 className="w-4 h-4" />
           </button>
         </div>
       </section>

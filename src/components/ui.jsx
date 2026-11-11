@@ -102,7 +102,7 @@ export function ProjectIcon({ id, size = 'md', active }) {
 
 export function StepProgress({ steps, current }) {
   return (
-    <div className="flex items-center gap-0 w-full" aria-label="Steps">
+    <div className="flex items-center gap-0 w-full bg-white/75 backdrop-blur-md rounded-2xl px-4 py-3.5 shadow-sm ring-1 ring-black/[0.04]" aria-label="Steps">
       {steps.map((s, i) => {
         const done = i < current;
         const active = i === current;

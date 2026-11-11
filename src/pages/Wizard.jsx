@@ -55,7 +55,7 @@ export default function Wizard() {
     <div className="relative">
       <div aria-hidden="true" className="absolute inset-0 pointer-events-none overflow-hidden">
         <div className="absolute inset-0 bg-cover bg-top" style={{ backgroundImage: `url(${wizardBg})` }} />
-        <div className="absolute inset-0 bg-white/50" />
+        <div className="absolute inset-0 bg-white/40" />
       </div>
       <div className="relative max-w-3xl mx-auto px-4 sm:px-6 py-8">
       <div className="mb-8">

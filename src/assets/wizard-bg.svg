@@ -1,141 +1,102 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1600" viewBox="0 0 1600 1600" preserveAspectRatio="xMidYMid slice">
 <defs>
-  <linearGradient id="wsky" x1="0" y1="0" x2="0" y2="1">
-    <stop offset="0" stop-color="#b9d4f7"/>
-    <stop offset="0.6" stop-color="#dceafb"/>
-    <stop offset="1" stop-color="#f2f8ff"/>
+  <linearGradient id="wpaper" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#eef3fa"/>
+    <stop offset="1" stop-color="#f7fafc"/>
   </linearGradient>
-  <radialGradient id="wsun" cx="0.5" cy="0.5" r="0.5">
-    <stop offset="0" stop-color="#fde68a" stop-opacity="0.95"/>
-    <stop offset="0.5" stop-color="#fde68a" stop-opacity="0.35"/>
-    <stop offset="1" stop-color="#fde68a" stop-opacity="0"/>
-  </radialGradient>
-  <linearGradient id="wridge1" x1="0" y1="0" x2="0" y2="1">
-    <stop offset="0" stop-color="#bcd9c8"/><stop offset="1" stop-color="#9ec9ae"/>
-  </linearGradient>
-  <linearGradient id="wridge2" x1="0" y1="0" x2="0" y2="1">
-    <stop offset="0" stop-color="#8fc49e"/><stop offset="1" stop-color="#6faf84"/>
-  </linearGradient>
-  <linearGradient id="wfield" x1="0" y1="0" x2="0" y2="1">
-    <stop offset="0" stop-color="#7cc48f"/><stop offset="1" stop-color="#5dae7b"/>
-  </linearGradient>
-  <linearGradient id="wfield2" x1="0" y1="0" x2="0" y2="1">
-    <stop offset="0" stop-color="#93d1a0"/><stop offset="1" stop-color="#72bd8b"/>
-  </linearGradient>
-  <linearGradient id="wroad" x1="0" y1="0" x2="0" y2="1">
-    <stop offset="0" stop-color="#e8dcc9"/><stop offset="1" stop-color="#d6c7ae"/>
-  </linearGradient>
-  <linearGradient id="wpv" x1="0" y1="0" x2="1" y2="1">
-    <stop offset="0" stop-color="#3b82f6"/><stop offset="1" stop-color="#1e40af"/>
-  </linearGradient>
+  <pattern id="wgrid" width="80" height="80" patternUnits="userSpaceOnUse">
+    <path d="M80 0 H0 V80" fill="none" stroke="#dbe4f0" stroke-width="1"/>
+  </pattern>
+  <pattern id="wgridS" width="16" height="16" patternUnits="userSpaceOnUse">
+    <path d="M16 0 H0 V16" fill="none" stroke="#e8eef7" stroke-width="0.6"/>
+  </pattern>
 </defs>
 
-<!-- sky -->
-<rect width="1600" height="560" fill="url(#wsky)"/>
-<circle cx="1280" cy="170" r="150" fill="url(#wsun)"/>
-<circle cx="1280" cy="170" r="62" fill="#fbbf24"/>
-<g fill="#ffffff" opacity="0.8">
-  <ellipse cx="300" cy="150" rx="120" ry="34"/><ellipse cx="380" cy="125" rx="80" ry="26"/>
-  <ellipse cx="820" cy="95" rx="90" ry="24"/><ellipse cx="1500" cy="320" rx="100" ry="26"/>
-  <ellipse cx="180" cy="300" rx="80" ry="22"/>
+<rect width="1600" height="1600" fill="url(#wpaper)"/>
+<rect width="1600" height="1600" fill="url(#wgridS)"/>
+<rect width="1600" height="1600" fill="url(#wgrid)"/>
+
+<!-- cadastral parcels -->
+<g fill="none" stroke="#9db4d0" stroke-width="2">
+  <path d="M120 180 L480 150 L560 320 L540 560 L200 600 L140 400 Z"/>
+  <path d="M480 150 L860 190 L880 420 L560 320 Z"/>
+  <path d="M560 320 L880 420 L920 700 L620 780 L540 560 Z"/>
+  <path d="M200 600 L540 560 L620 780 L560 1020 L240 1060 L180 840 Z"/>
+  <path d="M920 700 L880 420 L1240 380 L1300 640 L1180 760 Z"/>
+  <path d="M1240 380 L860 190 L980 60 L1300 110 L1400 240 Z"/>
+  <path d="M1300 640 L1240 380 L1400 240 L1520 420 L1480 680 Z"/>
+  <path d="M620 780 L920 700 L1180 760 L1140 1040 L820 1120 L560 1020 Z"/>
+  <path d="M1180 760 L1300 640 L1480 680 L1440 980 L1140 1040 Z"/>
+  <path d="M240 1060 L560 1020 L820 1120 L780 1380 L420 1440 L260 1300 Z"/>
+  <path d="M820 1120 L1140 1040 L1120 1360 L780 1380 Z"/>
+  <path d="M1140 1040 L1440 980 L1500 1260 L1120 1360 Z"/>
+  <path d="M60 120 L120 180 L140 400 L60 460 Z"/>
+  <path d="M1440 980 L1480 680 L1560 760 L1560 1100 Z"/>
 </g>
 
-<!-- ridges -->
-<path d="M0 560 L0 430 Q200 330 420 410 Q620 480 820 400 Q1020 320 1240 400 Q1440 470 1600 400 L1600 560 Z" fill="url(#wridge1)"/>
-<path d="M0 560 L0 500 Q260 420 520 490 Q780 560 1040 480 Q1300 420 1600 500 L1600 560 Z" fill="url(#wridge2)"/>
-
-<!-- fields -->
-<rect y="560" width="1600" height="1040" fill="url(#wfield)"/>
-<path d="M0 660 Q400 620 800 660 T1600 640 L1600 760 Q1200 800 800 760 T0 780 Z" fill="url(#wfield2)"/>
-<path d="M0 860 Q400 820 800 870 T1600 850 L1600 980 Q1200 1020 800 980 T0 1000 Z" fill="#6db986"/>
-<path d="M0 1080 Q400 1040 800 1090 T1600 1060 L1600 1210 Q1200 1250 800 1210 T0 1230 Z" fill="url(#wfield2)"/>
-<path d="M0 1330 Q400 1290 800 1340 T1600 1310 L1600 1600 L0 1600 Z" fill="#63b27f"/>
-
-<!-- winding road -->
-<path d="M760 1600 Q820 1400 700 1280 Q560 1140 640 1010 Q720 880 660 780 Q620 700 680 620 L720 620 Q660 700 720 780 Q800 900 720 1030 Q640 1160 780 1300 Q900 1420 840 1600 Z" fill="url(#wroad)"/>
-<path d="M790 1600 Q840 1410 720 1290 Q590 1150 670 1015 Q740 885 685 785 Q645 705 700 625" fill="none" stroke="#ffffff" stroke-width="6" stroke-dasharray="26 22" opacity="0.7"/>
-
-<!-- solar panel rows (left field) -->
+<!-- parcel fills (very light tints) -->
 <g>
-  <g transform="translate(120 700) skewX(-18)">
-    <rect x="0" y="0" width="90" height="46" rx="4" fill="#1e293b"/>
-    <rect x="4" y="4" width="82" height="38" rx="2" fill="url(#wpv)"/>
-    <path d="M4 17 h82 M4 29 h82 M31 4 v38 M58 4 v38" stroke="#93c5fd" stroke-width="2"/>
-  </g>
-  <rect x="150" y="746" width="10" height="30" fill="#475569"/>
-  <g transform="translate(260 720) skewX(-18)">
-    <rect x="0" y="0" width="90" height="46" rx="4" fill="#1e293b"/>
-    <rect x="4" y="4" width="82" height="38" rx="2" fill="url(#wpv)"/>
-    <path d="M4 17 h82 M4 29 h82 M31 4 v38 M58 4 v38" stroke="#93c5fd" stroke-width="2"/>
-  </g>
-  <rect x="290" y="766" width="10" height="30" fill="#475569"/>
-  <g transform="translate(160 850) skewX(-18)">
-    <rect x="0" y="0" width="110" height="56" rx="4" fill="#1e293b"/>
-    <rect x="5" y="5" width="100" height="46" rx="2" fill="url(#wpv)"/>
-    <path d="M5 20 h100 M5 36 h100 M38 5 v46 M72 5 v46" stroke="#93c5fd" stroke-width="2.4"/>
-  </g>
-  <rect x="200" y="906" width="12" height="34" fill="#475569"/>
-  <g transform="translate(330 875) skewX(-18)">
-    <rect x="0" y="0" width="110" height="56" rx="4" fill="#1e293b"/>
-    <rect x="5" y="5" width="100" height="46" rx="2" fill="url(#wpv)"/>
-    <path d="M5 20 h100 M5 36 h100 M38 5 v46 M72 5 v46" stroke="#93c5fd" stroke-width="2.4"/>
-  </g>
-  <rect x="372" y="931" width="12" height="34" fill="#475569"/>
-  <g transform="translate(200 1040) skewX(-18)">
-    <rect x="0" y="0" width="130" height="66" rx="5" fill="#1e293b"/>
-    <rect x="6" y="6" width="118" height="54" rx="3" fill="url(#wpv)"/>
-    <path d="M6 24 h118 M6 42 h118 M45 6 v54 M85 6 v54" stroke="#93c5fd" stroke-width="3"/>
-  </g>
-  <rect x="248" y="1106" width="14" height="40" fill="#475569"/>
-  <g transform="translate(400 1070) skewX(-18)">
-    <rect x="0" y="0" width="130" height="66" rx="5" fill="#1e293b"/>
-    <rect x="6" y="6" width="118" height="54" rx="3" fill="url(#wpv)"/>
-    <path d="M6 24 h118 M6 42 h118 M45 6 v54 M85 6 v54" stroke="#93c5fd" stroke-width="3"/>
-  </g>
-  <rect x="450" y="1136" width="14" height="40" fill="#475569"/>
+  <path d="M560 320 L880 420 L920 700 L620 780 L540 560 Z" fill="#dbeafe" opacity="0.45"/>
+  <path d="M200 600 L540 560 L620 780 L560 1020 L240 1060 L180 840 Z" fill="#dcfce7" opacity="0.4"/>
+  <path d="M1180 760 L1300 640 L1480 680 L1440 980 L1140 1040 Z" fill="#fef3c7" opacity="0.35"/>
+  <path d="M820 1120 L1140 1040 L1120 1360 L780 1380 Z" fill="#dbeafe" opacity="0.3"/>
 </g>
 
-<!-- farmhouse + barn (right field) -->
-<g>
-  <rect x="1120" y="820" width="150" height="90" rx="4" fill="#faf7f0"/>
-  <path d="M1108 824 L1195 762 L1282 824 Z" fill="#a8552e"/>
-  <rect x="1175" y="852" width="34" height="58" rx="2" fill="#7c4a21"/>
-  <rect x="1138" y="846" width="24" height="24" rx="2" fill="#bae6fd"/>
-  <rect x="1228" y="846" width="24" height="24" rx="2" fill="#bae6fd"/>
-  <rect x="1330" y="850" width="110" height="60" rx="3" fill="#e9dcc4"/>
-  <path d="M1322 852 L1385 812 L1448 852 Z" fill="#8c5a33"/>
-  <rect x="1352" y="872" width="66" height="38" rx="2" fill="#5b3a1e"/>
-  <path d="M1352 872 l66 38 M1418 872 l-66 38" stroke="#e9dcc4" stroke-width="4"/>
-  <!-- trees -->
-  <g>
-    <rect x="1058" y="856" width="12" height="60" fill="#7c4a21"/>
-    <circle cx="1064" cy="830" r="42" fill="#2e8b57"/>
-    <circle cx="1050" cy="812" r="20" fill="#3aa76d"/>
-    <rect x="1480" y="860" width="12" height="56" fill="#7c4a21"/>
-    <circle cx="1486" cy="836" r="38" fill="#2e8b57"/>
-    <circle cx="1474" cy="820" r="18" fill="#3aa76d"/>
-  </g>
+<!-- contour lines -->
+<g fill="none" stroke="#86a6c8" stroke-width="1.6" opacity="0.8">
+  <path d="M0 900 Q300 840 600 900 T1200 880 T1600 860"/>
+  <path d="M0 950 Q320 890 640 950 T1260 930 T1600 910"/>
+  <path d="M0 1000 Q340 945 680 1000 T1320 980 T1600 960"/>
+  <path d="M0 60 Q400 110 800 60 T1600 90"/>
+  <path d="M0 20 Q420 70 840 20 T1600 50"/>
+  <path d="M100 1600 Q260 1450 480 1480 Q700 1510 900 1440 Q1150 1350 1400 1420 Q1520 1450 1600 1440"/>
+  <path d="M160 1600 Q300 1490 500 1520 Q720 1550 920 1480 Q1160 1400 1380 1460 Q1520 1490 1600 1480"/>
 </g>
 
-<!-- paddy rows texture (foreground) -->
-<g stroke="#4a9e6d" stroke-width="5" fill="none" opacity="0.55">
-  <path d="M0 1240 Q400 1210 800 1250 T1600 1220"/>
-  <path d="M0 1300 Q400 1270 800 1310 T1600 1280"/>
-  <path d="M0 1380 Q400 1350 800 1390 T1600 1360"/>
-  <path d="M0 1460 Q400 1430 800 1470 T1600 1440"/>
-  <path d="M0 1540 Q400 1510 800 1550 T1600 1520"/>
+<!-- survey corner marks -->
+<g stroke="#64748b" stroke-width="2" fill="none">
+  <path d="M120 180 l18 0 M120 180 l0 18 M120 180 l12.7 -12.7"/>
+  <path d="M480 150 l-18 0 M480 150 l0 18 M480 150 l-12.7 -12.7"/>
+  <path d="M860 190 l18 0 M860 190 l0 -18"/>
+  <path d="M920 700 l18 0 M920 700 l0 18"/>
+  <path d="M620 780 l-18 0 M620 780 l0 18 M620 780 l-12.7 12.7"/>
+  <path d="M1140 1040 l18 0 M1140 1040 l0 18"/>
+  <path d="M780 1380 l-18 0 M780 1380 l0 -18"/>
+  <path d="M1440 980 l18 0 M1440 980 l0 18 M1440 980 l12.7 12.7"/>
 </g>
-<g stroke="#57bf8a" stroke-width="3" fill="none" opacity="0.7">
-  <path d="M60 1255 Q60 1235 68 1228 M60 1255 Q60 1242 52 1232" />
-  <path d="M300 1330 Q300 1310 308 1303 M300 1330 Q300 1317 292 1307" />
-  <path d="M560 1260 Q560 1240 568 1233 M560 1260 Q560 1247 552 1237" />
-  <path d="M980 1310 Q980 1290 988 1283 M980 1310 Q980 1297 972 1287" />
-  <path d="M1250 1270 Q1250 1250 1258 1243 M1250 1270 Q1250 1257 1242 1247" />
-  <path d="M1500 1350 Q1500 1330 1508 1323 M1500 1350 Q1500 1337 1492 1327" />
-  <path d="M140 1440 Q140 1420 148 1413 M140 1440 Q140 1427 132 1417" />
-  <path d="M480 1470 Q480 1450 488 1443 M480 1470 Q480 1457 472 1447" />
-  <path d="M880 1430 Q880 1410 888 1403 M880 1430 Q880 1417 872 1407" />
-  <path d="M1180 1520 Q1180 1500 1188 1493 M1180 1520 Q1180 1507 1172 1497" />
-  <path d="M1420 1480 Q1420 1460 1428 1453 M1420 1480 Q1420 1467 1412 1457" />
+<g fill="#64748b">
+  <circle cx="120" cy="180" r="4"/><circle cx="480" cy="150" r="4"/><circle cx="860" cy="190" r="4"/>
+  <circle cx="920" cy="700" r="4"/><circle cx="620" cy="780" r="4"/><circle cx="1140" cy="1040" r="4"/>
+  <circle cx="780" cy="1380" r="4"/><circle cx="1440" cy="980" r="4"/>
 </g>
+
+<!-- parcel numbers -->
+<g font-family="ui-monospace, monospace" font-size="26" fill="#7d93b2" text-anchor="middle" opacity="0.85">
+  <text x="360" y="390">๒๑๔</text>
+  <text x="730" y="540">๒๑๕</text>
+  <text x="390" y="800">๒๑๖</text>
+  <text x="1060" y="500">๓๐๑</text>
+  <text x="1330" y="540">๓๐๒</text>
+  <text x="880" y="930">๓๐๓</text>
+  <text x="520" y="1230">๔๑๐</text>
+  <text x="960" y="1260">๔๑๑</text>
+  <text x="1330" y="880">๔๑๒</text>
+</g>
+
+<!-- north arrow + scale bar -->
+<g transform="translate(1500 120)" stroke="#64748b" fill="none" stroke-width="2.5">
+  <path d="M0 60 L0 -30 M-14 -8 L0 -30 L14 -8"/>
+</g>
+<text x="1500" y="200" font-family="ui-monospace, monospace" font-size="30" fill="#64748b" text-anchor="middle">N</text>
+<g transform="translate(120 1500)">
+  <rect x="0" y="0" width="120" height="8" fill="#64748b"/>
+  <rect x="120" y="0" width="120" height="8" fill="none" stroke="#64748b" stroke-width="2"/>
+  <text x="0" y="-10" font-family="ui-monospace, monospace" font-size="22" fill="#64748b">0</text>
+  <text x="120" y="-10" font-family="ui-monospace, monospace" font-size="22" fill="#64748b" text-anchor="middle">100</text>
+  <text x="240" y="-10" font-family="ui-monospace, monospace" font-size="22" fill="#64748b" text-anchor="end">200 m</text>
+</g>
+
+<!-- sun: minimal, geometric -->
+<circle cx="1400" cy="120" r="46" fill="none" stroke="#e2b23a" stroke-width="3" opacity="0.5"/>
+<circle cx="1400" cy="120" r="30" fill="#f6d574" opacity="0.35"/>
 </svg>

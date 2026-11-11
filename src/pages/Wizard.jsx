@@ -4,6 +4,7 @@ import { useApp } from '../state/AppState';
 import { convertToSqMeters, convertSqMetersToThai } from '../utils/engineeringCalculations';
 import { GOAL_OPTIONS, BUDGET_OPTIONS } from '../engine/recommend';
 import GoogleMapPicker from '../components/GoogleMapPicker';
+import { DEFAULT_LAND } from '../engine/storage';
 import { StepProgress, OptionCard, Collapsible, Note, ICONS, PageBackdrop } from '../components/ui';
 import { useT } from '../i18n';
 import {
@@ -32,6 +33,31 @@ const LAND_KINDS = [
 
 function SproutIcon(props) { return <Trees {...props} />; }
 
+// Fields the land-kind cards own — merged from DEFAULT_LAND so toggles rebuild cleanly
+const KIND_KEYS = ['landType', 'hasWaterBody', 'landTypeUnknown', 'hasAgriculturalWaste',
+  'roadType', 'roadWidthMeters', 'zoningColor', 'gridDistanceMeters', 'gridUnknown',
+  'hasStructures', 'hasGridPower'];
+const KIND_BASE = Object.fromEntries(KIND_KEYS.map(k => [k, DEFAULT_LAND[k]]));
+const STICKY_BOOLS = ['hasWaterBody', 'hasAgriculturalWaste', 'hasStructures', 'hasGridPower'];
+
+// Merge selected cards in click order: booleans OR together, scalars last-wins
+function mergeKinds(ids) {
+  const patch = { ...KIND_BASE };
+  for (const id of ids) {
+    const k = LAND_KINDS.find(k => k.id === id);
+    if (!k) continue;
+    for (const [key, val] of Object.entries(k.patch)) {
+      if (key === 'landKind') continue;
+      if (STICKY_BOOLS.includes(key) && val === false && patch[key] === true) continue;
+      patch[key] = val;
+    }
+  }
+  patch.landTypeUnknown = ids.length === 1 && ids[0] === 'unsure';
+  patch.landKinds = ids;
+  patch.landKind = ids[ids.length - 1] || null; // last pick drives the summary label
+  return patch;
+}
+
 export default function Wizard() {
   const { land, goals, updateLand, updateGoals, lang } = useApp();
   const t = useT();
@@ -39,14 +65,24 @@ export default function Wizard() {
   const thai = convertSqMetersToThai(land.areaSqM);
 
   const canNext1 = land.areaSqM > 0;
-  // landKind = last card the user picked (fallback: infer from old fields for old drafts)
-  const kind = LAND_KINDS.find(k => k.id === land.landKind)
-    || (land.landTypeUnknown ? LAND_KINDS[6]
+  // landKinds = all picked cards (fallback: infer a single kind from old fields for old drafts)
+  const fallbackKind = land.landTypeUnknown ? LAND_KINDS[6]
     : (land.hasWaterBody || land.landType === 'pond') ? LAND_KINDS[4]
     : land.landType === 'agri' ? LAND_KINDS[1]
     : land.landType === 'slope' ? LAND_KINDS[5]
     : (land.roadType === 'main' && land.zoningColor === 'orange') ? LAND_KINDS[2]
-    : LAND_KINDS[0]);
+    : (land.zoningColor === 'yellow' && land.roadType === 'secondary') ? LAND_KINDS[3]
+    : LAND_KINDS[0];
+  const selectedKinds = land.landKinds
+    ? land.landKinds // [] = user deselected everything
+    : land.landKind ? [land.landKind] : [fallbackKind.id];
+
+  const toggleKind = (id) => {
+    const next = selectedKinds.includes(id)
+      ? selectedKinds.filter(k => k !== id)
+      : [...selectedKinds, id];
+    updateLand(mergeKinds(next));
+  };
 
   const finish = () => navigate('/results');
 
@@ -122,7 +158,7 @@ export default function Wizard() {
             <h2 className="text-base font-semibold flex items-center gap-2 mb-1">
               <Mountain className="w-4 h-4 text-brand-600" /> {t('What kind of land is it?')}
             </h2>
-            <p className="text-xs text-ink-faint mb-4">{t('Pick the closest match — if unsure, choose "Not sure yet"')}</p>
+            <p className="text-sm text-ink-faint mb-4">{t('Pick all that apply — e.g. farmland with a pond, or a roadside plot')}</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {LAND_KINDS.map(k => (
                 <OptionCard
@@ -130,8 +166,8 @@ export default function Wizard() {
                   icon={k.icon}
                   title={lang === 'th' ? k.titleTh : k.title}
                   sub={lang === 'th' ? k.subTh : k.sub}
-                  selected={kind?.id === k.id}
-                  onClick={() => updateLand(k.patch)}
+                  selected={selectedKinds.includes(k.id)}
+                  onClick={() => toggleKind(k.id)}
                 />
               ))}
             </div>

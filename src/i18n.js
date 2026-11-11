@@ -101,6 +101,7 @@ export const TH = {
   'Please enter at least a rough area so the system can estimate': 'กรุณากรอกขนาดคร่าว ๆ อย่างน้อยหนึ่งช่อง เพื่อให้ระบบประเมินได้',
   'What kind of land is it?': 'ที่ดินเป็นประเภทไหน',
   'Pick the closest match — if unsure, choose "Not sure yet"': 'เลือกที่ใกล้ที่สุด — ไม่แน่ใจให้เลือก "ยังไม่แน่ใจ"',
+  'Pick all that apply — e.g. farmland with a pond, or a roadside plot': 'เลือกได้หลายข้อ — เช่น นามีบ่อ หรือที่ดินติดถนน',
   'Answer more if you know (improves accuracy)': 'ตอบเพิ่มถ้ารู้ (ช่วยให้แม่นขึ้น)',
   'All skippable — the system will note missing data': 'ข้ามได้ทั้งหมด — ระบบจะแจ้งว่าขาดข้อมูลอะไร',
   'Do large trees or buildings shade the site?': 'มีต้นไม้ใหญ่หรืออาคารบังแดดไหม',

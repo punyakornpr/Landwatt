@@ -1,4 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1600" height="2400" viewBox="0 0 1600 2400" preserveAspectRatio="xMidYMin slice">
+<style>
+  .blade { animation: spin 6.5s linear infinite; }
+  .blade.slow { animation-duration: 8.5s; }
+  .blade.slower { animation-duration: 10.5s; animation-delay: -3s; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+</style>
 <defs>
   <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
     <stop offset="0" stop-color="#aad4f0"/>
@@ -93,6 +100,43 @@
 <!-- hills -->
 <path d="M0 980 Q 300 860 640 940 T 1600 900 L1600 1180 L0 1180 Z" fill="url(#hillA)"/>
 <path d="M0 1080 Q 400 980 820 1060 T 1600 1040 L1600 1300 L0 1300 Z" fill="url(#hillB)"/>
+
+<!-- wind turbines on the far ridge -->
+<g>
+  <!-- turbine 1 (left) -->
+  <g stroke="#f8fafc" stroke-width="5" stroke-linecap="round" opacity="0.85">
+    <path d="M368,900 L392,900 L386,806 L374,806 Z" fill="#f8fafc" stroke="none"/>
+    <rect x="380" y="794" width="20" height="11" rx="3" fill="#f8fafc" stroke="none"/>
+    <g class="blade" style="transform-origin:380px 800px">
+      <line x1="380" y1="800" x2="380" y2="730"/>
+      <line x1="380" y1="800" x2="440.6" y2="835"/>
+      <line x1="380" y1="800" x2="319.4" y2="835"/>
+    </g>
+    <circle cx="380" cy="800" r="7" fill="#f8fafc" stroke="none"/>
+  </g>
+  <!-- turbine 2 (center, main) -->
+  <g stroke="#f8fafc" stroke-width="6" stroke-linecap="round" opacity="0.9">
+    <path d="M938,945 L962,945 L955,816 L945,816 Z" fill="#f8fafc" stroke="none"/>
+    <rect x="950" y="803" width="22" height="12" rx="3" fill="#f8fafc" stroke="none"/>
+    <g class="blade slow" style="transform-origin:950px 810px">
+      <line x1="950" y1="810" x2="950" y2="728"/>
+      <line x1="950" y1="810" x2="1021" y2="851"/>
+      <line x1="950" y1="810" x2="879" y2="851"/>
+    </g>
+    <circle cx="950" cy="810" r="8" fill="#f8fafc" stroke="none"/>
+  </g>
+  <!-- turbine 3 (right, smaller) -->
+  <g stroke="#f8fafc" stroke-width="4" stroke-linecap="round" opacity="0.75">
+    <path d="M1471,940 L1489,940 L1484,866 L1476,866 Z" fill="#f8fafc" stroke="none"/>
+    <rect x="1480" y="855" width="17" height="10" rx="3" fill="#f8fafc" stroke="none"/>
+    <g class="blade slower" style="transform-origin:1480px 862px">
+      <line x1="1480" y1="862" x2="1480" y2="804"/>
+      <line x1="1480" y1="862" x2="1530" y2="891"/>
+      <line x1="1480" y1="862" x2="1430" y2="891"/>
+    </g>
+    <circle cx="1480" cy="862" r="6" fill="#f8fafc" stroke="none"/>
+  </g>
+</g>
 
 <!-- meadow -->
 <path d="M0 1180 Q 500 1120 900 1180 T 1600 1160 L1600 2400 L0 2400 Z" fill="url(#meadow)"/>

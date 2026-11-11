@@ -4,6 +4,7 @@ import { useApp } from '../state/AppState';
 import { convertToSqMeters, convertSqMetersToThai } from '../utils/engineeringCalculations';
 import { GOAL_OPTIONS, BUDGET_OPTIONS } from '../engine/recommend';
 import GoogleMapPicker from '../components/GoogleMapPicker';
+import geoGrid from '../assets/geo-grid.svg';
 import { StepProgress, OptionCard, Collapsible, Note, ICONS } from '../components/ui';
 import { useT } from '../i18n';
 import {
@@ -54,20 +55,18 @@ export default function Wizard() {
     <div className="relative">
       <div aria-hidden="true" className="absolute inset-0 pointer-events-none">
         <div className="absolute inset-0" style={{
-          background: `
-            radial-gradient(ellipse 55% 32% at 18% 0%, rgba(37,99,235,0.16), transparent),
-            radial-gradient(ellipse 45% 28% at 88% 6%, rgba(34,197,194,0.13), transparent),
-            radial-gradient(ellipse 50% 30% at 55% -6%, rgba(16,185,129,0.10), transparent),
-            radial-gradient(ellipse 60% 25% at 100% 60%, rgba(37,99,235,0.07), transparent),
-            radial-gradient(ellipse 55% 25% at 0% 75%, rgba(16,185,129,0.07), transparent),
-            linear-gradient(#F2F7FD, #FFFFFF 55%)
-          `,
+          background: 'linear-gradient(#F3F7FC, #FFFFFF 60%)',
         }} />
-        <div className="absolute inset-x-0 top-0 h-[560px]" style={{
-          backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(71,85,105,0.22) 1.2px, transparent 0)',
-          backgroundSize: '24px 24px',
-          maskImage: 'linear-gradient(to bottom, black 30%, transparent)',
-          WebkitMaskImage: 'linear-gradient(to bottom, black 30%, transparent)',
+        <div className="absolute inset-0" style={{
+          backgroundImage: `url(${geoGrid})`,
+          backgroundRepeat: 'repeat',
+          backgroundSize: '60px 52px',
+          opacity: 0.55,
+          maskImage: 'linear-gradient(to bottom, black 55%, transparent 95%)',
+          WebkitMaskImage: 'linear-gradient(to bottom, black 55%, transparent 95%)',
+        }} />
+        <div className="absolute inset-x-0 top-0 h-[300px]" style={{
+          background: 'linear-gradient(rgba(37,99,235,0.08), transparent)',
         }} />
       </div>
       <div className="relative max-w-3xl mx-auto px-4 sm:px-6 py-8">

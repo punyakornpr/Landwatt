@@ -63,34 +63,34 @@ export default function SingleLineDiagram({ project, specs, landData }) {
   };
 
   return (
-    <div className="bg-white border border-zinc-200 rounded-xl p-6 shadow-sm space-y-5">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3.5 border-b border-zinc-100 gap-2">
+    <div className="bg-white border border-mute-200 rounded-xl p-6 shadow-sm space-y-5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3.5 border-b border-mute-100 gap-2">
         <div>
-          <h3 className="text-base font-bold text-zinc-900 flex items-center">
+          <h3 className="text-base font-bold text-mute-900 flex items-center">
             Single Line Diagram (SLD)
           </h3>
-          <p className="text-xs text-zinc-500 mt-0.5">
+          <p className="text-xs text-mute-500 mt-0.5">
             Electrical schematic per EIT standards and {gridName} grid-interconnection rules
           </p>
         </div>
 
-        <div className="text-[11px] text-zinc-500 flex items-center">
-          <Info className="w-3.5 h-3.5 text-zinc-400 mr-1" />
+        <div className="text-[11px] text-mute-500 flex items-center">
+          <Info className="w-3.5 h-3.5 text-mute-400 mr-1" />
           <span>Click a component to view engineering ratings</span>
         </div>
       </div>
 
       {/* Schematic Canvas with Technical Dot Grid */}
       <div 
-        className="bg-zinc-50 rounded-lg p-6 border border-zinc-200 overflow-x-auto relative min-w-[700px]"
+        className="bg-mute-50 rounded-lg p-6 border border-mute-200 overflow-x-auto relative min-w-[700px]"
         style={{
-          backgroundImage: 'radial-gradient(#d4d4d8 1px, transparent 1px)',
+          backgroundImage: 'radial-gradient(#d2d2d7 1px, transparent 1px)',
           backgroundSize: '16px 16px'
         }}
       >
         
         {/* Main Busbar Line */}
-        <div className="absolute top-1/2 left-10 right-10 h-0.5 bg-zinc-400 -translate-y-1/2 z-0" />
+        <div className="absolute top-1/2 left-10 right-10 h-0.5 bg-mute-400 -translate-y-1/2 z-0" />
 
         <div className="relative z-10 flex items-center justify-between space-x-3">
           
@@ -99,12 +99,12 @@ export default function SingleLineDiagram({ project, specs, landData }) {
             onClick={() => setActiveElement(isSolar ? 'pv' : isEV ? 'ev_chargers' : isBESS ? 'bess_container' : 'gen_biogas')}
             className={`cursor-pointer transition p-3 rounded-lg border flex flex-col items-center w-36 text-center ${
               activeElement === (isSolar ? 'pv' : isEV ? 'ev_chargers' : isBESS ? 'bess_container' : 'gen_biogas')
-                ? 'bg-zinc-900 border-zinc-900 text-white shadow-md'
-                : 'bg-white border-zinc-200 text-zinc-800 hover:border-zinc-400 shadow-sm'
+                ? 'bg-mute-900 border-mute-900 text-white shadow-md'
+                : 'bg-white border-mute-200 text-mute-800 hover:border-mute-400 shadow-sm'
             }`}
           >
             <div className={`w-8 h-8 rounded-full flex items-center justify-center mb-1.5 text-xs font-mono font-bold ${
-              activeElement === (isSolar ? 'pv' : isEV ? 'ev_chargers' : isBESS ? 'bess_container' : 'gen_biogas') ? 'bg-zinc-800 text-white' : 'bg-zinc-100 text-zinc-700'
+              activeElement === (isSolar ? 'pv' : isEV ? 'ev_chargers' : isBESS ? 'bess_container' : 'gen_biogas') ? 'bg-mute-800 text-white' : 'bg-mute-100 text-mute-700'
             }`}>
               {isSolar ? 'PV' : isEV ? 'EV' : isBESS ? 'ESS' : 'GEN'}
             </div>
@@ -119,7 +119,7 @@ export default function SingleLineDiagram({ project, specs, landData }) {
             </span>
           </div>
 
-          <div className="text-zinc-400 text-xs font-mono font-bold">
+          <div className="text-mute-400 text-xs font-mono font-bold">
             ──▶
           </div>
 
@@ -128,12 +128,12 @@ export default function SingleLineDiagram({ project, specs, landData }) {
             onClick={() => setActiveElement(isEV ? 'ev_chargers' : 'inverter')}
             className={`cursor-pointer transition p-3 rounded-lg border flex flex-col items-center w-36 text-center ${
               activeElement === 'inverter'
-                ? 'bg-zinc-900 border-zinc-900 text-white shadow-md'
-                : 'bg-white border-zinc-200 text-zinc-800 hover:border-zinc-400 shadow-sm'
+                ? 'bg-mute-900 border-mute-900 text-white shadow-md'
+                : 'bg-white border-mute-200 text-mute-800 hover:border-mute-400 shadow-sm'
             }`}
           >
             <div className={`w-8 h-8 rounded-full flex items-center justify-center mb-1.5 text-xs font-mono font-bold ${
-              activeElement === 'inverter' ? 'bg-zinc-800 text-white' : 'bg-zinc-100 text-zinc-700'
+              activeElement === 'inverter' ? 'bg-mute-800 text-white' : 'bg-mute-100 text-mute-700'
             }`}>
               DC/AC
             </div>
@@ -148,7 +148,7 @@ export default function SingleLineDiagram({ project, specs, landData }) {
             </span>
           </div>
 
-          <div className="text-zinc-400 text-xs font-mono font-bold">
+          <div className="text-mute-400 text-xs font-mono font-bold">
             ──▶
           </div>
 
@@ -157,12 +157,12 @@ export default function SingleLineDiagram({ project, specs, landData }) {
             onClick={() => setActiveElement('transformer')}
             className={`cursor-pointer transition p-3 rounded-lg border flex flex-col items-center w-36 text-center ${
               activeElement === 'transformer'
-                ? 'bg-zinc-900 border-zinc-900 text-white shadow-md'
-                : 'bg-white border-zinc-200 text-zinc-800 hover:border-zinc-400 shadow-sm'
+                ? 'bg-mute-900 border-mute-900 text-white shadow-md'
+                : 'bg-white border-mute-200 text-mute-800 hover:border-mute-400 shadow-sm'
             }`}
           >
             <div className={`w-8 h-8 rounded-full flex items-center justify-center mb-1.5 text-xs font-mono font-bold ${
-              activeElement === 'transformer' ? 'bg-zinc-800 text-white' : 'bg-zinc-100 text-zinc-700'
+              activeElement === 'transformer' ? 'bg-mute-800 text-white' : 'bg-mute-100 text-mute-700'
             }`}>
               ⚡
             </div>
@@ -177,7 +177,7 @@ export default function SingleLineDiagram({ project, specs, landData }) {
             </span>
           </div>
 
-          <div className="text-zinc-400 text-xs font-mono font-bold">
+          <div className="text-mute-400 text-xs font-mono font-bold">
             ──▶
           </div>
 
@@ -186,12 +186,12 @@ export default function SingleLineDiagram({ project, specs, landData }) {
             onClick={() => setActiveElement('protection_relay')}
             className={`cursor-pointer transition p-3 rounded-lg border flex flex-col items-center w-40 text-center ${
               activeElement === 'protection_relay'
-                ? 'bg-zinc-900 border-zinc-900 text-white shadow-md'
-                : 'bg-white border-zinc-200 text-zinc-800 hover:border-zinc-400 shadow-sm'
+                ? 'bg-mute-900 border-mute-900 text-white shadow-md'
+                : 'bg-white border-mute-200 text-mute-800 hover:border-mute-400 shadow-sm'
             }`}
           >
             <div className={`w-8 h-8 rounded-full flex items-center justify-center mb-1.5 text-xs font-mono font-bold ${
-              activeElement === 'protection_relay' ? 'bg-zinc-800 text-white' : 'bg-zinc-100 text-zinc-700'
+              activeElement === 'protection_relay' ? 'bg-mute-800 text-white' : 'bg-mute-100 text-mute-700'
             }`}>
               50/51
             </div>
@@ -206,7 +206,7 @@ export default function SingleLineDiagram({ project, specs, landData }) {
             </span>
           </div>
 
-          <div className="text-zinc-400 text-xs font-mono font-bold">
+          <div className="text-mute-400 text-xs font-mono font-bold">
             ──▶
           </div>
 
@@ -215,12 +215,12 @@ export default function SingleLineDiagram({ project, specs, landData }) {
             onClick={() => setActiveElement('grid_pcc')}
             className={`cursor-pointer transition p-3 rounded-lg border flex flex-col items-center w-36 text-center ${
               activeElement === 'grid_pcc'
-                ? 'bg-zinc-900 border-zinc-900 text-white shadow-md'
-                : 'bg-white border-zinc-200 text-zinc-800 hover:border-zinc-400 shadow-sm'
+                ? 'bg-mute-900 border-mute-900 text-white shadow-md'
+                : 'bg-white border-mute-200 text-mute-800 hover:border-mute-400 shadow-sm'
             }`}
           >
             <div className={`w-8 h-8 rounded-full flex items-center justify-center mb-1.5 text-xs font-mono font-bold ${
-              activeElement === 'grid_pcc' ? 'bg-zinc-800 text-white' : 'bg-zinc-100 text-zinc-700'
+              activeElement === 'grid_pcc' ? 'bg-mute-800 text-white' : 'bg-mute-100 text-mute-700'
             }`}>
               GRID
             </div>
@@ -241,48 +241,48 @@ export default function SingleLineDiagram({ project, specs, landData }) {
 
       {/* Selected Element Engineering Deep Dive Card */}
       {activeElement && elementDescriptions[activeElement] ? (
-        <div className="p-4 rounded-lg bg-zinc-50 border border-zinc-200 space-y-1">
+        <div className="p-4 rounded-lg bg-mute-50 border border-mute-200 space-y-1">
           <div className="flex items-center justify-between">
-            <h4 className="text-xs font-bold text-zinc-900 font-mono">
+            <h4 className="text-xs font-bold text-mute-900 font-mono">
               {elementDescriptions[activeElement].title}
             </h4>
-            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-white text-zinc-700 border border-zinc-200">
+            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-white text-mute-700 border border-mute-200">
               {elementDescriptions[activeElement].standard}
             </span>
           </div>
-          <p className="text-xs text-zinc-600 leading-relaxed pt-1">
+          <p className="text-xs text-mute-600 leading-relaxed pt-1">
             {elementDescriptions[activeElement].desc}
           </p>
         </div>
       ) : (
-        <div className="p-2.5 rounded-lg bg-zinc-50 border border-zinc-200 text-center text-xs text-zinc-500">
+        <div className="p-2.5 rounded-lg bg-mute-50 border border-mute-200 text-center text-xs text-mute-500">
           Click any component in the diagram for electrical ratings (voltage, current, protection relays)
         </div>
       )}
 
       {/* Engineering Specs Table */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 text-xs">
-        <div className="p-3 rounded-lg bg-zinc-50 border border-zinc-200">
-          <span className="text-zinc-500 block text-[11px]">MV rated current</span>
-          <span className="text-zinc-900 font-mono font-semibold text-sm mt-0.5 block">
+        <div className="p-3 rounded-lg bg-mute-50 border border-mute-200">
+          <span className="text-mute-500 block text-[11px]">MV rated current</span>
+          <span className="text-mute-900 font-mono font-semibold text-sm mt-0.5 block">
             {specs.mvCurrentAmp || '26.2'} A @ {gridVoltage}
           </span>
         </div>
-        <div className="p-3 rounded-lg bg-zinc-50 border border-zinc-200">
-          <span className="text-zinc-500 block text-[11px]">Cable size</span>
-          <span className="text-zinc-900 font-mono text-xs mt-0.5 block truncate">
+        <div className="p-3 rounded-lg bg-mute-50 border border-mute-200">
+          <span className="text-mute-500 block text-[11px]">Cable size</span>
+          <span className="text-mute-900 font-mono text-xs mt-0.5 block truncate">
             {specs.mvCable || 'XLPE 24kV 1x185 sq.mm'}
           </span>
         </div>
-        <div className="p-3 rounded-lg bg-zinc-50 border border-zinc-200">
-          <span className="text-zinc-500 block text-[11px]">Reference standards</span>
-          <span className="text-zinc-900 font-medium text-xs mt-0.5 block">
+        <div className="p-3 rounded-lg bg-mute-50 border border-mute-200">
+          <span className="text-mute-500 block text-[11px]">Reference standards</span>
+          <span className="text-mute-900 font-medium text-xs mt-0.5 block">
             EIT 022013-64 / PEA Code
           </span>
         </div>
-        <div className="p-3 rounded-lg bg-zinc-50 border border-zinc-200">
-          <span className="text-zinc-500 block text-[11px]">Grid interconnection</span>
-          <span className="text-zinc-900 font-medium text-xs mt-0.5 block">
+        <div className="p-3 rounded-lg bg-mute-50 border border-mute-200">
+          <span className="text-mute-500 block text-[11px]">Grid interconnection</span>
+          <span className="text-mute-900 font-medium text-xs mt-0.5 block">
             {gridName} Overhead Feeder
           </span>
         </div>

@@ -276,5 +276,105 @@ export const EE_PROJECTS = [
       'Cover/fan refurbishment provisioned in years 8/16',
       'Up to 6 tunnels scale with plot and demand'
     ]
+  },
+  {
+    id: 'solar-lease',
+    title: 'Solar Land Lease (Developer Model)',
+    shortTitle: 'Solar Land Lease',
+    category: 'business',
+    icon: 'Handshake',
+    accentColor: 'amber',
+    tagline: 'Lease your land to a solar developer — near-zero investment, fixed rent for 25+ years',
+    suitableAreaMinRai: 1,
+    preferredZoning: ['green', 'yellow', 'purple', 'light_green'],
+    standards: ['Lease contract with PPA-backed developer', 'PEA interconnection terms handled by lessee'],
+    description: 'Instead of building anything yourself, lease the plot to a solar developer under a 25-30 year land-lease agreement. The developer pays for all equipment, permits and interconnection — you receive fixed annual rent per rai with periodic escalation, and the land returns to you (or re-leases) at term end',
+    keyBenefits: [
+      'Almost no capital outlay — the developer funds the whole plant',
+      'Fixed, predictable rent for 25+ years with step-up clauses',
+      'No O&M, no permits, no power-sale paperwork on your side',
+      'Land value preserved — the plot is not sold, only leased'
+    ],
+    technicalHighlights: [
+      'Typical lease ~25-35k THB/rai/yr in solar-suitable provinces',
+      'Escalation commonly ~10% every 5 years',
+      'Developer carries capex ~30-40M THB/MWp and all utility risk',
+      'End-of-term: re-lease, remove, or transfer per contract'
+    ]
+  },
+  {
+    id: 'data-center-lease',
+    title: 'Data Center / Edge Site Lease',
+    shortTitle: 'Data Center Lease',
+    category: 'business',
+    icon: 'Server',
+    accentColor: 'indigo',
+    tagline: 'The fastest-growing land business in Thailand — lease a plot to data center or telecom operators',
+    suitableAreaMinRai: 1,
+    preferredZoning: ['purple', 'red', 'orange', 'yellow'],
+    standards: ['Near MV substation / high-capacity feeder', 'Fiber corridor access', 'EEC or urban-fringe location preferred'],
+    description: 'Global cloud and AI demand is driving data center investment into Thailand (EEC corridor, Bangkok fringe, provincial hubs). Operators and tower/fiber companies lease well-located plots long-term — requirements are a robust power feed, fiber access, road frontage and appropriate zoning. You provide land; they build everything',
+    keyBenefits: [
+      'Premium lease rates — far above agricultural or solar land rent',
+      '20-30 year leases with strong corporate counterparties',
+      'Near-zero owner investment after due diligence',
+      'Riding the largest infrastructure trend in Thai property'
+    ],
+    technicalHighlights: [
+      'Edge/telecom sites lease ~60-120k THB/rai/yr where demand exists',
+      'Hyperscale campuses need 5-20+ rai plus substation proximity',
+      'Key gate: grid capacity and fiber — location decides everything',
+      'Due diligence phase ~6-12 months before a signed lease'
+    ]
+  },
+  {
+    id: 'solar-warehouse',
+    title: 'Warehouse for Rent + Rooftop Solar',
+    shortTitle: 'Solar Warehouse',
+    category: 'business',
+    icon: 'Warehouse',
+    accentColor: 'cyan',
+    tagline: 'E-commerce logistics demand: a small warehouse earns rent, its roof earns solar savings',
+    suitableAreaMinRai: 0.3,
+    preferredZoning: ['yellow', 'red', 'orange', 'purple'],
+    standards: ['Building permit + warehouse use under zoning', 'Road access for 4-6 wheel trucks'],
+    description: 'Build a compact warehouse on a road-frontage plot and lease it to logistics, agricultural suppliers or e-commerce distributors — the fastest-growing commercial property segment in Thailand. Rooftop PV offsets common-area power or can be leased to a solar operator as a second income layer',
+    keyBenefits: [
+      'Two income streams: warehouse rent + rooftop PV/lease',
+      'E-commerce and delivery demand keeps rental occupancy high',
+      'Reusable asset — warehouse still holds resale/rental value',
+      'Scales building-by-building as demand proves out'
+    ],
+    technicalHighlights: [
+      'Warehouse shell ~8,000-10,000 THB/m² turnkey',
+      'Rent ~120-180 THB/m²/month depending on location',
+      'Roof structure pre-sized for ~0.5 kWp per 3.3 m² of roof',
+      'Dock doors + turning apron sized for 4-6 wheel trucks'
+    ]
+  },
+  {
+    id: 'carbon-forest',
+    title: 'Carbon Credit Forestry (T-VER)',
+    shortTitle: 'Carbon Forestry',
+    category: 'bioenergy',
+    icon: 'Trees',
+    accentColor: 'emerald',
+    tagline: 'Plant fast-growing trees, register T-VER carbon credits — the lowest-capex land income on this list',
+    suitableAreaMinRai: 1,
+    preferredZoning: ['green', 'light_green', 'rural'],
+    standards: ['T-VER registration via Thailand Greenhouse Gas Management Org (TGO)', 'Approved forestry methodology'],
+    description: 'Plant fast-growing or native tree species (eucalyptus, acacia, teak mixes) and register the plantation under Thailand\'s T-VER voluntary carbon scheme. Sequestered CO2 is verified and sold as credits to companies offsetting emissions — plus a timber harvest at maturity. Minimal infrastructure: just land, seedlings and a small solar irrigation pump',
+    keyBenefits: [
+      'Lowest capital entry of any plan here — seedlings and labor',
+      'Carbon credit demand rising with corporate net-zero pledges',
+      'Improves the land: soil, shade and water retention recover',
+      'Timber value at harvest is a bonus on top of credits'
+    ],
+    technicalHighlights: [
+      '~200 trees/rai fast-growing species, 4-6 tCO2/rai/yr uptake',
+      'T-VER credit prices ~150-300 THB/tCO2 (market-dependent)',
+      'First verified credits typically from year 5 onward',
+      'Small solar pump kit covers seedling irrigation off-grid'
+    ]
   }
 ];

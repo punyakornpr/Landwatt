@@ -11,9 +11,9 @@ export default {
         // TerraWatt friendly palette — brand/paper ผูกกับ CSS variables เพื่อสลับธีมได้
         paper: 'rgb(var(--paper) / <alpha-value>)',
         ink: {
-          DEFAULT: '#1d1d1f',
-          soft: '#6e6e73',
-          faint: '#86868b',
+          DEFAULT: 'rgb(var(--mute-900) / <alpha-value>)',
+          soft: 'rgb(var(--mute-500) / <alpha-value>)',
+          faint: 'rgb(var(--mute-400) / <alpha-value>)',
         },
         brand: {
           50: 'rgb(var(--brand-50) / <alpha-value>)',
@@ -66,7 +66,26 @@ export default {
           800: 'rgb(var(--electric-800) / <alpha-value>)',
           900: 'rgb(var(--electric-900) / <alpha-value>)',
           950: 'rgb(var(--electric-950) / <alpha-value>)',
-        }
+        },
+        mute: {
+          50: 'rgb(var(--mute-50) / <alpha-value>)',
+          100: 'rgb(var(--mute-100) / <alpha-value>)',
+          200: 'rgb(var(--mute-200) / <alpha-value>)',
+          300: 'rgb(var(--mute-300) / <alpha-value>)',
+          400: 'rgb(var(--mute-400) / <alpha-value>)',
+          500: 'rgb(var(--mute-500) / <alpha-value>)',
+          600: 'rgb(var(--mute-600) / <alpha-value>)',
+          700: 'rgb(var(--mute-700) / <alpha-value>)',
+          800: 'rgb(var(--mute-800) / <alpha-value>)',
+          900: 'rgb(var(--mute-900) / <alpha-value>)',
+        },
+        danger: {
+          50: 'rgb(var(--danger-50) / <alpha-value>)',
+          100: 'rgb(var(--danger-100) / <alpha-value>)',
+          200: 'rgb(var(--danger-200) / <alpha-value>)',
+          600: 'rgb(var(--danger-600) / <alpha-value>)',
+          700: 'rgb(var(--danger-700) / <alpha-value>)',
+        },
       },
       fontFamily: {
         sans: ['Prompt', 'Sarabun', 'Noto Sans Thai', 'Inter', 'system-ui', 'sans-serif'],

@@ -67,7 +67,7 @@ export default function Report({ projectId }) {
                 [t('Goals'), goals.aims.length ? goals.aims.map(goalLabel).join(', ') : t('let the system suggest')],
                 [t('Budget'), goals.budget === 'unsure' ? t('not sure yet') : budgetLabel],
               ].map(([k, v], i) => (
-                <tr key={i} className="border-b border-[#F7F5EF]">
+                <tr key={i} className="border-b border-[#f5f5f7]">
                   <td className="py-2 text-ink-faint w-40">{k}</td>
                   <td className="py-2">{v}</td>
                 </tr>
@@ -132,7 +132,7 @@ export default function Report({ projectId }) {
                 [t('Mid CAPEX'), summary.capex ? fmtTHB(summary.capex.mid) : '—'],
                 [t('Est. IRR'), specs.financials?.irrPercent ? `${specs.financials.irrPercent}%` : '—'],
               ].map(([k, v], i) => (
-                <tr key={i} className="border-b border-[#F7F5EF]">
+                <tr key={i} className="border-b border-[#f5f5f7]">
                   <td className="py-1.5 text-ink-faint font-sans w-40">{k}</td>
                   <td className="py-1.5">{v}</td>
                 </tr>

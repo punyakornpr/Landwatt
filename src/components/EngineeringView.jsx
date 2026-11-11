@@ -7,7 +7,7 @@ import { Note, fmtTHB } from './ui';
 const SRC = {
   user: ['Your input', 'bg-electric-100 text-electric-800'],
   demo: ['Demo value', 'bg-volt-100 text-volt-800'],
-  est: ['Estimate', 'bg-[#EDECE5] text-ink-soft'],
+  est: ['Estimate', 'bg-[#f5f5f7] text-ink-soft'],
   calc: ['Computed', 'bg-energy-100 text-energy-800'],
 };
 
@@ -34,7 +34,7 @@ const STATUS = {
   pass: ['Passed checks available', 'bg-energy-100 text-energy-800'],
   assumed: ['Estimated/assumed', 'bg-electric-100 text-electric-800'],
   warn: ['Needs further checks', 'bg-volt-100 text-volt-800'],
-  unverified: ['Needs further checks', 'bg-[#EDECE5] text-ink-soft'],
+  unverified: ['Needs further checks', 'bg-[#f5f5f7] text-ink-soft'],
   fail: ['Failed checked criteria', 'bg-volt-100 text-volt-800'],
 };
 
@@ -73,7 +73,7 @@ function Trace({ fid, name, status, purpose, formula, vars, provenance, sub, ste
               <table className="text-[11px] font-mono w-full">
                 <tbody>
                   {vars.map(([sym, meaning, unit, val, src], i) => (
-                    <tr key={i} className="border-b border-[#F1EFE8] last:border-0">
+                    <tr key={i} className="border-b border-[#f5f5f7] last:border-0">
                       <td className="py-0.5 pr-2 font-semibold w-16">{sym}</td>
                       <td className="py-0.5 pr-2 text-ink-soft">{meaning}{unit ? ` (${unit})` : ''}</td>
                       <td className="py-0.5 pr-2 text-right w-24">{val}</td>

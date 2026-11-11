@@ -3,7 +3,7 @@ import {
   Sun, Sprout, Zap, BatteryCharging, Waves, Flame,
   TrendingUp, PiggyBank, Lightbulb, ChevronDown,
   CheckCircle2, AlertTriangle, Info, HelpCircle,
-  Store, Snowflake, Package,
+  Store, Snowflake, Package, Handshake, Server, Warehouse, Trees,
 } from 'lucide-react';
 import { STATUS, PROJECT_FRIENDLY } from '../engine/recommend';
 import { useApp } from '../state/AppState';
@@ -12,6 +12,7 @@ import { useT } from '../i18n';
 export const ICONS = {
   Sun, Sprout, Zap, BatteryCharging, Waves, Flame,
   TrendingUp, PiggyBank, Lightbulb, Store, Snowflake, Package,
+  Handshake, Server, Warehouse, Trees,
 };
 
 export function Reveal({ children, delay = 0, className = '' }) {
@@ -44,9 +45,10 @@ export function Reveal({ children, delay = 0, className = '' }) {
 }
 
 export function PageHead({ title, sub, children }) {
+  const { lang } = useApp();
   return (
     <div className="mb-6">
-      <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">{title}</h1>
+      <h1 className={`text-2xl sm:text-3xl font-bold ${lang === 'th' ? 'leading-[1.3]' : 'tracking-tight'}`}>{title}</h1>
       {sub && <p className="mt-1.5 text-sm text-ink-soft leading-relaxed max-w-2xl">{sub}</p>}
       {children}
     </div>
@@ -87,7 +89,7 @@ export function StepProgress({ steps, current }) {
         return (
           <React.Fragment key={i}>
             {i > 0 && <div className={`flex-1 h-0.5 mx-1 sm:mx-2 rounded ${i <= current ? 'bg-brand-600' : 'bg-[#E8E8ED]'}`} />}
-            <div className="flex flex-col items-center gap-1 min-w-0">
+            <div className="flex flex-col items-center gap-2 min-w-0">
               <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs sm:text-sm font-semibold transition ${
                 done ? 'bg-brand-600 text-white' :
                 active ? 'bg-brand-700 text-white ring-4 ring-brand-100' :
@@ -95,7 +97,7 @@ export function StepProgress({ steps, current }) {
               }`}>
                 {done ? <CheckCircle2 className="w-4 h-4" /> : i + 1}
               </div>
-              <span className={`text-[10px] sm:text-xs text-center leading-tight max-w-[72px] sm:max-w-none ${
+              <span className={`text-[10px] sm:text-xs text-center leading-normal max-w-[72px] sm:max-w-none ${
                 active ? 'text-ink font-medium' : 'text-ink-faint'
               }`}>{s}</span>
             </div>
@@ -122,7 +124,7 @@ export function Collapsible({ title, sub, children, defaultOpen = false }) {
         </div>
         <ChevronDown className={`w-5 h-5 text-ink-faint transition-transform ${open ? 'rotate-180' : ''}`} />
       </button>
-      {open && <div className="px-5 pb-5 pt-1 border-t border-[#EBEBEF]">{children}</div>}
+      {open && <div className="px-5 pb-5 pt-1 border-t border-[#e8e8ed]">{children}</div>}
     </div>
   );
 }

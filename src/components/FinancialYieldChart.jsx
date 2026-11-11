@@ -59,28 +59,28 @@ export default function FinancialYieldChart({ project, specs, landData }) {
   const monthlyLabel = isEV ? 'Energy dispensed to EVs (MWh/month)' : 'Energy generated (MWh/month)';
 
   return (
-    <div className="bg-white border border-zinc-200 rounded-xl p-6 shadow-sm space-y-5">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3.5 border-b border-zinc-100 gap-3">
+    <div className="bg-white border border-mute-200 rounded-xl p-6 shadow-sm space-y-5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3.5 border-b border-mute-100 gap-3">
         <div>
-          <h3 className="text-base font-bold text-zinc-900">
+          <h3 className="text-base font-bold text-mute-900">
             Financial yield estimate (Techno-Economics)
           </h3>
-          <p className="text-xs text-zinc-500 mt-0.5">
+          <p className="text-xs text-mute-500 mt-0.5">
             Estimated 25-yr cumulative cash flow{hasMonthly ? ` and monthly ${isEV ? 'dispensed energy' : 'generation'} (spread by assumed ${isPV ? 'seasonal sun' : 'flat'} weights — not measured or simulated monthly data)` : ''}
           </p>
         </div>
 
         {/* Tab Toggle */}
-        <div className="flex items-center bg-zinc-100 p-0.5 rounded-lg border border-zinc-200 text-xs">
+        <div className="flex items-center bg-mute-100 p-0.5 rounded-lg border border-mute-200 text-xs">
           <button
             onClick={() => setChartTab('cashflow')}
             className={`px-3 py-1 rounded-md font-medium transition flex items-center space-x-1.5 ${
               chartTab === 'cashflow'
-                ? 'bg-white text-zinc-900 font-semibold shadow-sm'
-                : 'text-zinc-600 hover:text-zinc-900'
+                ? 'bg-white text-mute-900 font-semibold shadow-sm'
+                : 'text-mute-600 hover:text-mute-900'
             }`}
           >
-            <TrendingUp className="w-3.5 h-3.5 text-zinc-600" />
+            <TrendingUp className="w-3.5 h-3.5 text-mute-600" />
             <span>Cumulative cash flow (25 yrs)</span>
           </button>
           {hasMonthly && (
@@ -88,11 +88,11 @@ export default function FinancialYieldChart({ project, specs, landData }) {
               onClick={() => setChartTab('generation')}
               className={`px-3 py-1 rounded-md font-medium transition flex items-center space-x-1.5 ${
                 chartTab === 'generation'
-                  ? 'bg-white text-zinc-900 font-semibold shadow-sm'
-                  : 'text-zinc-600 hover:text-zinc-900'
+                  ? 'bg-white text-mute-900 font-semibold shadow-sm'
+                  : 'text-mute-600 hover:text-mute-900'
               }`}
             >
-              <BarChart3 className="w-3.5 h-3.5 text-zinc-600" />
+              <BarChart3 className="w-3.5 h-3.5 text-mute-600" />
               <span>{isEV ? 'Monthly dispensed energy' : 'Monthly generation'}</span>
             </button>
           )}
@@ -101,53 +101,53 @@ export default function FinancialYieldChart({ project, specs, landData }) {
 
       {/* 4 Financial Key Indicators */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <div className="p-3.5 rounded-lg bg-zinc-50 border border-zinc-200">
-          <span className="text-zinc-500 text-[11px] block">
+        <div className="p-3.5 rounded-lg bg-mute-50 border border-mute-200">
+          <span className="text-mute-500 text-[11px] block">
             Total investment (CAPEX)
           </span>
-          <span className="text-lg font-bold text-zinc-900 font-mono mt-1 block">
-            {specs.financials?.totalCapexMillionTHB} <span className="text-xs text-zinc-500 font-normal">M THB</span>
+          <span className="text-lg font-bold text-mute-900 font-mono mt-1 block">
+            {specs.financials?.totalCapexMillionTHB} <span className="text-xs text-mute-500 font-normal">M THB</span>
           </span>
         </div>
 
-        <div className="p-3.5 rounded-lg bg-zinc-50 border border-zinc-200">
-          <span className="text-zinc-500 text-[11px] block">
+        <div className="p-3.5 rounded-lg bg-mute-50 border border-mute-200">
+          <span className="text-mute-500 text-[11px] block">
             Return rate (IRR)
           </span>
-          <span className="text-lg font-bold text-zinc-900 font-mono mt-1 block">
-            {specs.financials?.irrPercent}% <span className="text-xs text-zinc-500 font-normal">/ yr</span>
+          <span className="text-lg font-bold text-mute-900 font-mono mt-1 block">
+            {specs.financials?.irrPercent}% <span className="text-xs text-mute-500 font-normal">/ yr</span>
           </span>
         </div>
 
-        <div className="p-3.5 rounded-lg bg-zinc-50 border border-zinc-200">
-          <span className="text-zinc-500 text-[11px] block">
+        <div className="p-3.5 rounded-lg bg-mute-50 border border-mute-200">
+          <span className="text-mute-500 text-[11px] block">
             Payback period
           </span>
-          <span className="text-lg font-bold text-zinc-900 font-mono mt-1 block">
-            {specs.financials?.paybackYears} <span className="text-xs text-zinc-500 font-normal">yrs</span>
+          <span className="text-lg font-bold text-mute-900 font-mono mt-1 block">
+            {specs.financials?.paybackYears} <span className="text-xs text-mute-500 font-normal">yrs</span>
           </span>
         </div>
 
-        <div className="p-3.5 rounded-lg bg-zinc-50 border border-zinc-200">
-          <span className="text-zinc-500 text-[11px] block">
+        <div className="p-3.5 rounded-lg bg-mute-50 border border-mute-200">
+          <span className="text-mute-500 text-[11px] block">
             Net present value (NPV @ 6%)
           </span>
-          <span className="text-lg font-bold text-zinc-900 font-mono mt-1 block">
-            +{specs.financials?.npv25YrMillionTHB || '12.4'} <span className="text-xs text-zinc-500 font-normal">M THB</span>
+          <span className="text-lg font-bold text-mute-900 font-mono mt-1 block">
+            +{specs.financials?.npv25YrMillionTHB || '12.4'} <span className="text-xs text-mute-500 font-normal">M THB</span>
           </span>
         </div>
       </div>
 
       {/* Chart View */}
-      <div className="w-full h-72 bg-zinc-50 p-3 rounded-lg border border-zinc-200">
+      <div className="w-full h-72 bg-mute-50 p-3 rounded-lg border border-mute-200">
         <ResponsiveContainer width="100%" height="100%">
           {chartTab === 'cashflow' || !hasMonthly ? (
             <LineChart data={cashflowData} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#e4e4e7" />
-              <XAxis dataKey="year" stroke="#71717a" fontSize={11} interval={3} />
-              <YAxis stroke="#71717a" fontSize={11} unit=" M" />
+              <CartesianGrid strokeDasharray="3 3" stroke="#e8e8ed" />
+              <XAxis dataKey="year" stroke="#6e6e73" fontSize={11} interval={3} />
+              <YAxis stroke="#6e6e73" fontSize={11} unit=" M" />
               <Tooltip 
-                contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e4e4e7', borderRadius: '8px', fontSize: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}
+                contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e8e8ed', borderRadius: '8px', fontSize: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}
                 formatter={(val) => [`${val} M THB`, '']}
               />
               <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '8px' }} />
@@ -155,7 +155,7 @@ export default function FinancialYieldChart({ project, specs, landData }) {
                 type="monotone" 
                 dataKey="cumulative" 
                 name="Cumulative cash flow" 
-                stroke="#18181b" 
+                stroke="#1d1d1f" 
                 strokeWidth={2} 
                 dot={{ r: 2 }}
                 activeDot={{ r: 5 }}
@@ -163,11 +163,11 @@ export default function FinancialYieldChart({ project, specs, landData }) {
             </LineChart>
           ) : (
             <BarChart data={monthlyData} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#e4e4e7" />
-              <XAxis dataKey="month" stroke="#71717a" fontSize={11} />
-              <YAxis stroke="#71717a" fontSize={11} unit=" MWh" />
+              <CartesianGrid strokeDasharray="3 3" stroke="#e8e8ed" />
+              <XAxis dataKey="month" stroke="#6e6e73" fontSize={11} />
+              <YAxis stroke="#6e6e73" fontSize={11} unit=" MWh" />
               <Tooltip 
-                contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e4e4e7', borderRadius: '8px', fontSize: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}
+                contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e8e8ed', borderRadius: '8px', fontSize: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}
                 formatter={(val) => [`${val} MWh`, 'Energy output']}
               />
               <Bar 
@@ -181,9 +181,9 @@ export default function FinancialYieldChart({ project, specs, landData }) {
         </ResponsiveContainer>
       </div>
 
-      <div className="p-3 rounded-lg bg-zinc-50 border border-zinc-200 text-xs text-zinc-600 flex items-center justify-between gap-3">
+      <div className="p-3 rounded-lg bg-mute-50 border border-mute-200 text-xs text-mute-600 flex items-center justify-between gap-3">
         <span>{specs.cashFlowModel || 'Cash-flow model per project type'}</span>
-        <span className="text-zinc-900 font-semibold font-mono shrink-0">Payback year {specs.financials?.paybackYears}</span>
+        <span className="text-mute-900 font-semibold font-mono shrink-0">Payback year {specs.financials?.paybackYears}</span>
       </div>
 
     </div>

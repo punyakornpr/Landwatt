@@ -123,7 +123,7 @@ export default function Results() {
                   <div className="flex flex-wrap items-center gap-2">
                     <h2 className="text-lg font-bold">{meta.name}</h2>
                     <span className="text-xs text-ink-faint font-normal">{meta.sub}</span>
-                    {idx === 0 && <span className="chip bg-brand-700 text-white">{t('Best fit right now')}</span>}
+                    {idx === 0 && (r.score > top[1]?.score || r.status !== top[1]?.status || !top[1]) && <span className="chip bg-brand-700 text-white">{t('Best fit right now')}</span>}
                   </div>
                   <p className="text-sm text-ink-soft mt-0.5">{meta.oneLiner}</p>
                   <div className="mt-2.5 flex flex-wrap items-center gap-2">
@@ -186,7 +186,7 @@ export default function Results() {
                 </div>
               </div>
 
-              <div className="mt-4 pt-4 border-t border-[#EBEBEF] flex flex-col sm:flex-row gap-2.5">
+              <div className="mt-4 pt-4 border-t border-[#e8e8ed] flex flex-col sm:flex-row gap-2.5">
                 <button
                   onClick={() => { setChosenPlan(r.id); navigate(`/plan/${r.id}`); }}
                   className="btn-primary flex-1">

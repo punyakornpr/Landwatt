@@ -11,6 +11,10 @@ import {
   calculateBESSFarmSpecs,
   calculateFloatingSolarSpecs,
   calculateBiogasSpecs,
+  calculateSolarLeaseSpecs,
+  calculateDataCenterLeaseSpecs,
+  calculateSolarWarehouseSpecs,
+  calculateCarbonForestSpecs,
 } from '../utils/engineeringCalculations.js';
 
 function computeSpecs(projectId, safeLand) {
@@ -26,6 +30,10 @@ function computeSpecs(projectId, safeLand) {
     case 'grid-bess': return calculateBESSFarmSpecs(safeLand);
     case 'floating-solar': return calculateFloatingSolarSpecs(safeLand);
     case 'biomass-biogas': return calculateBiogasSpecs(safeLand);
+    case 'solar-lease': return calculateSolarLeaseSpecs(safeLand);
+    case 'data-center-lease': return calculateDataCenterLeaseSpecs(safeLand);
+    case 'solar-warehouse': return calculateSolarWarehouseSpecs(safeLand);
+    case 'carbon-forest': return calculateCarbonForestSpecs(safeLand);
     default: return calculateSolarFarmSpecs(safeLand);
   }
 }
@@ -42,7 +50,7 @@ export function getSpecs(projectId, land, budgetMaxTHB = null) {
   // linear guess can overshoot. 0.92 margin per pass; floor ≈ the smallest area that
   // still yields a nonzero build per design (agrivoltaics drops 30% of base strings,
   // so it needs ≥2 base strings ≈ 220 m²).
-  const minAreaSqM = { 'small-solar': 34, 'agrivoltaics': 220, 'solar-utility-kit': 15, 'ev-moto-swap': 40, 'solar-coldroom': 70, 'solar-dryer': 100 }[projectId] || 120;
+  const minAreaSqM = { 'small-solar': 34, 'agrivoltaics': 220, 'solar-utility-kit': 15, 'ev-moto-swap': 40, 'solar-coldroom': 70, 'solar-dryer': 100, 'solar-warehouse': 300, 'carbon-forest': 800, 'solar-lease': 1600, 'data-center-lease': 1600 }[projectId] || 120;
   let areaSqM = safeLand.areaSqM, specs2 = specs, capex2 = capex, prevCapex = Infinity;
   for (let i = 0; i < 16 && capex2 > budgetMaxTHB; i++) {
     // Stuck at a size cap → CAPEX flat → budget ratio shrinks too slowly; halve instead.
@@ -129,6 +137,26 @@ export function friendlySummary(projectId, specs, land, lang = 'en') {
       areaUsed = R(`About ${(areaRai * 0.4).toFixed(1)} rai (digesters + powerhouse)`, `ราว ${(areaRai * 0.4).toFixed(1)} ไร่ (ถังหมัก + โรงไฟฟ้า)`);
       benefit = R(`Continuous output ~${specs.annualEnergyMWh} MWh/yr`, `ผลิตต่อเนื่อง ~${specs.annualEnergyMWh} MWh/ปี`);
       break;
+    case 'solar-lease':
+      areaUsed = `${plotShare} (~${specs.leasableRai} ${R('rai leased', 'ไร่ให้เช่า')})`;
+      benefit = R(`Rent ~${(specs.annualLeaseTHB || 0).toLocaleString()} THB/yr — the developer builds the plant`,
+                  `ค่าเช่า ~${(specs.annualLeaseTHB || 0).toLocaleString()} บาท/ปี — ผู้พัฒนาลงทุนสร้างเอง`);
+      break;
+    case 'data-center-lease':
+      areaUsed = `${plotShare} (~${specs.leasableRai} ${R('rai leased', 'ไร่ให้เช่า')})`;
+      benefit = R(`Premium site rent ~${(specs.annualLeaseTHB || 0).toLocaleString()} THB/yr if an operator commits`,
+                  `ค่าเช่าระดับพรีเมียม ~${(specs.annualLeaseTHB || 0).toLocaleString()} บาท/ปี ถ้ามีผู้ประกอบการสนใจ`);
+      break;
+    case 'solar-warehouse':
+      areaUsed = `${plotShare} (${R(`${specs.warehouseM2} m² warehouse + yard`, `โกดัง ${specs.warehouseM2} ตร.ม. + ลานรถ`)})`;
+      benefit = R(`Rent ~150 THB/m²/mo at ~85% occupancy + rooftop PV offsets`,
+                  `ค่าเช่า ~150 บาท/ตร.ม./เดือน ที่เข้าพัก ~85% + โซลาร์หลังคาช่วยค่าไฟ`);
+      break;
+    case 'carbon-forest':
+      areaUsed = `${plotShare} (~${specs.plantableRai} ${R('rai planted', 'ไร่ที่ปลูก')})`;
+      benefit = R(`~${specs.treeCount.toLocaleString()} trees → ~${specs.creditTonsYr} tCO2/yr credits + timber`,
+                  `ต้นไม้ ~${specs.treeCount.toLocaleString()} ต้น → คาร์บอนเครดิต ~${specs.creditTonsYr} ตัน/ปี + ไม้`);
+      break;
     default:
       areaUsed = '—'; benefit = '—';
   }
@@ -154,6 +182,10 @@ export function realityChecklist(projectId, lang = 'en') {
     'grid-bess': ['มีผู้ซื้อบริการ/สัญญาชัดเจนก่อนลงทุน', 'ตรวจมาตรฐานความปลอดภัยแบตเตอรี่กับหน่วยงานกำกับ'],
     'floating-solar': ['ยืนยันสิทธิ์ใช้น้ำและความลึกบ่อจริง', 'ประเมินระดับน้ำขึ้นลงตลอดปี'],
     'biomass-biogas': ['ทำสัญญาปริมาณวัตถุดิบตลอดปี', 'ขอใบอนุญาตโรงงานและจัดการกลิ่นกับชุมชน'],
+    'solar-lease': ['เทียบข้อเสนอจากผู้พัฒนา 2–3 เจ้า — อัตราค่าเช่าและเงื่อนไขขึ้นค่าเช่าต่างกันมาก', 'ให้ทนายอ่านสัญญาเช่า โดยเฉพาะเงื่อนไขสิ้นสุดสัญญาและการรื้อถอน'],
+    'data-center-lease': ['เช็คไฟเบอร์ออปติกและกำลังสายส่งใกล้แปลง — เป็นตัวชี้ขาดหลัก', 'คาดการณ์ 6–12 เดียวก่อนได้สัญญา — ไม่ใช่รายได้ทันที'],
+    'solar-warehouse': ['สำรวจคู่แข่งและความต้องการเช่าในพื้นที่ — อัตราเข้าพัก 85% เป็นแค่สมมติ', 'เช็คผังเมืองให้สร้างโกดังได้และทางเข้ารถบรรทุก'],
+    'carbon-forest': ['ปรึกษา TGO/ผู้ลงทะเบียน T-VER — ขั้นตอนรับรองใช้เวลาหลายปี', 'รายได้หลักคือไม้ตอนตัด — คาร์บอนเครดิตยังให้เงินน้อยต่อไร่'],
   } : {
     'solar-farm': ['Check zoning / land-use rules with the local authority', 'Apply for construction / land-grading permits under local law'],
     'small-solar': ['Check the roof/structure can bear panel weight and has no daytime shading', 'Ask the utility (PEA/MEA) about small-system connection rules and metering'],
@@ -166,6 +198,10 @@ export function realityChecklist(projectId, lang = 'en') {
     'grid-bess': ['Secure a service buyer / clear contract before investing', 'Verify battery safety standards with regulators'],
     'floating-solar': ['Verify water-use rights and actual pond depth', 'Assess year-round water level variation'],
     'biomass-biogas': ['Get contracted year-round feedstock volume', 'Obtain a factory license and manage odor with the community'],
+    'solar-lease': ['Compare offers from 2–3 developers — lease rates and escalation terms vary widely', 'Have a lawyer read the lease — especially end-of-term and decommissioning clauses'],
+    'data-center-lease': ['Check fiber routes and substation capacity near the plot — they decide feasibility', 'Expect 6–12 months of due diligence before any lease is signed'],
+    'solar-warehouse': ['Survey local rental competition — the 85% occupancy is an assumption', 'Verify zoning allows a warehouse and that trucks can reach the site'],
+    'carbon-forest': ['Talk to TGO / a T-VER verifier early — registration takes years', 'Timber is the real revenue — carbon credits still pay little per rai'],
   };
   return [...common, ...(per[projectId] || [])];
 }

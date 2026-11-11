@@ -139,10 +139,10 @@ export default function GoogleMapPicker({
       className: 'custom-land-pin',
       html: `
         <div style="position: relative; display: flex; flex-direction: column; align-items: center; cursor: pointer;">
-          <div style="width: 32px; height: 32px; background: #18181b; border: 2.5px solid #ffffff; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); box-shadow: 0 4px 10px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center;">
+          <div style="width: 32px; height: 32px; background: #1d1d1f; border: 2.5px solid #ffffff; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); box-shadow: 0 4px 10px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center;">
             <span style="transform: rotate(45deg); font-size: 13px; font-weight: bold; color: white;">⚡</span>
           </div>
-          <div style="background: #ffffff; color: #18181b; border: 1px solid #e4e4e7; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 600; margin-top: 3px; white-space: nowrap; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+          <div style="background: #ffffff; color: #1d1d1f; border: 1px solid #e8e8ed; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 600; margin-top: 3px; white-space: nowrap; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
             Land plot
           </div>
         </div>
@@ -157,7 +157,7 @@ export default function GoogleMapPicker({
     }).addTo(map);
 
     marker.bindPopup(`
-      <div style="color: #18181b; font-family: Prompt, sans-serif; font-size: 12px;">
+      <div style="color: #1d1d1f; font-family: Prompt, sans-serif; font-size: 12px;">
         <strong>Land plot position</strong><br/>
         Coords: ${coordinates.lat.toFixed(5)}, ${coordinates.lng.toFixed(5)}
       </div>
@@ -282,7 +282,7 @@ export default function GoogleMapPicker({
     const handleIcon = L.divIcon({
       className: 'boundary-corner-handle',
       html: `
-        <div style="width: 14px; height: 14px; background: #18181b; border: 2.5px solid #ffffff; border-radius: 50%; box-shadow: 0 1px 4px rgba(0,0,0,0.4); cursor: grab;"></div>
+        <div style="width: 14px; height: 14px; background: #1d1d1f; border: 2.5px solid #ffffff; border-radius: 50%; box-shadow: 0 1px 4px rgba(0,0,0,0.4); cursor: grab;"></div>
       `,
       iconSize: [14, 14],
       iconAnchor: [7, 7]
@@ -311,7 +311,7 @@ export default function GoogleMapPicker({
 
     if (points.length >= 3) {
       const poly = L.polygon(points.map(p => [p.lat, p.lng]), {
-        color: '#18181b',
+        color: '#1d1d1f',
         weight: 2.5,
         dashArray: '5, 5',
         fillColor: '#3b82f6',
@@ -322,7 +322,7 @@ export default function GoogleMapPicker({
       recalculateAreaAndPerimeter(points);
     } else if (points.length === 2) {
       const line = L.polyline(points.map(p => [p.lat, p.lng]), {
-        color: '#18181b',
+        color: '#1d1d1f',
         weight: 2.5,
         dashArray: '5, 5'
       }).addTo(map);
@@ -404,10 +404,10 @@ export default function GoogleMapPicker({
       className: 'custom-grid-pin',
       html: `
         <div style="position: relative; display: flex; flex-direction: column; align-items: center; cursor: pointer;">
-          <div style="width: 30px; height: 30px; background: #d97706; border: 2.5px solid #ffffff; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); box-shadow: 0 4px 10px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center;">
+          <div style="width: 30px; height: 30px; background: #ea580c; border: 2.5px solid #ffffff; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); box-shadow: 0 4px 10px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center;">
             <span style="transform: rotate(45deg); font-size: 13px; font-weight: bold; color: white;">🗼</span>
           </div>
-          <div style="background: #ffffff; color: #d97706; border: 1px solid #fcd34d; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 600; margin-top: 3px; white-space: nowrap; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+          <div style="background: #ffffff; color: #ea580c; border: 1px solid #fdba74; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 600; margin-top: 3px; white-space: nowrap; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
             22kV Line
           </div>
         </div>
@@ -452,7 +452,7 @@ export default function GoogleMapPicker({
       polylineRef.current.setLatLngs([p1, p2]);
     } else {
       const line = L.polyline([p1, p2], {
-        color: '#d97706',
+        color: '#ea580c',
         weight: 2.5,
         dashArray: '5, 5',
         opacity: 0.9
@@ -604,7 +604,7 @@ export default function GoogleMapPicker({
   };
 
   return (
-    <div className="bg-zinc-50 rounded-xl border border-zinc-200 p-3.5 space-y-3">
+    <div className="bg-mute-50 rounded-xl border border-mute-200 p-3.5 space-y-3">
       
       {/* Top Search & Layer Controls */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-2.5">
@@ -627,23 +627,23 @@ export default function GoogleMapPicker({
                 );
               }}
               placeholder={t('Search district, province or coordinates') + '...'}
-              className="w-full bg-white border border-zinc-200 focus:border-zinc-900 rounded-lg pl-8 pr-16 py-1.5 text-xs text-zinc-900 placeholder-zinc-400 outline-none transition"
+              className="w-full bg-white border border-mute-200 focus:border-mute-900 rounded-lg pl-8 pr-16 py-1.5 text-xs text-mute-900 placeholder-mute-400 outline-none transition"
             />
-            <Search className="w-3.5 h-3.5 text-zinc-400 absolute left-2.5 top-2 pointer-events-none" />
+            <Search className="w-3.5 h-3.5 text-mute-400 absolute left-2.5 top-2 pointer-events-none" />
             <button
               type="submit"
-              className="absolute right-1 top-1 px-2.5 py-0.5 rounded bg-zinc-900 hover:bg-zinc-800 text-white text-[11px] font-medium transition"
+              className="absolute right-1 top-1 px-2.5 py-0.5 rounded bg-brand-600 hover:bg-brand-700 text-white text-[11px] font-medium transition"
             >
               {t('Search')}
             </button>
             {searchResults.length > 0 && (
-              <div className="absolute left-0 right-0 top-full mt-1 z-[1100] bg-white border border-zinc-200 rounded-lg shadow-lg overflow-hidden">
+              <div className="absolute left-0 right-0 top-full mt-1 z-[1100] bg-white border border-mute-200 rounded-lg shadow-lg overflow-hidden">
                 {searchResults.map((r, i) => (
                   <button
                     key={i}
                     type="button"
                     onClick={() => handlePickResult(r)}
-                    className="w-full text-left px-3 py-2 text-xs text-zinc-800 hover:bg-zinc-50 border-b border-zinc-100 last:border-b-0 line-clamp-1"
+                    className="w-full text-left px-3 py-2 text-xs text-mute-800 hover:bg-mute-50 border-b border-mute-100 last:border-b-0 line-clamp-1"
                   >
                     {r.label}
                   </button>
@@ -655,7 +655,7 @@ export default function GoogleMapPicker({
             type="button"
             onClick={() => setShowDistrictPicker(v => !v)}
             className={`shrink-0 px-2.5 py-1.5 rounded-lg border text-[11px] font-medium transition flex items-center space-x-1 ${
-              showDistrictPicker ? 'bg-zinc-900 text-white border-zinc-900' : 'bg-white text-zinc-700 border-zinc-200 hover:border-zinc-400'
+              showDistrictPicker ? 'bg-brand-600 text-white border-brand-600' : 'bg-white text-mute-700 border-mute-200 hover:border-mute-400'
             }`}
           >
             <MapPin className="w-3.5 h-3.5" />
@@ -666,7 +666,7 @@ export default function GoogleMapPicker({
             onClick={locateMe}
             disabled={locating}
             title={t('Use my current location (GPS)')}
-            className="shrink-0 px-2.5 py-1.5 rounded-lg border text-[11px] font-medium transition flex items-center space-x-1 bg-white text-zinc-700 border-zinc-200 hover:border-zinc-400 disabled:opacity-60"
+            className="shrink-0 px-2.5 py-1.5 rounded-lg border text-[11px] font-medium transition flex items-center space-x-1 bg-white text-mute-700 border-mute-200 hover:border-mute-400 disabled:opacity-60"
           >
             {locating
               ? <RefreshCw className="w-3.5 h-3.5 animate-spin" />
@@ -675,43 +675,12 @@ export default function GoogleMapPicker({
           </button>
         </div>
 
-        {/* Map Layers */}
-        <div className="flex items-center space-x-1 bg-white p-0.5 rounded-lg border border-zinc-200 text-xs shadow-sm self-end sm:self-auto">
-          <button
-            type="button"
-            onClick={() => setMapType('esri-satellite')}
-            className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition ${
-              mapType === 'esri-satellite' ? 'bg-zinc-900 text-white' : 'text-zinc-600 hover:text-zinc-900'
-            }`}
-          >
-            Satellite
-          </button>
-          <button
-            type="button"
-            onClick={() => setMapType('google-hybrid')}
-            className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition ${
-              mapType === 'google-hybrid' ? 'bg-zinc-900 text-white' : 'text-zinc-600 hover:text-zinc-900'
-            }`}
-          >
-            Google Hybrid
-          </button>
-          <button
-            type="button"
-            onClick={() => setMapType('google-roadmap')}
-            className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition ${
-              mapType === 'google-roadmap' ? 'bg-zinc-900 text-white' : 'text-zinc-600 hover:text-zinc-900'
-            }`}
-          >
-            Roadmap
-          </button>
-        </div>
-
       </div>
 
       {/* District Picker Panel */}
       {showDistrictPicker && (
-        <div className="flex flex-wrap items-center gap-2 p-2.5 rounded-lg bg-white border border-zinc-200 text-xs">
-          <MapPin className="w-3.5 h-3.5 text-zinc-500" />
+        <div className="flex flex-wrap items-center gap-2 p-2.5 rounded-lg bg-white border border-mute-200 text-xs">
+          <MapPin className="w-3.5 h-3.5 text-mute-500" />
           <select
             value={pickProvince}
             onChange={(e) => { setPickProvince(e.target.value); setPickDistrict(''); }}
@@ -735,7 +704,7 @@ export default function GoogleMapPicker({
             type="button"
             onClick={confirmDistrictPick}
             disabled={!pickProvince}
-            className="px-3 py-1.5 rounded-md bg-zinc-900 hover:bg-zinc-800 text-white text-[11px] font-medium transition disabled:opacity-40"
+            className="px-3 py-1.5 rounded-md bg-brand-600 hover:bg-brand-700 text-white text-[11px] font-medium transition disabled:opacity-40"
           >
             {t('Go')}
           </button>
@@ -744,7 +713,7 @@ export default function GoogleMapPicker({
 
       {/* Search status */}
       {(searchState === 'loading' || searchState === 'error' || searchState === 'geo-error') && (
-        <p className={`text-[11px] px-1 ${searchState === 'loading' ? 'text-zinc-500' : 'text-red-600'}`}>
+        <p className={`text-[11px] px-1 ${searchState === 'loading' ? 'text-mute-500' : 'text-danger-600'}`}>
           {searchState === 'loading'
             ? t('Searching…')
             : searchState === 'geo-error'
@@ -754,7 +723,7 @@ export default function GoogleMapPicker({
       )}
 
       {/* Action Toolbar */}
-      <div className="flex flex-wrap items-center justify-between gap-2 p-2 rounded-lg bg-white border border-zinc-200 text-xs">
+      <div className="flex flex-wrap items-center justify-between gap-2 p-2 rounded-lg bg-white border border-mute-200 text-xs">
         
         <div className="flex flex-wrap items-center gap-1.5">
           <button
@@ -767,8 +736,8 @@ export default function GoogleMapPicker({
             }}
             className={`px-3 py-1.5 rounded-md font-medium flex items-center space-x-1.5 transition ${
               isDrawingBoundary
-                ? 'bg-zinc-900 text-white shadow-sm'
-                : 'bg-zinc-100 hover:bg-zinc-200 text-zinc-800'
+                ? 'bg-brand-600 text-white shadow-sm'
+                : 'bg-mute-100 hover:bg-mute-200 text-mute-800'
             }`}
           >
             <PenTool className="w-3.5 h-3.5" />
@@ -778,10 +747,10 @@ export default function GoogleMapPicker({
           <button
             type="button"
             onClick={handleAutoGenerateBoundaryBox}
-            className="px-2.5 py-1.5 rounded-md bg-zinc-100 hover:bg-zinc-200 text-zinc-700 transition flex items-center space-x-1 text-xs"
+            className="px-2.5 py-1.5 rounded-md bg-mute-100 hover:bg-mute-200 text-mute-700 transition flex items-center space-x-1 text-xs"
             title={t('Auto-generate a rectangle of the current area around the pin')}
           >
-            <Sparkles className="w-3.5 h-3.5 text-zinc-600" />
+            <Sparkles className="w-3.5 h-3.5 text-mute-600" />
             <span>{t('Auto-fit box')}</span>
           </button>
 
@@ -790,7 +759,7 @@ export default function GoogleMapPicker({
               <button
                 type="button"
                 onClick={handleUndoPoint}
-                className="px-2 py-1.5 rounded-md bg-zinc-100 hover:bg-zinc-200 text-zinc-600 transition flex items-center space-x-1"
+                className="px-2 py-1.5 rounded-md bg-mute-100 hover:bg-mute-200 text-mute-600 transition flex items-center space-x-1"
                 title={t('Undo last corner')}
               >
                 <Undo2 className="w-3 h-3" />
@@ -800,7 +769,7 @@ export default function GoogleMapPicker({
               <button
                 type="button"
                 onClick={handleClearPolygon}
-                className="px-2 py-1.5 rounded-md bg-zinc-100 hover:bg-rose-50 text-rose-600 transition flex items-center space-x-1"
+                className="px-2 py-1.5 rounded-md bg-mute-100 hover:bg-danger-50 text-danger-600 transition flex items-center space-x-1"
                 title={t('Clear boundary')}
               >
                 <Trash2 className="w-3 h-3" />
@@ -814,7 +783,7 @@ export default function GoogleMapPicker({
           <button
             type="button"
             onClick={invalidateMapSize}
-            className="p-1.5 rounded-md bg-zinc-100 hover:bg-zinc-200 text-zinc-600 transition"
+            className="p-1.5 rounded-md bg-mute-100 hover:bg-mute-200 text-mute-600 transition"
             title={t('Refresh map size')}
           >
             <RefreshCw className="w-3.5 h-3.5" />
@@ -830,8 +799,8 @@ export default function GoogleMapPicker({
             }}
             className={`px-2.5 py-1.5 rounded-md text-xs font-medium flex items-center space-x-1.5 transition ${
               isPinningGrid
-                ? 'bg-amber-600 text-white'
-                : 'bg-zinc-100 hover:bg-zinc-200 text-zinc-700'
+                ? 'bg-volt-600 text-white'
+                : 'bg-mute-100 hover:bg-mute-200 text-mute-700'
             }`}
           >
             <Zap className="w-3.5 h-3.5" />
@@ -843,10 +812,10 @@ export default function GoogleMapPicker({
 
       {/* Map Viewport Wrapper */}
       <div 
-        className={`relative rounded-lg overflow-hidden border border-zinc-200 w-full ${
+        className={`relative rounded-lg overflow-hidden border border-mute-200 w-full ${
           isDrawingBoundary ? 'map-drawing-crosshair' : ''
         }`}
-        style={{ height: '420px', minHeight: '420px', backgroundColor: '#f4f4f5' }}
+        style={{ height: '420px', minHeight: '420px', backgroundColor: '#f5f5f7' }}
       >
         <div 
           ref={mapContainerRef} 
@@ -857,56 +826,76 @@ export default function GoogleMapPicker({
 
         {/* Floating Instruction Banner when Drawing */}
         {isDrawingBoundary && (
-          <div className="absolute top-3 inset-x-8 z-[500] mx-auto max-w-sm bg-white/95 border border-zinc-300 text-zinc-800 px-3.5 py-1.5 rounded-lg shadow-md backdrop-blur-md text-xs text-center flex items-center justify-center space-x-2">
-            <PenTool className="w-3.5 h-3.5 text-zinc-700 flex-shrink-0" />
+          <div className="absolute top-3 inset-x-8 z-[500] mx-auto max-w-sm bg-white/95 border border-mute-300 text-mute-800 px-3.5 py-1.5 rounded-lg shadow-md backdrop-blur-md text-xs text-center flex items-center justify-center space-x-2">
+            <PenTool className="w-3.5 h-3.5 text-mute-700 flex-shrink-0" />
             <span>{t('Click the map to set each plot corner (at least 3 points)')}</span>
           </div>
         )}
 
         {/* Floating Live Drawn Area Calculation Card */}
         {polygonPoints.length >= 3 && (
-          <div className="absolute bottom-3 right-3 z-[500] bg-white border border-zinc-200 p-3 rounded-lg shadow-lg text-xs space-y-1.5 max-w-xs">
-            <div className="flex items-center justify-between text-zinc-500 text-[11px]">
-              <span className="font-semibold text-zinc-900 flex items-center">
-                <Maximize2 className="w-3.5 h-3.5 mr-1 text-zinc-600" />
+          <div className="absolute bottom-3 right-3 z-[500] bg-white border border-mute-200 p-3 rounded-lg shadow-lg text-xs space-y-1.5 max-w-xs">
+            <div className="flex items-center justify-between text-mute-500 text-[11px]">
+              <span className="font-semibold text-mute-900 flex items-center">
+                <Maximize2 className="w-3.5 h-3.5 mr-1 text-mute-600" />
                 {t('Drawn area')}
               </span>
               <span className="font-mono">{polygonPoints.length} {t('corners')}</span>
             </div>
 
-            <div className="text-zinc-900 font-mono font-bold text-sm">
-              {polygonArea.totalRaiDecimal} {t('rai')} <span className="text-xs text-zinc-500 font-normal">({polygonArea.sqM.toLocaleString()} m²)</span>
+            <div className="text-mute-900 font-mono font-bold text-sm">
+              {polygonArea.totalRaiDecimal} {t('rai')} <span className="text-xs text-mute-500 font-normal">({polygonArea.sqM.toLocaleString()} m²)</span>
             </div>
 
-            <div className="text-[11px] text-zinc-500 flex justify-between">
-              <span>{t('Perimeter:')} <strong className="text-zinc-800 font-mono">{polygonPerimeterM}</strong> m</span>
+            <div className="text-[11px] text-mute-500 flex justify-between">
+              <span>{t('Perimeter:')} <strong className="text-mute-800 font-mono">{polygonPerimeterM}</strong> m</span>
             </div>
 
             <button
               type="button"
               onClick={handleApplyArea}
-              className="w-full mt-1 py-1.5 px-2.5 rounded-md bg-zinc-900 hover:bg-zinc-800 text-white font-medium text-xs flex items-center justify-center space-x-1.5 transition"
+              className="w-full mt-1 py-1.5 px-2.5 rounded-md bg-brand-600 hover:bg-brand-700 text-white font-medium text-xs flex items-center justify-center space-x-1.5 transition"
             >
               <Check className="w-3.5 h-3.5" />
               <span>{t('Apply this area')}</span>
             </button>
 
             {areaAppliedAlert && (
-              <div className="text-[10px] text-emerald-600 text-center font-medium">
+              <div className="text-[10px] text-energy-600 text-center font-medium">
                 {t('Applied to land size ✓')}
               </div>
             )}
           </div>
         )}
 
+        {/* Floating Map Layer Switcher */}
+        <div className="absolute bottom-3 left-3 z-[500] flex items-center space-x-1 bg-white/95 backdrop-blur-sm p-0.5 rounded-lg border border-mute-200 text-xs shadow-md">
+          {[
+            ['esri-satellite', 'Satellite'],
+            ['google-hybrid', 'Hybrid'],
+            ['google-roadmap', 'Roadmap'],
+          ].map(([type, label]) => (
+            <button
+              key={type}
+              type="button"
+              onClick={() => setMapType(type)}
+              className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition ${
+                mapType === type ? 'bg-brand-600 text-white' : 'text-mute-600 hover:text-mute-900'
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+
         {/* Floating Google Maps Direct Buttons */}
         <div className="absolute top-3 left-3 z-[500] flex items-center space-x-1.5">
           <button
             type="button"
             onClick={openInGoogleMaps}
-            className="px-2.5 py-1 rounded-md bg-white/95 hover:bg-white text-zinc-800 border border-zinc-200 text-xs font-medium flex items-center space-x-1 shadow-sm transition"
+            className="px-2.5 py-1 rounded-md bg-white/95 hover:bg-white text-mute-800 border border-mute-200 text-xs font-medium flex items-center space-x-1 shadow-sm transition"
           >
-            <ExternalLink className="w-3.5 h-3.5 text-zinc-500" />
+            <ExternalLink className="w-3.5 h-3.5 text-mute-500" />
             <span>Google Maps</span>
           </button>
         </div>
@@ -914,25 +903,25 @@ export default function GoogleMapPicker({
       </div>
 
       {/* Real-Time Pin Coordinates Bar */}
-      <div className="p-2.5 rounded-lg bg-white border border-zinc-200 grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
+      <div className="p-2.5 rounded-lg bg-white border border-mute-200 grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
         <div>
-          <span className="text-zinc-400 block text-[11px]">{t('Pin coordinates (GPS)')}</span>
-          <span className="text-zinc-900 font-mono font-medium text-xs mt-0.5 block flex items-center">
-            <MapPin className="w-3.5 h-3.5 mr-1 text-zinc-500" />
+          <span className="text-mute-400 block text-[11px]">{t('Pin coordinates (GPS)')}</span>
+          <span className="text-mute-900 font-mono font-medium text-xs mt-0.5 block flex items-center">
+            <MapPin className="w-3.5 h-3.5 mr-1 text-mute-500" />
             {currentCoords.lat.toFixed(5)}° N, {currentCoords.lng.toFixed(5)}° E
           </span>
         </div>
 
         <div>
-          <span className="text-zinc-400 block text-[11px]">{t('Location')}</span>
-          <span className="text-zinc-800 font-medium text-xs mt-0.5 block">
+          <span className="text-mute-400 block text-[11px]">{t('Location')}</span>
+          <span className="text-mute-800 font-medium text-xs mt-0.5 block">
             {detectedLocationName}
           </span>
         </div>
 
         <div>
-          <span className="text-zinc-400 block text-[11px]">{t('Tip')}</span>
-          <span className="text-zinc-500 text-[11px] mt-0.5 block">
+          <span className="text-mute-400 block text-[11px]">{t('Tip')}</span>
+          <span className="text-mute-500 text-[11px] mt-0.5 block">
             {t('Drag the ⚡ pin or use "Draw boundary" to outline the real plot')}
           </span>
         </div>

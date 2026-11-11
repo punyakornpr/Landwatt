@@ -4,7 +4,7 @@ import { useApp } from '../state/AppState';
 import { PROVINCES_DATA } from '../data/provinces';
 import {
   ArrowRight, MapPin, ListChecks, FileText, Sun, Sprout, Zap,
-  HelpCircle, CheckCircle2, PlayCircle,
+  HelpCircle, CheckCircle2, PlayCircle, ChevronRight,
 } from 'lucide-react';
 import { DisclaimerStrip, Reveal } from '../components/ui';
 import { useT } from '../i18n';
@@ -61,7 +61,7 @@ const FAQS = [
 ];
 
 export default function Landing() {
-  const { updateLand, updateGoals } = useApp();
+  const { updateLand, updateGoals, lang } = useApp();
   const t = useT();
 
   const useExample = (ex) => {
@@ -79,13 +79,10 @@ export default function Landing() {
       >
         <div className="absolute inset-0 bg-gradient-to-b from-white/60 via-white/10 to-white pointer-events-none" />
         <div className="relative max-w-6xl mx-auto px-4 sm:px-6 pt-16 sm:pt-24 pb-36 sm:pb-48 text-center">
-          <span className="chip bg-white border border-brand-200 text-brand-800 mb-6 animate-in">
-            <Sun className="w-3.5 h-3.5" /> {t('Land-use energy planning assistant')}
-          </span>
-          <h1 className="text-4xl sm:text-6xl font-bold tracking-tight leading-[1.08] animate-in" style={{ animationDelay: '90ms' }}>
-            {t('Your vacant land can')}<br className="sm:hidden" />{' '}
+          <h1 className={`text-4xl sm:text-6xl font-bold animate-in ${lang === 'th' ? 'leading-[1.25]' : 'tracking-tight leading-[1.08]'}`} style={{ animationDelay: '90ms' }}>
+            {t('Your vacant land')}<br className="sm:hidden" />{' '}
             <span className="bg-gradient-to-r from-brand-700 via-brand-600 to-electric-500 bg-clip-text text-transparent">
-              {t('do more than you think')}
+              {t('can do more than you think')}
             </span>
           </h1>
           <p className="mt-5 text-base sm:text-xl text-ink-soft max-w-2xl mx-auto leading-relaxed animate-in" style={{ animationDelay: '180ms' }}>
@@ -100,7 +97,7 @@ export default function Landing() {
             </button>
           </div>
           <p className="mt-4 animate-in" style={{ animationDelay: '360ms' }}>
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-white/75 backdrop-blur px-4 py-1.5 text-xs text-ink-soft shadow-sm">
+            <span className="inline-flex items-center gap-1.5 rounded-2xl bg-white/75 backdrop-blur px-4 py-1.5 text-xs text-ink-soft shadow-sm">
               {t('No sign-up · no electrical knowledge needed · under 2 minutes')}
             </span>
           </p>
@@ -109,7 +106,9 @@ export default function Landing() {
 
       {/* Why LandWatt */}
       <section className="max-w-6xl mx-auto px-4 sm:px-6 py-10">
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <h2 className="text-xl sm:text-2xl font-bold text-center">{t('Why LandWatt')}</h2>
+        <p className="text-sm text-ink-faint text-center mt-1">{t('Simple for anyone — rigorous engineering underneath')}</p>
+        <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4">
           {[
             { icon: MapPin, title: 'Know what suits your land', desc: 'Answer simple questions about the land and see fitting options with reasons' },
             { icon: ListChecks, title: 'See it before you invest', desc: 'Simulated layout, usable area, investment and cautions' },
@@ -142,12 +141,17 @@ export default function Landing() {
           ].map((s, i) => (
             <Reveal key={i} delay={i * 60}>
             <div className="relative card p-5 text-center h-full">
-              <span className="absolute top-3 left-4 text-xs font-bold text-brand-600">{t('Step')} {i + 1}</span>
-              <div className="w-11 h-11 rounded-full bg-brand-700 text-white flex items-center justify-center mx-auto mt-2 mb-3">
+              <div className="relative w-11 h-11 rounded-2xl bg-brand-50 text-brand-700 flex items-center justify-center mx-auto mb-3">
                 <s.icon className="w-5 h-5" />
+                <span className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-brand-700 text-white text-[10px] font-bold flex items-center justify-center">
+                  {i + 1}
+                </span>
               </div>
-              <div className="text-sm font-semibold">{t(s.t)}</div>
+              <div className="text-base font-semibold">{t(s.t)}</div>
               <div className="text-xs text-ink-faint mt-1 leading-relaxed">{t(s.d)}</div>
+              {i < 3 && (
+                <ChevronRight className="hidden lg:block absolute left-full top-1/2 -translate-y-1/2 w-4 h-4 text-mute-300" />
+              )}
             </div>
             </Reveal>
           ))}
@@ -173,7 +177,7 @@ export default function Landing() {
                   </div>
                   <span className="chip bg-volt-100 text-volt-800 border border-volt-200">{t('Demo data')}</span>
                 </div>
-                <h3 className="mt-4 font-semibold">{t(ex.label)}</h3>
+                <h3 className="mt-4 font-semibold text-lg">{t(ex.label)}</h3>
                 <p className="mt-1 text-sm text-ink-soft leading-relaxed">{t(ex.desc)}</p>
                 <span className="mt-3 inline-flex items-center text-sm font-medium text-brand-700">
                   {t('Use this example')} <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-0.5 transition" />

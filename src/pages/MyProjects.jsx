@@ -53,7 +53,7 @@ export default function MyProjects() {
           </button>
           <input ref={fileRef} type="file" accept="application/json" className="hidden" onChange={handleImport} />
         </div>
-        {importError && <p className="mt-2 text-xs text-red-600">{importError}</p>}
+        {importError && <p className="mt-2 text-xs text-danger-600">{importError}</p>}
       </PageHead>
 
       {projects.length === 0 ? (
@@ -98,11 +98,11 @@ export default function MyProjects() {
                   {confirmId === p.id ? (
                     <span className="flex items-center gap-1.5">
                       <button onClick={() => { deleteProject(p.id); setConfirmId(null); }}
-                        className="text-xs font-medium text-white bg-red-600 rounded-lg px-3 py-2">{t('Confirm delete')}</button>
+                        className="text-xs font-medium text-white bg-danger-600 rounded-lg px-3 py-2">{t('Confirm delete')}</button>
                       <button onClick={() => setConfirmId(null)} className="btn-ghost text-xs px-2 py-2">{t('Cancel')}</button>
                     </span>
                   ) : (
-                    <button onClick={() => setConfirmId(p.id)} className="btn-ghost text-xs px-3 py-2.5 text-red-600" title={t('Delete')}>
+                    <button onClick={() => setConfirmId(p.id)} className="btn-ghost text-xs px-3 py-2.5 text-danger-600" title={t('Delete')}>
                       <Trash2 className="w-4 h-4" />
                     </button>
                   )}

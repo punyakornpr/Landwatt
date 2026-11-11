@@ -208,6 +208,57 @@ export function evaluateLandFeasibility(landData) {
   if (roadType !== 'dirt') bioScore += 5;
   scores['biomass-biogas'] = Math.min(Math.max(bioScore, 10), 94);
 
+  // 7. Solar land lease — developer builds, owner collects rent
+  let leaseScore = 50;
+  if (areaRai >= 5) leaseScore += 20;
+  else if (areaRai >= 2) leaseScore += 12;
+  else leaseScore -= 15; // developers want ≥1-2 rai of usable land
+  if (ghi >= 5.1) leaseScore += 12;
+  else if (ghi >= 4.9) leaseScore += 6;
+  if (landType === 'flat') leaseScore += 10;
+  else if (landType === 'pond') leaseScore -= 30;
+  if (gridDistanceMeters <= 500) leaseScore += 8;
+  else if (gridDistanceMeters > 1500) leaseScore -= 15;
+  scores['solar-lease'] = Math.min(Math.max(leaseScore, 10), 92);
+
+  // 8. Data-center / edge site lease — premium but location-gated
+  let dcScore = 35;
+  if (roadType === 'main') dcScore += 20;
+  else if (roadType === 'secondary') dcScore += 5;
+  else dcScore -= 20;
+  if (gridDistanceMeters <= 300) dcScore += 20;
+  else if (gridDistanceMeters <= 800) dcScore += 5;
+  else dcScore -= 15;
+  if (areaRai >= 1 && areaRai <= 15) dcScore += 10;
+  else if (areaRai > 15) dcScore += 5;
+  if (zoningColor === 'purple' || zoningColor === 'orange' || zoningColor === 'red') dcScore += 15;
+  else if (zoningColor === 'yellow') dcScore += 5;
+  if (landType === 'pond') dcScore -= 30;
+  scores['data-center-lease'] = Math.min(Math.max(dcScore, 10), 90);
+
+  // 9. Warehouse + rooftop solar — e-commerce logistics demand
+  let whScore = 45;
+  if (roadType === 'main') whScore += 20;
+  else if (roadType === 'secondary') whScore += 10;
+  else whScore -= 25; // trucks must reach the site
+  if (roadWidthMeters >= 8) whScore += 10;
+  if (areaSqM >= 500 && areaSqM <= 16000) whScore += 12;
+  else if (areaSqM < 500) whScore -= 15;
+  if (landType === 'flat') whScore += 8;
+  if (landType === 'pond') whScore -= 30;
+  if (zoningColor === 'yellow' || zoningColor === 'purple' || zoningColor === 'orange' || zoningColor === 'red') whScore += 8;
+  scores['solar-warehouse'] = Math.min(Math.max(whScore, 10), 90);
+
+  // 10. Carbon credit forestry — lowest capex, slow but ESG-driven income
+  let cfScore = 45;
+  if (areaRai >= 5) cfScore += 20;
+  else if (areaRai >= 2) cfScore += 10;
+  else cfScore -= 10; // credits scale with area
+  if (landType === 'agri' || landType === 'flat') cfScore += 12;
+  if (landType === 'pond') cfScore -= 30;
+  if (zoningColor === 'green' || zoningColor === 'light_green') cfScore += 10;
+  scores['carbon-forest'] = Math.min(Math.max(cfScore, 10), 88);
+
   return scores;
 }
 
@@ -1000,6 +1051,200 @@ export function calculateBiogasSpecs(landData) {
     },
     cashFlowModel: 'CF_y = R_FiT − OPEX − Overhaul(yrs 8/16/24 ~8% CAPEX) — flat baseload output, no PV-style degradation, periodic engine overhauls',
     cashFlows,
+  };
+}
+
+// 7. Solar land lease — developer builds the plant, owner collects rent
+export function calculateSolarLeaseSpecs(landData) {
+  const { areaSqM = 1600, provinceData = {} } = landData;
+  const ghi = provinceData.ghi || 5.1;
+  const excludedAreaSqM = Math.max(0, landData.excludedAreaSqM || 0);
+  const leasableRai = Math.max(0, (areaSqM - excludedAreaSqM) / 1600) * 0.85; // setbacks/buffer
+
+  // ~30k THB/rai/yr, ~2%/yr escalation proxy for the usual 10%/5yr step-ups
+  const leaseRateTHB = 30000;
+  const annualLeaseTHB = leasableRai * leaseRateTHB;
+  const totalCapex = 80000; // owner's cost: survey, title work, legal, fence
+  const opexPerYear = 8000; // admin, land tax on leased income, misc
+
+  const cashFlows = [-totalCapex];
+  for (let y = 1; y <= 25; y++) {
+    cashFlows.push(annualLeaseTHB * Math.pow(1.02, y - 1) - opexPerYear);
+  }
+  const cfFin = financeFromCashFlows(cashFlows);
+
+  // Developer-side PV estimate (context only — the lessee builds and owns it)
+  const devKWp = (leasableRai * 1600 * 0.78) / 4 * 0.62;
+  const devMWhYr = devKWp * ghi * 365 * 0.8 / 1000;
+  const co2AvoidedTonsPerYear = devMWhYr * 0.4999;
+
+  return {
+    leasableRai: leasableRai.toFixed(2),
+    leaseRateTHB,
+    annualLeaseTHB: Math.round(annualLeaseTHB),
+    dcCapacityKWp: Math.round(devKWp),
+    moduleCount: Math.round(devKWp / 0.62),
+    excludedAreaSqM,
+    tariffStatus: 'lease',
+    cashFlows,
+    financials: {
+      totalCapexTHB: Math.round(totalCapex),
+      totalCapexMillionTHB: (totalCapex / 1000000).toFixed(2),
+      annualRevenueMillionTHB: (annualLeaseTHB / 1000000).toFixed(2),
+      netAnnualCashflowMillionTHB: ((annualLeaseTHB - opexPerYear) / 1000000).toFixed(2),
+      paybackYears: cfFin.paybackYears,
+      paybackInterpolated: cfFin.paybackInterpolated,
+      irrPercent: cfFin.irrPercent,
+      npv25YrMillionTHB: cfFin.npv25YrMillionTHB
+    },
+    cashFlowModel: 'CF_y = lease/rai × 1.02^(y−1) − OPEX — rent model, developer carries plant CAPEX',
+    esg: { co2TonsYear: co2AvoidedTonsPerYear.toFixed(1), treesEquivalent: Math.round(co2AvoidedTonsPerYear * 60).toLocaleString() }
+  };
+}
+
+// 8. Data-center / edge site lease — premium rent, location decides everything
+export function calculateDataCenterLeaseSpecs(landData) {
+  const { areaSqM = 1600 } = landData;
+  const excludedAreaSqM = Math.max(0, landData.excludedAreaSqM || 0);
+  const leasableRai = Math.max(0, (areaSqM - excludedAreaSqM) / 1600) * 0.75;
+
+  // Edge/telecom-class lease ~80k THB/rai/yr where demand exists
+  const leaseRateTHB = 80000;
+  const annualLeaseTHB = leasableRai * leaseRateTHB;
+  const totalCapex = 150000; // due-diligence support, legal, survey
+  const opexPerYear = 15000;
+
+  const cashFlows = [-totalCapex];
+  for (let y = 1; y <= 25; y++) {
+    cashFlows.push(annualLeaseTHB * Math.pow(1.02, y - 1) - opexPerYear);
+  }
+  const cfFin = financeFromCashFlows(cashFlows);
+
+  // Rooftop PV potential of the future facility (context)
+  const roofM2 = leasableRai * 1600 * 0.2;
+  const roofKWp = roofM2 / 6.5;
+  const co2AvoidedTonsPerYear = (roofKWp * 5.1 * 365 * 0.8 * 0.4999) / 1000;
+
+  return {
+    leasableRai: leasableRai.toFixed(2),
+    leaseRateTHB,
+    annualLeaseTHB: Math.round(annualLeaseTHB),
+    dcCapacityKWp: Math.round(roofKWp),
+    moduleCount: Math.round(roofKWp / 0.62),
+    excludedAreaSqM,
+    tariffStatus: 'lease',
+    cashFlows,
+    financials: {
+      totalCapexTHB: Math.round(totalCapex),
+      totalCapexMillionTHB: (totalCapex / 1000000).toFixed(2),
+      annualRevenueMillionTHB: (annualLeaseTHB / 1000000).toFixed(2),
+      netAnnualCashflowMillionTHB: ((annualLeaseTHB - opexPerYear) / 1000000).toFixed(2),
+      paybackYears: cfFin.paybackYears,
+      paybackInterpolated: cfFin.paybackInterpolated,
+      irrPercent: cfFin.irrPercent,
+      npv25YrMillionTHB: cfFin.npv25YrMillionTHB
+    },
+    cashFlowModel: 'CF_y = lease/rai × 1.02^(y−1) − OPEX — site lease, operator builds the facility',
+    esg: { co2TonsYear: co2AvoidedTonsPerYear.toFixed(1), treesEquivalent: Math.round(co2AvoidedTonsPerYear * 60).toLocaleString() }
+  };
+}
+
+// 9. Warehouse for rent + rooftop solar — e-commerce logistics trend
+export function calculateSolarWarehouseSpecs(landData) {
+  const { areaSqM = 1600, provinceData = {} } = landData;
+  const ghi = provinceData.ghi || 5.1;
+  const excludedAreaSqM = Math.max(0, landData.excludedAreaSqM || 0);
+  const usableArea = Math.max(0, areaSqM - excludedAreaSqM) * 0.78;
+
+  // Coverage ~40% of usable plot, single building capped at 1,200 m²
+  const warehouseM2 = Math.min(usableArea * 0.40, 1200);
+  // Roof PV: ~50% roof usable at 4.5 m²/kWp, cap 150 kWp (LV-class)
+  const roofSolarKWp = Math.min(warehouseM2 * 0.5 / 4.5, 150);
+  const totalCapex = warehouseM2 * 9000 + roofSolarKWp * 35000 + 250000; // shell + PV + yard/permits
+
+  // Rent ~150 THB/m²/mo at 85% occupancy; PV offsets common-area load / roof income
+  const annualRevenue = warehouseM2 * 150 * 12 * 0.85;
+  const solarSavings = roofSolarKWp * ghi * 0.75 * 365 * 4.5;
+  const opexPerYear = totalCapex * 0.02 + annualRevenue * 0.08; // upkeep + management share
+
+  const cashFlows = [-totalCapex];
+  for (let y = 1; y <= 25; y++) {
+    const refurb = y === 15 ? warehouseM2 * 500 : 0; // roof/door refit
+    cashFlows.push(annualRevenue + solarSavings * Math.pow(0.996, y - 1) - opexPerYear - refurb);
+  }
+  const cfFin = financeFromCashFlows(cashFlows);
+  const co2AvoidedTonsPerYear = (roofSolarKWp * ghi * 0.75 * 365 * 0.4999) / 1000;
+
+  return {
+    warehouseM2: Math.round(warehouseM2),
+    roofSolarKWp: Math.round(roofSolarKWp),
+    dcCapacityKWp: Math.round(roofSolarKWp),
+    moduleCount: Math.round(roofSolarKWp / 0.62),
+    inverterCount: 1,
+    inverterUnitKW: Math.max(10, Math.round(roofSolarKWp)),
+    excludedAreaSqM,
+    tariffStatus: 'scenario',
+    cashFlows,
+    financials: {
+      totalCapexTHB: Math.round(totalCapex),
+      totalCapexMillionTHB: (totalCapex / 1000000).toFixed(2),
+      annualRevenueMillionTHB: ((annualRevenue + solarSavings) / 1000000).toFixed(2),
+      netAnnualCashflowMillionTHB: ((annualRevenue + solarSavings - opexPerYear) / 1000000).toFixed(2),
+      paybackYears: cfFin.paybackYears,
+      paybackInterpolated: cfFin.paybackInterpolated,
+      irrPercent: cfFin.irrPercent,
+      npv25YrMillionTHB: cfFin.npv25YrMillionTHB
+    },
+    cashFlowModel: 'CF_y = (m² × ฿150 × 12 × 0.85) + S_solar×0.996^(y−1) − OPEX − Refurb(y15) — rental + rooftop PV',
+    esg: { co2TonsYear: co2AvoidedTonsPerYear.toFixed(1), treesEquivalent: Math.round(co2AvoidedTonsPerYear * 60).toLocaleString() }
+  };
+}
+
+// 10. Carbon credit forestry — T-VER credits + timber, slow ESG income
+export function calculateCarbonForestSpecs(landData) {
+  const { areaSqM = 1600 } = landData;
+  const excludedAreaSqM = Math.max(0, landData.excludedAreaSqM || 0);
+  const plantableRai = Math.max(0, (areaSqM - excludedAreaSqM) / 1600) * 0.85;
+
+  const treesPerRai = 200;
+  const treeCount = Math.round(plantableRai * treesPerRai);
+  const totalCapex = plantableRai * 18000 + 30000; // seedlings+planting+yr1-3 establishment, T-VER consult
+  const maintPerYear = plantableRai * 2500; // weeding/fire breaks on established plantation
+  const creditTonsYr = plantableRai * 8; // fast-growing pulpwood uptake ~8 tCO2/rai/yr
+  const creditPrice0 = 300; // THB/tCO2, escalating 3%/yr from first verified year
+
+  // Small solar pump kit for seedling irrigation (3 panels ≈ 1.9 kWp)
+  const pumpKWp = 1.9;
+
+  const cashFlows = [-totalCapex];
+  for (let y = 1; y <= 25; y++) {
+    const credits = y >= 5 ? creditTonsYr * creditPrice0 * Math.pow(1.03, y - 5) : 0;
+    const timber = y % 5 === 0 ? plantableRai * 12000 : 0; // pulpwood ~5-yr cycles, ~12k/rai net
+    cashFlows.push(credits + timber - maintPerYear);
+  }
+  const cfFin = financeFromCashFlows(cashFlows);
+
+  return {
+    plantableRai: plantableRai.toFixed(2),
+    treeCount,
+    creditTonsYr: creditTonsYr.toFixed(1),
+    dcCapacityKWp: pumpKWp,
+    moduleCount: 3,
+    excludedAreaSqM,
+    tariffStatus: 'scenario',
+    cashFlows,
+    financials: {
+      totalCapexTHB: Math.round(totalCapex),
+      totalCapexMillionTHB: (totalCapex / 1000000).toFixed(2),
+      annualRevenueMillionTHB: ((creditTonsYr * creditPrice0) / 1000000).toFixed(2),
+      netAnnualCashflowMillionTHB: ((creditTonsYr * creditPrice0 - maintPerYear) / 1000000).toFixed(2),
+      paybackYears: cfFin.paybackYears,
+      paybackInterpolated: cfFin.paybackInterpolated,
+      irrPercent: cfFin.irrPercent,
+      npv25YrMillionTHB: cfFin.npv25YrMillionTHB
+    },
+    cashFlowModel: 'CF_y = Credits(y5+, ฿300×1.03^(y−5)) + Timber(y10,y20) − Maintenance — slow ESG income',
+    esg: { co2TonsYear: creditTonsYr.toFixed(1), treesEquivalent: treeCount.toLocaleString() }
   };
 }
 

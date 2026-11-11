@@ -31,8 +31,8 @@ export const TH = {
 
   // Landing
   'Land-use energy planning assistant': 'ผู้ช่วยวางแผนใช้ที่ดินทำพลังงาน',
-  'Your vacant land can': 'ที่ดินว่างของคุณ',
-  'do more than you think': 'ทำประโยชน์ได้มากกว่าที่คิด',
+  'Your vacant land': 'ที่ดินว่างของคุณ',
+  'can do more than you think': 'ทำประโยชน์ได้มากกว่าที่คิด',
   'Tell us where your land is and what you want — LandWatt compares energy options and estimates area, investment and returns in plain terms':
     'บอกแค่ว่าที่ดินอยู่ที่ไหนและอยากได้อะไร — LandWatt เปรียบเทียบทางเลือกด้านพลังงานและประเมินพื้นที่ เงินลงทุน และผลตอบแทนให้แบบเข้าใจง่าย',
   'Plan my land': 'วางแผนที่ดินของฉัน',
@@ -457,10 +457,20 @@ export const TH = {
 
   // Misc page keys
   'Step': 'ขั้นที่',
+  'Why LandWatt': 'ทำไมต้อง LandWatt',
+  'Simple for anyone — rigorous engineering underneath': 'ใช้ง่ายสำหรับทุกคน — มีการคำนวณวิศวกรรมจริงรองรับข้างหลัง',
   'm² → usable left ≈ {n} m²': 'ตร.ม. → เหลือใช้ได้ ≈ {n} ตร.ม.',
   'Under': 'ต่ำกว่า',
   'Over': 'มากกว่า',
   'THB': 'บาท',
+  'rai leased': 'ไร่ให้เช่า',
+  'THB/yr rent': 'บาท/ปี ค่าเช่า',
+  'Warehouse': 'โกดัง',
+  'm²': 'ตร.ม.',
+  'rooftop PV': 'โซลาร์หลังคา',
+  'kWp': 'kWp',
+  'trees': 'ต้น',
+  'tCO2/yr': 'ตัน CO2/ปี',
 
   // Plan strengths (eeProjects.keyBenefits)
   'Steady cash flow for 20-25 years (PPA/FiT)': 'กระแสเงินสดมั่นคง 20-25 ปี (PPA/FiT)',
@@ -496,6 +506,22 @@ export const TH = {
   'Lowest startup cost of any plan here — ~400k THB per tunnel': 'ต้นทุนเริ่มต่ำสุดในทุกแผน — ~4 แสนบาท/อุโมงค์',
   'Service income during every harvest, no power-sale license needed': 'รายได้บริการทุกฤดูเก็บเกี่ยว ไม่ต้องมีใบอนุญาตขายไฟ',
   'Almost no moving parts — passive heat plus small DC fans': 'แทบไม่มีชิ้นส่วนเคลื่อนไหว — ความร้อนพาสซีฟ + พัดลม DC เล็ก',
+  'Almost no capital outlay — the developer funds the whole plant': 'แทบไม่ต้องลงทุน — ผู้พัฒนาออกทุนสร้างทั้งหมด',
+  'Fixed, predictable rent for 25+ years with step-up clauses': 'ค่าเช่าคงที่คาดการณ์ได้ยาว 25+ ปี พร้อมเงื่อนไขขึ้นค่าเช่า',
+  'No O&M, no permits, no power-sale paperwork on your side': 'ไม่ต้องดูแล ไม่ต้องขออนุญาต ไม่มีเอกสารขายไฟฝั่งเรา',
+  'Land value preserved — the plot is not sold, only leased': 'มูลค่าที่ดินยังอยู่ — ไม่ได้ขาย แค่ให้เช่า',
+  'Premium lease rates — far above agricultural or solar land rent': 'ค่าเช่าระดับพรีเมียม — สูงกว่าเช่าเกษตรหรือโซลาร์มาก',
+  '20-30 year leases with strong corporate counterparties': 'สัญญาเช่า 20-30 ปี กับคู่สัญญาองค์กรที่มั่นคง',
+  'Near-zero owner investment after due diligence': 'เจ้าของที่แทบไม่ต้องลงทุนหลังผ่าน due diligence',
+  'Riding the largest infrastructure trend in Thai property': 'เกาะเทรนด์โครงสร้างพื้นฐานที่ใหญ่สุดของอสังหาไทย',
+  'Two income streams: warehouse rent + rooftop PV/lease': 'รายได้สองทาง: ค่าเช่าโกดัง + โซลาร์หลังคา/เช่าหลังคา',
+  'E-commerce and delivery demand keeps rental occupancy high': 'ดีมานด์อีคอมเมิร์ซและขนส่งทำให้อัตราเข้าพักสูง',
+  'Reusable asset — warehouse still holds resale/rental value': 'สินทรัพย์ใช้ต่อได้ — โกดังยังมีมูลค่าขาย/เช่าต่อ',
+  'Scales building-by-building as demand proves out': 'ขยายทีละอาคารตามดีมานด์ที่พิสูจน์แล้ว',
+  'Lowest capital entry of any plan here — seedlings and labor': 'ลงทุนเริ่มต่ำสุดในทุกแผน — ต้นกล้ากับแรงงาน',
+  'Carbon credit demand rising with corporate net-zero pledges': 'ดีมานด์คาร์บอนเครดิตโตตามคำมั่น net-zero ขององค์กร',
+  'Improves the land: soil, shade and water retention recover': 'ฟื้นที่ดิน: ดิน ร่มเงา และการกักน้ำกลับมาดีขึ้น',
+  'Timber value at harvest is a bonus on top of credits': 'มูลค่าไม้ตอนตัดเป็นโบนัสเพิ่มจากเครดิต',
 };
 
 export function useT() {

@@ -20,6 +20,7 @@ export function AppStateProvider({ children }) {
   const api = useMemo(() => ({
     draft,
     lang,
+    setLang,
     toggleLang: () => setLang(l => (l === 'th' ? 'en' : 'th')),
     land: draft.land,
     goals: draft.goals,

@@ -64,4 +64,27 @@ export const PROVIDERS = {
     { name: 'Agri-equipment fabricator', scale: 'Regional', focus: 'Tunnel dryers, racks and food-grade covers built locally', note: 'Ask the DOAE regional office for approved solar-dryer designs before building' },
     { name: 'Local licensed installer', scale: 'Local', focus: 'Small PV + DC fans for tunnel ventilation', note: 'Only a few kW — any competent installer can do it' },
   ],
+  'solar-lease': [
+    { name: 'B.Grimm Power', scale: 'National', focus: 'Utility-scale developer that leases land for solar farms', note: 'SET-listed — established land-lease process', website: 'https://www.bgrimmpower.com/en/home', contact: 'Tel +66 2 710 3400' },
+    { name: 'SPCG', scale: 'National', focus: 'Solar-farm developer — leases suitable plots long-term', note: 'Owns and operates its farms — pays lease plus handles everything', website: 'https://www.spcg.co.th', contact: 'Tel 02-011-8111 · info@spcg.co.th' },
+    { name: 'Banpu NEXT', scale: 'National', focus: 'Energy solutions company expanding PV capacity', note: 'Ask their land-sourcing team about lease terms', website: 'https://www.banpunext.co.th', contact: 'Tel 02-095-6599 · contact@banpunext.co.th' },
+    { name: 'Local developer / land broker', scale: 'Regional', focus: 'Provincial solar developers and lease brokers', note: 'Often faster — but verify their PPA/funding track record before signing' },
+  ],
+  'data-center-lease': [
+    { name: 'True IDC / SUPERNAP', scale: 'National', focus: 'Thailand\'s largest data-center operator (True Group)', note: 'Expanding edge and hyperscale sites — contact their real-estate/site team', website: 'https://www.trueidc.com', contact: 'True IDC sales via trueidc.com' },
+    { name: 'STT GDC Thailand', scale: 'National', focus: 'Regional data-center operator (ST Telemedia)', note: 'Multiple Bangkok sites — expanding footprint', website: 'https://www.sttelemediagdc.com', contact: 'Via sttelemediagdc.com contact form' },
+    { name: 'AIS CS (fiber/tower)', scale: 'National', focus: 'Telecom infrastructure — edge sites and tower land leases', note: 'Smaller plots work for tower/edge leases', website: 'https://www.ais.th', contact: 'AIS business contact' },
+    { name: 'Industrial-estate broker', scale: 'Regional', focus: 'Agents placing digital-infrastructure sites (EEC especially)', note: 'A broker who knows the corridor is worth the fee' },
+  ],
+  'solar-warehouse': [
+    { name: 'Local design-build contractor', scale: 'Local', focus: 'Small steel-frame warehouses — turnkey shell + permit', note: 'Compare 2–3 quotes including piling and fire protection' },
+    { name: 'WHA / Frasers (reference)', scale: 'National', focus: 'Large logistics developers — study their spec sheet as a quality benchmark', note: 'They do not build for you, but their spec shows what tenants expect', website: 'https://www.wha.co.th' },
+    { name: 'SCG Solar Roof Solutions', scale: 'National', focus: 'Rooftop PV package sized to the warehouse roof', note: 'Ask about structural load check before panel layout', website: 'https://www.scgsmartliving.com/th/service/solar-roof-factory', contact: 'Tel 02-586-2222 · contact@scg.com' },
+  ],
+  'carbon-forest': [
+    { name: 'TGO (Thailand Greenhouse Gas Mgmt Org)', scale: 'National', focus: 'T-VER registry and approved methodologies — the mandatory starting point', note: 'Check current forestry methodologies and registered verifiers', website: 'https://ghgreduction.tgo.or.th' },
+    { name: 'Forest Industry Organization (FIO)', scale: 'National', focus: 'State enterprise for commercial forestry — seedlings and planting know-how', note: 'Cheap certified seedlings for fast-growing species', website: 'https://www.fio.co.th' },
+    { name: 'Carbon project developer / VNV Advisory', scale: 'Regional', focus: 'Carbon-credit project developers who co-develop and share revenue', note: 'They handle verification paperwork for a revenue share — compare terms' },
+    { name: 'Local forestry office', scale: 'Local', focus: 'Royal Forest Dept / provincial office — species advice and land-use rules', note: 'Confirm the plot can legally be planted as forestry' },
+  ],
 };

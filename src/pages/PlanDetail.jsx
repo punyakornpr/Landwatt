@@ -90,6 +90,9 @@ export default function PlanDetail({ projectId }) {
     specs.dryerTunnels && `${specs.dryerTunnels} ${t('solar drying tunnels')} (~${specs.dryCapacityKgDay} ${t('kg/day')})`,
     specs.pontoonType && `${t('Floating pontoons')} ${specs.pontoonType.split('(')[0]}`,
     specs.mountingStructure && `${t('Raised structure for farming under panels')}`,
+    specs.leasableRai && `~${specs.leasableRai} ${t('rai leased')} (~${(specs.annualLeaseTHB || 0).toLocaleString()} ${t('THB/yr rent')})`,
+    specs.warehouseM2 && `${t('Warehouse')} ~${specs.warehouseM2} ${t('m²')} + ${t('rooftop PV')} ~${specs.roofSolarKWp} ${t('kWp')}`,
+    specs.treeCount && `~${specs.treeCount.toLocaleString()} ${t('trees')} (~${specs.creditTonsYr} ${t('tCO2/yr')})`,
   ].filter(Boolean) : [
     specs.moduleCount && `~${specs.moduleCount} solar panels`,
     specs.inverterCount && `${specs.inverterCount} inverters`,
@@ -104,6 +107,9 @@ export default function PlanDetail({ projectId }) {
     specs.dryerTunnels && `${specs.dryerTunnels} solar drying tunnels (~${specs.dryCapacityKgDay} kg/day)`,
     specs.pontoonType && `Floating pontoons ${specs.pontoonType.split('(')[0]}`,
     specs.mountingStructure && `Raised structure for farming under panels`,
+    specs.leasableRai && `~${specs.leasableRai} rai leased (~${(specs.annualLeaseTHB || 0).toLocaleString()} THB/yr rent)`,
+    specs.warehouseM2 && `Warehouse ~${specs.warehouseM2} m² + rooftop PV ~${specs.roofSolarKWp} kWp`,
+    specs.treeCount && `~${specs.treeCount.toLocaleString()} trees (~${specs.creditTonsYr} tCO2/yr)`,
   ].filter(Boolean);
 
   return (

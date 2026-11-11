@@ -7,7 +7,7 @@ export const STATUS = {
   great:        { label: 'Great fit',       labelTh: 'เหมาะมาก',        color: 'bg-energy-100 text-energy-800 border-energy-200', dot: 'bg-energy-500' },
   worth:        { label: 'Worth exploring', labelTh: 'น่าสนใจ',        color: 'bg-electric-100 text-electric-800 border-electric-200', dot: 'bg-electric-500' },
   insufficient: { label: 'Needs more data', labelTh: 'ต้องการข้อมูลเพิ่ม', color: 'bg-volt-100 text-volt-800 border-volt-200', dot: 'bg-volt-500' },
-  no:           { label: 'Not recommended', labelTh: 'ไม่แนะนำ',        color: 'bg-zinc-100 text-zinc-500 border-zinc-200', dot: 'bg-zinc-400' },
+  no:           { label: 'Not recommended', labelTh: 'ไม่แนะนำ',        color: 'bg-mute-100 text-mute-500 border-mute-200', dot: 'bg-mute-400' },
 };
 
 export const BUDGET_MAX_THB = {
@@ -104,6 +104,34 @@ export const PROJECT_FRIENDLY = {
     oneLiner: 'Turns farm waste or manure into biogas for power — needs a steady feedstock supply',
     oneLinerTh: 'เปลี่ยนเศษเกษตรหรือมูลสัตว์เป็นไบโอแก๊สผลิตไฟ — ต้องมีวัตถุดิบต่อเนื่อง',
   },
+  'solar-lease': {
+    name: 'Solar land lease', nameTh: 'เช่าที่ดินทำโซลาร์ฟาร์ม',
+    sub: 'Developer Land Lease', subTh: 'ให้เช่าที่ดินกับผู้พัฒนา',
+    icon: 'Handshake',
+    oneLiner: 'A solar developer leases your land and builds everything — you collect rent for 25+ years',
+    oneLinerTh: 'ผู้พัฒนาเช่าที่ดินและลงทุนสร้างเองทั้งหมด — คุณเก็บค่าเช่ายาว 25+ ปี',
+  },
+  'data-center-lease': {
+    name: 'Data center site lease', nameTh: 'เช่าที่ดินทำดาต้าเซ็นเตอร์',
+    sub: 'Digital Infrastructure', subTh: 'โครงสร้างดิจิทัล',
+    icon: 'Server',
+    oneLiner: 'Premium land lease to data center or telecom operators — the hottest land business right now',
+    oneLinerTh: 'เช่าที่ดินให้ผู้ประกอบการดาต้าเซ็นเตอร์/โทรคมนาคม — ธุรกิจที่ดินที่ร้อนแรงสุดตอนนี้',
+  },
+  'solar-warehouse': {
+    name: 'Warehouse + rooftop solar', nameTh: 'โกดังให้เช่า + โซลาร์หลังคา',
+    sub: 'Logistics Property', subTh: 'อสังหาโลจิสติกส์',
+    icon: 'Warehouse',
+    oneLiner: 'Build a small warehouse and rent it to logistics or e-commerce — the roof earns solar savings too',
+    oneLinerTh: 'สร้างโกดังเล็กให้เช่าโลจิสติกส์/อีคอมเมิร์ซ — หลังคาทำโซลาร์เพิ่มรายได้',
+  },
+  'carbon-forest': {
+    name: 'Carbon credit forestry', nameTh: 'ปลูกป่าคาร์บอนเครดิต',
+    sub: 'T-VER Carbon Credits', subTh: 'คาร์บอนเครดิต T-VER',
+    icon: 'Trees',
+    oneLiner: 'Plant fast-growing trees, register T-VER credits — lowest capital entry, slow ESG income',
+    oneLinerTh: 'ปลูกไม้โตเร็ว ขึ้นทะเบียนเครดิต T-VER — ลงทุนต่ำสุด รายได้ช้าแต่ยั่งยืน',
+  },
 };
 
 // Localized friendly meta: returns EN fields, or Th fields when lang==='th' (falls back to EN per field)
@@ -199,6 +227,36 @@ function reasonsFor(projectId, land, lang = 'en') {
       cautions.push(R('A real feedstock survey is required: daily volume, year-round continuity and transport cost before concluding feasibility', 'ต้องสำรวจวัตถุดิบจริง: ปริมาณต่อวัน ความต่อเนื่องทั้งปี และค่าขนส่ง ก่อนสรุปความเป็นไปได้'));
       cautions.push(R('Odor management and a factory license must be handled', 'ต้องจัดการกลิ่นและขอใบอนุญาตโรงงาน'));
       break;
+    case 'solar-lease':
+      reasons.push(R('Near-zero investment — the developer funds the plant, you collect rent', 'แทบไม่ต้องลงทุน — ผู้พัฒนาออกทุนสร้าง คุณเก็บค่าเช่า'));
+      if (areaRai >= 2) reasons.push(R(`${areaRai.toFixed(1)} rai is the size solar developers actually look for`, `${areaRai.toFixed(1)} ไร่ เป็นขนาดที่ผู้พัฒนาโซลาร์ตามหาจริง`));
+      if (ghi >= 5.1) reasons.push(R(`Good sun here (avg ${ghi} kWh/m²/day) — what makes land leasable`, `แดดดีที่นี่ (เฉลี่ย ${ghi} kWh/ตร.ม./วัน) — ปัจจัยที่ทำให้ที่ดินน่าเช่า`));
+      if (land.gridDistanceMeters <= 500) reasons.push(R('Close to the grid — developers pay more for plots that interconnect cheaply', 'ใกล้สายไฟ — ผู้พัฒนาให้ราคาดีกับแปลงที่เชื่อมต่อถูก'));
+      cautions.push(R('Lease offers vary a lot — get 2–3 developer quotes and a lawyer before signing', 'ข้อเสนอค่าเช่าต่างกันมาก — เทียบ 2–3 เจ้าและให้ทนายดูสัญญาก่อนเซ็น'));
+      cautions.push(R('You give up use of the land for 25+ years — check end-of-term and decommission clauses', 'สูญสิทธิ์ใช้ที่ดิน 25+ ปี — เช็คเงื่อนไขสิ้นสัญญาและการรื้อถอน'));
+      break;
+    case 'data-center-lease':
+      reasons.push(R('The hottest land trend in Thailand — cloud/AI demand is driving data center site deals', 'เทรนด์ที่ดินที่ร้อนแรงสุดในไทย — ดีมานด์ cloud/AI ดันดีลดาต้าเซ็นเตอร์'));
+      if (land.roadType === 'main') reasons.push(R('Main-road access — operators need construction and service access', 'ติดถนนใหญ่ — ผู้ประกอบการต้องการทางเข้าสำหรับก่อสร้างและบริการ'));
+      if (land.gridDistanceMeters <= 300) reasons.push(R('Very close to the grid/substation — the #1 site criterion for digital infrastructure', 'ใกล้สายไฟ/สถานีไฟฟ้ามาก — เกณฑ์อันดับหนึ่งของโครงสร้างดิจิทัล'));
+      if (areaRai >= 1) reasons.push(R('Plot size fits an edge site or telecom facility', 'ขนาดแปลงพอสำหรับ edge site หรือสถานีโทรคมนาคม'));
+      cautions.push(R('Demand is highly location-specific — most rural plots will not attract an operator', 'ดีมานด์เฉพาะทำเลมาก — ที่ดินชนบทส่วนใหญ่ไม่ดึงดูดผู้ประกอบการ'));
+      cautions.push(R('Fiber routes and grid capacity must be verified — land alone tells only half the story', 'ต้องยืนยันเส้นทางไฟเบอร์และกำลังสาย — ที่ดินอย่างเดียวบอกได้ครึ่งเดียว'));
+      break;
+    case 'solar-warehouse':
+      reasons.push(R('E-commerce logistics is the fastest-growing rental segment in Thailand', 'โลจิสติกส์อีคอมเมิร์ซเป็นตลาดเช่าที่โตเร็วสุดในไทย'));
+      if (land.roadType === 'main') reasons.push(R('Road frontage for trucks — the core requirement for warehouse rent', 'หน้ากว้างติดถนนรถบรรทุกเข้าได้ — เงื่อนไขหลักของค่าเช่าโกดัง'));
+      reasons.push(R('Two income layers: warehouse rent plus rooftop PV offset/lease', 'รายได้สองชั้น: ค่าเช่าโกดัง + โซลาร์หลังคาช่วยค่าไฟ/ให้เช่า'));
+      cautions.push(R('Occupancy depends on local demand — the 85% rate used here is an assumption to verify', 'อัตราเข้าพักขึ้นกับดีมานด์ท้องถิ่น — 85% ที่ใช้คำนวณเป็นสมมติฐานต้องเช็ค'));
+      cautions.push(R('Check zoning and building-permit feasibility for a warehouse before costing', 'เช็คผังเมืองและความเป็นไปได้ขออนุญาตก่อสร้างโกดังก่อนคิดต้นทุน'));
+      break;
+    case 'carbon-forest':
+      reasons.push(R('Lowest capital entry on this list — seedlings, labor and a small solar pump', 'ลงทุนต่ำสุดในลิสต์ — ต้นกล้า แรงงาน และปั๊มโซลาร์เล็ก'));
+      if (areaRai >= 5) reasons.push(R(`${areaRai.toFixed(1)} rai gives meaningful credit volume`, `${areaRai.toFixed(1)} ไร่ ให้ปริมาณเครดิตที่มีนัยสำคัญ`));
+      if (land.landType === 'agri' || land.landType === 'flat') reasons.push(R('Open/farm land suits tree planting without major clearing', 'ที่โล่ง/ที่เกษตรปลูกป่าได้โดยไม่ต้องแปลงพื้นที่มาก'));
+      cautions.push(R('Carbon credits alone pay little per rai — timber at harvest is the real return', 'คาร์บอนเครดิตอย่างเดียวให้เงินน้อยต่อไร่ — รายได้จริงอยู่ที่ไม้ตอนตัด'));
+      cautions.push(R('T-VER registration and verification take years — talk to TGO or a verifier early', 'การขึ้นทะเบียนและรับรอง T-VER ใช้เวลาหลายปี — ปรึกษา TGO หรือผู้รับรองตั้งแต่เนิ่น'));
+      break;
   }
   return { reasons, cautions };
 }
@@ -276,6 +334,36 @@ function screening(projectId, land, goals, lang = 'en') {
       if (land.landType === 'pond')
         return { status: 'no', blockReason: R('Most of the plot is water — unsuitable for under-panel crops', 'แปลงส่วนใหญ่เป็นน้ำ — ไม่เหมาะปลูกพืชใต้แผง') };
       return null;
+    case 'solar-lease':
+      if (land.landType === 'pond')
+        return { status: 'insufficient', blockReason: R('Mostly water — a developer cannot build on a pond', 'ส่วนใหญ่เป็นน้ำ — ผู้พัฒนาสร้างบนบ่อไม่ได้') };
+      if (areaRai < 1)
+        return { status: 'no', blockReason: R('Under 1 rai — developers generally need at least 1–2 rai of usable land', 'น้อยกว่า 1 ไร่ — ผู้พัฒนามักต้องการที่ดินใช้ได้อย่างน้อย 1–2 ไร่') };
+      return null;
+    case 'data-center-lease':
+      if (land.landType === 'pond')
+        return { status: 'no', blockReason: R('Mostly water — no operator builds on a pond', 'ส่วนใหญ่เป็นน้ำ — ไม่มีผู้ประกอบการสร้างบนบ่อ') };
+      if (land.roadType === 'dirt')
+        return { status: 'insufficient', blockReason: R('No proper road — digital sites need construction and service access', 'ไม่มีถนนดี — โครงสร้างดิจิทัลต้องการทางเข้าก่อสร้างและบริการ') };
+      if (land.gridDistanceMeters > 800)
+        return { status: 'insufficient', blockReason: R('Far from a substation/strong feeder — robust power is the #1 site requirement', 'ไกลสถานีไฟฟ้า/สายป้อน — ไฟที่มั่นคงคือเงื่อนไขอันดับหนึ่ง') };
+      if (areaRai < 1)
+        return { status: 'insufficient', blockReason: R('Under 1 rai — most operators need more space', 'น้อยกว่า 1 ไร่ — ผู้ประกอบการส่วนใหญ่ต้องการพื้นที่มากกว่านี้') };
+      return null;
+    case 'solar-warehouse':
+      if (land.landType === 'pond')
+        return { status: 'no', blockReason: R('Mostly water — a warehouse needs dry buildable land', 'ส่วนใหญ่เป็นน้ำ — โกดังต้องอยู่บนที่แห้ง') };
+      if (land.roadType === 'dirt')
+        return { status: 'insufficient', blockReason: R('Trucks cannot rely on a dirt track — a warehouse needs proper road access', 'รถบรรทุกเข้าทางดินไม่ได้ — โกดังต้องอยู่บนถนนที่ใช้งานจริง') };
+      if (land.areaSqM < 300)
+        return { status: 'no', blockReason: R('Too small for a warehouse plus truck apron', 'เล็กเกินสำหรับโกดังบวกลานรถบรรทุก') };
+      return null;
+    case 'carbon-forest':
+      if (land.landType === 'pond')
+        return { status: 'no', blockReason: R('Mostly water — no room to plant trees', 'ส่วนใหญ่เป็นน้ำ — ไม่มีที่ปลูกต้นไม้') };
+      if (areaRai < 1)
+        return { status: 'insufficient', blockReason: R('Under 1 rai — credit volume too small to justify T-VER registration', 'น้อยกว่า 1 ไร่ — ปริมาณเครดิตน้อยเกินไปสำหรับการขึ้นทะเบียน T-VER') };
+      return null;
   }
   return null;
 }
@@ -294,6 +382,10 @@ function goalBoost(projectId, aims) {
     'grid-bess': ['backup'],
     'floating-solar': ['income'],
     'biomass-biogas': ['farm', 'income'],
+    'solar-lease': ['income', 'unsure'],
+    'data-center-lease': ['income'],
+    'solar-warehouse': ['income', 'ev'],
+    'carbon-forest': ['income', 'farm', 'unsure'],
   };
   if (!aims.length) return 0;
   const matched = (map[projectId] || []).some(a => aims.includes(a));
@@ -320,9 +412,10 @@ export function recommendProjects(land, goals, lang = 'en') {
   const results = Object.keys(PROJECT_FRIENDLY).map(id => {
     const screened = screening(id, land, goals, lang);
     let score = Math.round(Math.min(98, Math.max(10, (raw[id] || 50) + goalBoost(id, aims))));
-    // Heavy missing data caps the score so it can't exceed data confidence
+    // Missing data keeps scores under a confidence ceiling — soft-compressed
+    // instead of flat-clamped so relative ranking survives
     const scoreCap = confidence.level === 'Low' ? 70 : confidence.level === 'Medium' ? 85 : 98;
-    score = Math.min(score, scoreCap);
+    if (score > scoreCap) score = scoreCap + Math.round((score - scoreCap) * 0.25);
     let status = screened?.status || (score >= 72 ? 'great' : score >= 52 ? 'worth' : score >= 38 ? 'insufficient' : 'no');
     if (confidence.level === 'Low' && status === 'great') status = 'worth';
     const { reasons, cautions } = reasonsFor(id, land, lang);

@@ -57,7 +57,7 @@ export default function Compare() {
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-[#EBEBEF]">
+              <tr className="border-b border-[#e8e8ed]">
                 <th className="text-left p-4 text-ink-faint font-medium w-44">{t('Topic')}</th>
                 {plans.map(p => (
                   <th key={p.id} className="text-left p-4 min-w-[200px]">
@@ -65,7 +65,7 @@ export default function Compare() {
                       <ProjectIcon id={p.id} />
                       <div>
                         <div className="font-bold">{projectFriendly(p.id, lang).name}</div>
-                        <button onClick={() => toggleCompare(p.id)} className="text-[11px] text-ink-faint hover:text-red-600 font-normal flex items-center gap-0.5 mt-0.5">
+                        <button onClick={() => toggleCompare(p.id)} className="text-[11px] text-ink-faint hover:text-danger-600 font-normal flex items-center gap-0.5 mt-0.5">
                           <X className="w-3 h-3" /> {t('Remove')}
                         </button>
                       </div>
@@ -76,7 +76,7 @@ export default function Compare() {
             </thead>
             <tbody>
               {rows.map((row, i) => (
-                <tr key={i} className="border-b border-[#F7F5EF] last:border-0 align-top">
+                <tr key={i} className="border-b border-[#f5f5f7] last:border-0 align-top">
                   <td className="p-4 text-ink-faint text-xs font-medium">{row.label}</td>
                   {plans.map(p => (
                     <td key={p.id} className="p-4 text-sm leading-relaxed">{row.get(p)}</td>
@@ -105,7 +105,7 @@ export default function Compare() {
             <div className="flex items-center gap-3 mb-4">
               <ProjectIcon id={p.id} />
               <div className="flex-1 font-bold">{projectFriendly(p.id, lang).name}</div>
-              <button onClick={() => toggleCompare(p.id)} className="text-ink-faint hover:text-red-600"><X className="w-4 h-4" /></button>
+              <button onClick={() => toggleCompare(p.id)} className="text-ink-faint hover:text-danger-600"><X className="w-4 h-4" /></button>
             </div>
             <dl className="space-y-3">
               {rows.map((row, i) => (

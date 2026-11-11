@@ -98,7 +98,7 @@ export default function Results() {
           const budgetWarn = budgetCaution(r.id, goals.budget, capexM ? capexM * 1e6 : null);
           const isCompared = compareIds.includes(r.id);
           return (
-            <div key={r.id} className={`card p-5 sm:p-6 ${idx === 0 ? 'border-brand-300 ring-1 ring-brand-100' : ''}`}>
+            <div key={r.id} className={`card p-5 sm:p-6 ${idx === 0 ? 'border-brand-300 ring-2 ring-brand-200/70 shadow-lg shadow-brand-600/10' : ''}`}>
               <div className="flex flex-col sm:flex-row gap-4">
                 <ProjectIcon id={r.id} size="lg" active={idx === 0} />
                 <div className="flex-1 min-w-0">
@@ -110,11 +110,18 @@ export default function Results() {
                   <p className="text-sm text-ink-soft mt-0.5">{meta.oneLiner}</p>
                   <div className="mt-2.5 flex flex-wrap items-center gap-2">
                     <StatusBadge status={r.status} />
-                    <span className="text-xs text-ink-faint">Suitability {r.score}/100 <button className="underline decoration-dotted" onClick={() => setWhyOpen(whyOpen === r.id ? null : r.id)}>why this score?</button></span>
+                    <span className="flex items-center gap-1.5 text-xs text-ink-faint">
+                      Suitability
+                      <span className="w-16 h-1.5 rounded-full bg-brand-100 overflow-hidden">
+                        <span className="score-bar" style={{ width: `${r.score}%` }} />
+                      </span>
+                      <span className="font-semibold text-ink">{r.score}/100</span>
+                      <button className="underline decoration-dotted" onClick={() => setWhyOpen(whyOpen === r.id ? null : r.id)}>why this score?</button>
+                    </span>
                   </div>
 
                   {whyOpen === r.id && (
-                    <div className="mt-3 rounded-xl bg-paper border border-[#E7E5DD] p-4 text-xs text-ink-soft space-y-1.5">
+                    <div className="mt-3 rounded-xl bg-paper border border-[#E8E8ED] p-4 text-xs text-ink-soft space-y-1.5">
                       <div className="font-medium text-ink">Scoring factors (prototype weights)</div>
                       <ul className="list-disc pl-4 space-y-1">
                         <li>Land area and terrain suitability</li>
@@ -153,7 +160,7 @@ export default function Results() {
                 </div>
               </div>
 
-              <div className="mt-4 pt-4 border-t border-[#F0EEE7] flex flex-col sm:flex-row gap-2.5">
+              <div className="mt-4 pt-4 border-t border-[#EBEBEF] flex flex-col sm:flex-row gap-2.5">
                 <button
                   onClick={() => { setChosenPlan(r.id); navigate(`/plan/${r.id}`); }}
                   className="btn-primary flex-1">
@@ -177,7 +184,7 @@ export default function Results() {
             {rest.map(r => {
               const meta = PROJECT_FRIENDLY[r.id];
               return (
-                <div key={r.id} className="flex items-start gap-3 p-3.5 rounded-xl border border-[#E7E5DD] bg-paper/60">
+                <div key={r.id} className="flex items-start gap-3 p-3.5 rounded-xl border border-[#E8E8ED] bg-paper/60">
                   <ProjectIcon id={r.id} size="md" />
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">

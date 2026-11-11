@@ -28,10 +28,10 @@ function NavBar() {
   }`;
 
   return (
-    <header className="sticky top-0 z-40 bg-paper/90 backdrop-blur-md border-b border-[#E7E5DD]">
+    <header className="sticky top-0 z-40 bg-white/70 backdrop-blur-xl saturate-150 border-b border-black/[0.08]">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
         <button onClick={() => navigate('/')} className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-xl bg-brand-700 flex items-center justify-center text-white">
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-brand-600 to-electric-500 flex items-center justify-center text-white shadow-md shadow-brand-600/30">
             <Sun className="w-5 h-5" />
           </div>
           <div className="text-left">
@@ -56,7 +56,7 @@ function NavBar() {
       </div>
 
       {open && (
-        <nav className="md:hidden border-t border-[#E7E5DD] bg-paper px-4 py-3 space-y-1">
+        <nav className="md:hidden border-t border-black/[0.08] bg-white/95 backdrop-blur-xl px-4 py-3 space-y-1">
           {NAV_ITEMS.map(n => (
             <button key={n.path}
               onClick={() => { setOpen(false); navigate(`/${n.path}`); }}
@@ -89,8 +89,8 @@ function RoutedApp() {
   return (
     <div className="min-h-screen flex flex-col">
       <NavBar />
-      <main className="flex-1">{page}</main>
-      <footer className="border-t border-[#E7E5DD] py-8 px-4 sm:px-6 text-center no-print">
+      <main key={path} className="flex-1 animate-in">{page}</main>
+      <footer className="border-t border-[#E8E8ED] py-8 px-4 sm:px-6 text-center no-print">
         <p className="text-xs text-ink-faint">
           LandWatt — results are preliminary estimates, not legal or price guarantees ·
           Your data is stored only in this browser

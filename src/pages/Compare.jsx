@@ -52,7 +52,7 @@ export default function Compare() {
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-[#F0EEE7]">
+              <tr className="border-b border-[#EBEBEF]">
                 <th className="text-left p-4 text-ink-faint font-medium w-44">Topic</th>
                 {plans.map(p => (
                   <th key={p.id} className="text-left p-4 min-w-[200px]">

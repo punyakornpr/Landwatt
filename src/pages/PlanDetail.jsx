@@ -165,11 +165,11 @@ export default function PlanDetail({ projectId }) {
           <h2 className="text-lg font-bold mb-1">How much money is needed and is it worth it?</h2>
           <div className="card p-5 space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
-              <div className="rounded-xl bg-paper border border-[#E7E5DD] p-4">
+              <div className="rounded-xl bg-paper border border-[#E8E8ED] p-4">
                 <div className="text-xs text-ink-faint">Initial investment</div>
                 <div className="text-lg font-bold mt-0.5">{summary.capex ? fmtTHB(summary.capex.mid) : '—'}</div>
               </div>
-              <div className="rounded-xl bg-paper border border-[#E7E5DD] p-4">
+              <div className="rounded-xl bg-paper border border-[#E8E8ED] p-4">
                 <div className="text-xs text-ink-faint">Revenue/savings per year (approx.)</div>
                 <div className="text-lg font-bold mt-0.5">
                   {specs.financials?.annualRevenueMillionTHB ? fmtTHB(specs.financials.annualRevenueMillionTHB) : 'Not estimable yet'}
@@ -184,7 +184,7 @@ export default function PlanDetail({ projectId }) {
                   <div className="text-[11px] text-volt-800 mt-1">Power revenue uses an assumed rate, not a confirmed power-purchase entitlement</div>
                 )}
               </div>
-              <div className="rounded-xl bg-paper border border-[#E7E5DD] p-4">
+              <div className="rounded-xl bg-paper border border-[#E8E8ED] p-4">
                 <div className="text-xs text-ink-faint">Rough payback</div>
                 <div className="text-lg font-bold mt-0.5">{summary.payback}</div>
               </div>
@@ -199,7 +199,7 @@ export default function PlanDetail({ projectId }) {
                   ['Net cash flow/yr', specs.financials?.netAnnualCashflowMillionTHB ? fmtTHB(specs.financials.netAnnualCashflowMillionTHB) : specs.financials?.netAnnualProfitMillionTHB ? fmtTHB(specs.financials.netAnnualProfitMillionTHB) : '—'],
                   ['Actual DC/AC ratio', specs.actualDcAcRatio || '—'],
                 ].map(([k, v], i) => (
-                  <div key={i} className="rounded-xl border border-[#E7E5DD] p-3">
+                  <div key={i} className="rounded-xl border border-[#E8E8ED] p-3">
                     <div className="text-[11px] text-ink-faint">{k}</div>
                     <div className="text-sm font-bold mt-0.5">{v}</div>
                   </div>

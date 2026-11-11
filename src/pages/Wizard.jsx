@@ -102,7 +102,7 @@ export default function Wizard() {
                 </div>
               ))}
             </div>
-            <div className="mt-3 flex items-center justify-between rounded-xl bg-paper border border-[#E7E5DD] px-4 py-2.5 text-sm">
+            <div className="mt-3 flex items-center justify-between rounded-xl bg-paper border border-[#E8E8ED] px-4 py-2.5 text-sm">
               <span className="text-ink-faint">Total area</span>
               <span className="font-semibold">{(land.areaSqM / 1600).toFixed(2)} rai ≈ {land.areaSqM.toLocaleString()} m²</span>
             </div>
@@ -141,7 +141,7 @@ export default function Wizard() {
                   {[['None or little', false], ['Noticeable shading', true], ['Unknown', null]].map(([label, val]) => (
                     <button key={label} type="button"
                       onClick={() => updateLand({ hasShading: val })}
-                      className={`chip border transition ${land.hasShading === val ? 'bg-brand-700 text-white border-brand-700' : 'bg-white border-[#DDDAD0] text-ink-soft hover:border-brand-400'}`}>
+                      className={`chip border transition ${land.hasShading === val ? 'bg-brand-700 text-white border-brand-700' : 'bg-white border-[#D2D2D7] text-ink-soft hover:border-brand-400'}`}>
                       {label}
                     </button>
                   ))}
@@ -153,7 +153,7 @@ export default function Wizard() {
                   {[['None', 'none'], ['Yes — specify size', 'yes'], ['Unknown', 'unknown']].map(([label, val]) => (
                     <button key={val} type="button"
                       onClick={() => updateLand({ hasStructures: val, excludedAreaSqM: val === 'yes' ? land.excludedAreaSqM : 0 })}
-                      className={`chip border transition ${land.hasStructures === val ? 'bg-brand-700 text-white border-brand-700' : 'bg-white border-[#DDDAD0] text-ink-soft hover:border-brand-400'}`}>
+                      className={`chip border transition ${land.hasStructures === val ? 'bg-brand-700 text-white border-brand-700' : 'bg-white border-[#D2D2D7] text-ink-soft hover:border-brand-400'}`}>
                       {label}
                     </button>
                   ))}
@@ -180,7 +180,7 @@ export default function Wizard() {
                     ['Dirt road/hard to reach', { roadType: 'dirt', roadWidthMeters: 4 }]].map(([label, patch]) => (
                     <button key={label} type="button"
                       onClick={() => updateLand(patch)}
-                      className={`chip border transition ${land.roadType === patch.roadType ? 'bg-brand-700 text-white border-brand-700' : 'bg-white border-[#DDDAD0] text-ink-soft hover:border-brand-400'}`}>
+                      className={`chip border transition ${land.roadType === patch.roadType ? 'bg-brand-700 text-white border-brand-700' : 'bg-white border-[#D2D2D7] text-ink-soft hover:border-brand-400'}`}>
                       {label}
                     </button>
                   ))}
@@ -191,12 +191,12 @@ export default function Wizard() {
                 <div className="flex flex-wrap gap-2 mb-3">
                   <button type="button"
                     onClick={() => updateLand({ gridUnknown: true })}
-                    className={`chip border transition ${land.gridUnknown ? 'bg-brand-700 text-white border-brand-700' : 'bg-white border-[#DDDAD0] text-ink-soft hover:border-brand-400'}`}>
+                    className={`chip border transition ${land.gridUnknown ? 'bg-brand-700 text-white border-brand-700' : 'bg-white border-[#D2D2D7] text-ink-soft hover:border-brand-400'}`}>
                     Unknown (skip)
                   </button>
                   <button type="button"
                     onClick={() => updateLand({ gridUnknown: false })}
-                    className={`chip border transition ${!land.gridUnknown ? 'bg-brand-700 text-white border-brand-700' : 'bg-white border-[#DDDAD0] text-ink-soft hover:border-brand-400'}`}>
+                    className={`chip border transition ${!land.gridUnknown ? 'bg-brand-700 text-white border-brand-700' : 'bg-white border-[#D2D2D7] text-ink-soft hover:border-brand-400'}`}>
                     Know roughly
                   </button>
                 </div>
@@ -204,7 +204,8 @@ export default function Wizard() {
                   <div>
                     <input type="range" min="20" max="2000" step="20" value={land.gridDistanceMeters}
                       onChange={(e) => updateLand({ gridDistanceMeters: parseInt(e.target.value) })}
-                      className="w-full accent-brand-700" />
+                      style={{ '--fill': `${((land.gridDistanceMeters - 20) / 1980) * 100}%` }}
+                      className="w-full" />
                     <div className="flex justify-between text-xs text-ink-faint mt-1">
                       <span>Adjacent</span>
                       <span className="font-medium text-ink">about {land.gridDistanceMeters} m away</span>
@@ -259,7 +260,7 @@ export default function Wizard() {
                 {[['Under 3,000', 2000], ['3,000–10,000', 6500], ['10,000–30,000', 20000], ['Over 30,000', 45000]].map(([label, val]) => (
                   <button key={label} type="button"
                     onClick={() => updateGoals({ monthlyBill: val })}
-                    className={`chip border transition ${goals.monthlyBill === val ? 'bg-brand-700 text-white border-brand-700' : 'bg-white border-[#DDDAD0] text-ink-soft hover:border-brand-400'}`}>
+                    className={`chip border transition ${goals.monthlyBill === val ? 'bg-brand-700 text-white border-brand-700' : 'bg-white border-[#D2D2D7] text-ink-soft hover:border-brand-400'}`}>
                     {label} THB
                   </button>
                 ))}
@@ -274,7 +275,7 @@ export default function Wizard() {
                 {[['Heavy traffic', 'high'], ['Moderate', 'medium'], ['Quiet', 'low'], ['Unknown', 'unknown']].map(([label, val]) => (
                   <button key={label} type="button"
                     onClick={() => updateGoals({ evTraffic: val })}
-                    className={`chip border transition ${goals.evTraffic === val ? 'bg-brand-700 text-white border-brand-700' : 'bg-white border-[#DDDAD0] text-ink-soft hover:border-brand-400'}`}>
+                    className={`chip border transition ${goals.evTraffic === val ? 'bg-brand-700 text-white border-brand-700' : 'bg-white border-[#D2D2D7] text-ink-soft hover:border-brand-400'}`}>
                     {label}
                   </button>
                 ))}
@@ -290,7 +291,7 @@ export default function Wizard() {
                 <button key={b.id} type="button"
                   onClick={() => updateGoals({ budget: b.id })}
                   className={`text-left px-4 py-3 rounded-xl border-2 text-sm font-medium transition ${
-                    goals.budget === b.id ? 'border-brand-600 bg-brand-50/60 text-brand-900' : 'border-[#E7E5DD] bg-white hover:border-brand-300'
+                    goals.budget === b.id ? 'border-brand-600 bg-brand-50/60 text-brand-900' : 'border-[#E8E8ED] bg-white hover:border-brand-300'
                   }`}>
                   {b.label}
                 </button>

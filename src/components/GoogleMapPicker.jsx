@@ -689,7 +689,7 @@ export default function GoogleMapPicker({
           <select
             value={pickProvince}
             onChange={(e) => { setPickProvince(e.target.value); setPickDistrict(''); }}
-            className="bg-white border border-zinc-200 rounded-md px-2 py-1.5 text-xs text-zinc-800 max-w-[10rem]"
+            className="bg-white border border-[#D2D2D7] rounded-lg px-2 py-1.5 text-xs text-ink max-w-[10rem] outline-none transition hover:border-brand-400 focus:border-brand-600 focus:ring-2 focus:ring-brand-600/15"
           >
             <option value="">Select province</option>
             {TH_ADMIN.map(p => <option key={p.provinceEn} value={p.provinceEn}>{p.provinceEn}</option>)}
@@ -698,7 +698,7 @@ export default function GoogleMapPicker({
             value={pickDistrict}
             onChange={(e) => setPickDistrict(e.target.value)}
             disabled={!pickProvince}
-            className="bg-white border border-zinc-200 rounded-md px-2 py-1.5 text-xs text-zinc-800 max-w-[12rem] disabled:opacity-50"
+            className="bg-white border border-[#D2D2D7] rounded-lg px-2 py-1.5 text-xs text-ink max-w-[12rem] outline-none transition hover:border-brand-400 focus:border-brand-600 focus:ring-2 focus:ring-brand-600/15 disabled:opacity-50"
           >
             <option value="">{pickProvince ? 'Whole province / pick a district' : 'Pick a province first'}</option>
             {pickProvince && TH_ADMIN.find(p => p.provinceEn === pickProvince)?.districts.map(d => (

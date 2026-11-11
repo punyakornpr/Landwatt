@@ -32,7 +32,7 @@ export default function Report({ projectId }) {
         </button>
       </div>
 
-      <div className="bg-white border border-[#E7E5DD] rounded-2xl p-6 sm:p-10 print:border-0 print:p-0">
+      <div className="bg-white border border-[#E8E8ED] rounded-2xl p-6 sm:p-10 print:border-0 print:p-0">
         {/* Letterhead */}
         <div className="flex items-start justify-between border-b-2 border-brand-700 pb-5 mb-6">
           <div>
@@ -75,7 +75,7 @@ export default function Report({ projectId }) {
         {/* Plan */}
         <section className="mt-6">
           <h2 className="text-sm font-bold uppercase tracking-wide text-ink-faint mb-2">2. Selected plan & assessment</h2>
-          <div className="rounded-xl border border-[#E7E5DD] p-4">
+          <div className="rounded-xl border border-[#E8E8ED] p-4">
             <div className="flex items-center justify-between">
               <span className="font-semibold">{meta.name} <span className="text-xs font-normal text-ink-faint">({meta.sub})</span></span>
               {rec && <span className="text-sm font-medium">{STATUS_EN[rec.status]} · score {rec.score}/100</span>}
@@ -137,7 +137,7 @@ export default function Report({ projectId }) {
           </table>
         </section>
 
-        <div className="mt-8 rounded-xl bg-[#F3F1EA] px-4 py-3 text-xs text-ink-soft leading-relaxed">
+        <div className="mt-8 rounded-xl bg-[#F5F5F7] px-4 py-3 text-xs text-ink-soft leading-relaxed">
           <strong>Report limitations:</strong> This document is a preliminary feasibility estimate from user inputs and LandWatt system assumptions.
           It is not a certification of land rights, permits, grid connection, construction documents, or guaranteed income.
           Investment and return figures are estimates; actuals depend on installation prices, usage behavior and the relevant authorities

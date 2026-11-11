@@ -18,7 +18,7 @@ function Src({ t }) {
 
 function KV({ k, v, src }) {
   return (
-    <div className="rounded-lg border border-[#E7E5DD] bg-paper p-3">
+    <div className="rounded-lg border border-[#E8E8ED] bg-paper p-3">
       <div className="text-[10px] text-ink-faint font-sans flex items-center justify-between gap-2">
         <span>{k}</span>{src && <Src t={src} />}
       </div>
@@ -45,7 +45,7 @@ function Trace({ fid, name, status, purpose, formula, vars, provenance, sub, ste
   const panelId = `trace-${fid}-${useState(() => ++traceSeq)[0]}`;
   const [statusLabel, statusCls] = STATUS[status] || STATUS.unverified;
   return (
-    <div className="rounded-xl border border-[#E7E5DD] p-4 space-y-2">
+    <div className="rounded-xl border border-[#E8E8ED] p-4 space-y-2">
       {/* 1. name/purpose + status */}
       <div className="flex items-baseline gap-2 flex-wrap">
         <span className="text-[10px] font-mono font-bold bg-brand-700 text-white rounded px-1.5 py-0.5">{fid}</span>
@@ -312,7 +312,7 @@ Hot: 38.1 × [1 + (−0.0030) × (60 − 25)] = ${sd.vmpHot} V/panel → ${sd.st
           <KV k="CAPEX per MWp" v={specs.capexPerMWpMillionTHB ? `~${specs.capexPerMWpMillionTHB}M THB/MWp` : 'flat rate by type'} src="demo" />
         </div>
         {specs.dualIncome && (
-          <div className="text-xs rounded-lg bg-paper border border-[#E7E5DD] p-3">
+          <div className="text-xs rounded-lg bg-paper border border-[#E8E8ED] p-3">
             Split income — power {fmtTHB(specs.dualIncome.powerRevenueMillionTHB)}/yr (assumed FiT) + crops {fmtTHB(specs.dualIncome.agriRevenueMillionTHB)}/yr (estimate, crop unspecified, do not treat as confirmed)
           </div>
         )}
@@ -323,14 +323,14 @@ Hot: 38.1 × [1 + (−0.0030) × (60 − 25)] = ${sd.vmpHot} V/panel → ${sd.st
         </div>
         <FinancialYieldChart project={project} specs={specs} landData={land} />
         {(specs.cashFlows?.length > 1) && (
-          <details className="rounded-lg border border-[#E7E5DD]">
+          <details className="rounded-lg border border-[#E8E8ED]">
             <summary className="cursor-pointer text-xs font-semibold px-4 py-3">
               Cash-flow table yrs 0–{(specs.cashFlows.length - 1)} (Payback/NPV/IRR reproducible)
             </summary>
             <div className="px-4 pb-4 overflow-x-auto">
               <table className="text-[11px] font-mono w-full">
                 <thead>
-                  <tr className="text-ink-faint border-b border-[#E7E5DD]">
+                  <tr className="text-ink-faint border-b border-[#E8E8ED]">
                     <th className="text-left py-1 pr-3">Year</th>
                     <th className="text-right py-1 pr-3">CF (M THB)</th>
                     <th className="text-right py-1 pr-3">DF @6%</th>

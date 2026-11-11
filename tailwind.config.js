@@ -11,9 +11,9 @@ export default {
         // TerraWatt friendly palette — brand/paper ผูกกับ CSS variables เพื่อสลับธีมได้
         paper: 'rgb(var(--paper) / <alpha-value>)',
         ink: {
-          DEFAULT: '#20252B',
-          soft: '#4B5563',
-          faint: '#8A919B',
+          DEFAULT: '#1d1d1f',
+          soft: '#6e6e73',
+          faint: '#86868b',
         },
         brand: {
           50: 'rgb(var(--brand-50) / <alpha-value>)',

@@ -6,7 +6,8 @@ import {
   ArrowRight, MapPin, ListChecks, FileText, Sun, Sprout, Zap,
   HelpCircle, CheckCircle2, PlayCircle,
 } from 'lucide-react';
-import { DisclaimerStrip } from '../components/ui';
+import { DisclaimerStrip, Reveal } from '../components/ui';
+import heroBg from '../assets/hero-landscape.svg';
 
 const EXAMPLES = [
   {
@@ -70,20 +71,26 @@ export default function Landing() {
   return (
     <div className="pb-16">
       {/* Hero */}
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-brand-50/80 via-paper to-paper pointer-events-none" />
-        <div className="relative max-w-6xl mx-auto px-4 sm:px-6 pt-14 sm:pt-20 pb-14 text-center">
-          <span className="chip bg-white border border-brand-200 text-brand-800 mb-5">
+      <section
+        className="relative overflow-hidden bg-cover bg-[center_62%] hero-scene"
+        style={{ backgroundImage: `url(${heroBg})` }}
+      >
+        <div className="absolute inset-0 bg-gradient-to-b from-white/60 via-white/10 to-white pointer-events-none" />
+        <div className="relative max-w-6xl mx-auto px-4 sm:px-6 pt-16 sm:pt-24 pb-36 sm:pb-48 text-center">
+          <span className="chip bg-white border border-brand-200 text-brand-800 mb-6 animate-in">
             <Sun className="w-3.5 h-3.5" /> Land-use energy planning assistant
           </span>
-          <h1 className="text-3xl sm:text-5xl font-bold tracking-tight leading-tight">
-            Your vacant land can<br className="sm:hidden" /> do more than you think
+          <h1 className="text-4xl sm:text-6xl font-bold tracking-tight leading-[1.08] animate-in" style={{ animationDelay: '90ms' }}>
+            Your vacant land can<br className="sm:hidden" />{' '}
+            <span className="bg-gradient-to-r from-brand-700 via-brand-600 to-electric-500 bg-clip-text text-transparent">
+              do more than you think
+            </span>
           </h1>
-          <p className="mt-4 text-base sm:text-lg text-ink-soft max-w-2xl mx-auto leading-relaxed">
+          <p className="mt-5 text-base sm:text-xl text-ink-soft max-w-2xl mx-auto leading-relaxed animate-in" style={{ animationDelay: '180ms' }}>
             Tell us where your land is and what you want — LandWatt compares energy options
             and estimates area, investment and returns in plain terms
           </p>
-          <div className="mt-7 flex flex-col sm:flex-row items-center justify-center gap-3">
+          <div className="mt-7 flex flex-col sm:flex-row items-center justify-center gap-3 animate-in" style={{ animationDelay: '270ms' }}>
             <button onClick={() => navigate('/start')} className="btn-primary text-base px-7 py-3.5 w-full sm:w-auto">
               Plan my land <ArrowRight className="w-4 h-4" />
             </button>
@@ -91,7 +98,11 @@ export default function Landing() {
               <PlayCircle className="w-4 h-4" /> Try an example
             </button>
           </div>
-          <p className="mt-4 text-xs text-ink-faint">No sign-up · no electrical knowledge needed · under 2 minutes</p>
+          <p className="mt-4 animate-in" style={{ animationDelay: '360ms' }}>
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-white/75 backdrop-blur px-4 py-1.5 text-xs text-ink-soft shadow-sm">
+              No sign-up · no electrical knowledge needed · under 2 minutes
+            </span>
+          </p>
         </div>
       </section>
 
@@ -103,19 +114,22 @@ export default function Landing() {
             { icon: ListChecks, title: 'See it before you invest', desc: 'Simulated layout, usable area, investment and cautions' },
             { icon: FileText, title: 'Compare cost & value', desc: 'Put 2–3 plans side by side and download a summary to decide' },
           ].map((c, i) => (
-            <div key={i} className="card p-6">
-              <div className="w-11 h-11 rounded-xl bg-brand-50 text-brand-700 flex items-center justify-center mb-4">
-                <c.icon className="w-5.5 h-5.5 w-6 h-6" />
+            <Reveal key={i} delay={i * 80}>
+              <div className="card p-6 h-full">
+                <div className="w-11 h-11 rounded-xl bg-brand-50 text-brand-700 flex items-center justify-center mb-4">
+                  <c.icon className="w-6 h-6" />
+                </div>
+                <h3 className="font-semibold">{c.title}</h3>
+                <p className="mt-1.5 text-sm text-ink-soft leading-relaxed">{c.desc}</p>
               </div>
-              <h3 className="font-semibold">{c.title}</h3>
-              <p className="mt-1.5 text-sm text-ink-soft leading-relaxed">{c.desc}</p>
-            </div>
+            </Reveal>
           ))}
         </div>
       </section>
 
       {/* How it works */}
-      <section className="max-w-6xl mx-auto px-4 sm:px-6 py-10">
+      <section className="bg-[#F5F5F7]">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-14">
         <h2 className="text-xl sm:text-2xl font-bold text-center">How it works</h2>
         <p className="text-sm text-ink-faint text-center mt-1">4 easy steps, done in a few minutes</p>
         <div className="mt-8 grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -125,7 +139,8 @@ export default function Landing() {
             { icon: ListChecks, t: 'Review a plan', d: 'Simulation, investment and cautions' },
             { icon: FileText, t: 'Download a summary', d: 'Save plans and print a short report' },
           ].map((s, i) => (
-            <div key={i} className="relative card p-5 text-center">
+            <Reveal key={i} delay={i * 60}>
+            <div className="relative card p-5 text-center h-full">
               <span className="absolute top-3 left-4 text-xs font-bold text-brand-600">Step {i + 1}</span>
               <div className="w-11 h-11 rounded-full bg-brand-700 text-white flex items-center justify-center mx-auto mt-2 mb-3">
                 <s.icon className="w-5 h-5" />
@@ -133,8 +148,10 @@ export default function Landing() {
               <div className="text-sm font-semibold">{s.t}</div>
               <div className="text-xs text-ink-faint mt-1 leading-relaxed">{s.d}</div>
             </div>
+            </Reveal>
           ))}
         </div>
+      </div>
       </section>
 
       {/* Examples */}
@@ -146,10 +163,11 @@ export default function Landing() {
             const icons = [Sun, Zap, Sprout];
             const Icon = icons[i];
             return (
-              <button key={ex.id} onClick={() => useExample(ex)}
-                className="card p-6 text-left hover:border-brand-400 transition group">
+              <Reveal key={ex.id} delay={i * 80}>
+              <button onClick={() => useExample(ex)}
+                className="card p-6 text-left hover:border-brand-400 transition group w-full h-full">
                 <div className="flex items-center justify-between">
-                  <div className="w-10 h-10 rounded-xl bg-[#F3F1EA] text-ink-soft flex items-center justify-center group-hover:bg-brand-700 group-hover:text-white transition">
+                  <div className="w-10 h-10 rounded-xl bg-[#F5F5F7] text-ink-soft flex items-center justify-center group-hover:bg-brand-700 group-hover:text-white transition">
                     <Icon className="w-5 h-5" />
                   </div>
                   <span className="chip bg-volt-100 text-volt-800 border border-volt-200">Demo data</span>
@@ -160,6 +178,7 @@ export default function Landing() {
                   Use this example <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-0.5 transition" />
                 </span>
               </button>
+              </Reveal>
             );
           })}
         </div>
@@ -167,7 +186,7 @@ export default function Landing() {
 
       {/* Trust */}
       <section className="max-w-3xl mx-auto px-4 sm:px-6 py-10">
-        <DisclaimerStrip />
+        <Reveal><DisclaimerStrip /></Reveal>
       </section>
 
       {/* FAQ */}
@@ -175,7 +194,8 @@ export default function Landing() {
         <h2 className="text-xl sm:text-2xl font-bold text-center mb-6">Frequently asked questions</h2>
         <div className="space-y-3">
           {FAQS.map((f, i) => (
-            <details key={i} className="card group open:bg-white">
+            <Reveal key={i} delay={i * 50}>
+            <details className="card group open:bg-white">
               <summary className="flex items-center justify-between gap-3 px-5 py-4 cursor-pointer list-none">
                 <span className="flex items-center gap-2.5 text-sm font-medium">
                   <HelpCircle className="w-4 h-4 text-brand-600 flex-shrink-0" /> {f.q}
@@ -184,6 +204,7 @@ export default function Landing() {
               </summary>
               <p className="px-5 pb-4 pl-[42px] text-sm text-ink-soft leading-relaxed">{f.a}</p>
             </details>
+            </Reveal>
           ))}
         </div>
         <div className="text-center mt-10">

@@ -208,17 +208,19 @@ export default function Results() {
       </div>
 
       {rest.length > 0 && (
-        <Collapsible title={t('Other options not ideal right now')} sub={t('Missing conditions or higher risk — reasons shown')} defaultOpen={false}>
+        <Collapsible title={t('All options — ranked')} sub={t('Every option in rank order, best fit first — scores and reasons shown')} defaultOpen={true}>
           <div className="space-y-3 pt-3">
-            {rest.map(r => {
+            {rest.map((r, i) => {
               const meta = projectFriendly(r.id, lang);
               return (
                 <div key={r.id} className="flex items-start gap-3 p-3.5 rounded-xl border border-[#E8E8ED] bg-paper/60">
+                  <span className="w-7 h-7 rounded-lg bg-brand-50 text-brand-700 text-xs font-bold flex items-center justify-center flex-shrink-0 mt-1.5">#{i + 4}</span>
                   <ProjectIcon id={r.id} size="md" />
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
                       <span className="text-sm font-semibold">{meta.name}</span>
                       <StatusBadge status={r.status} />
+                      <span className="text-xs text-ink-faint font-medium">{r.score}/100</span>
                     </div>
                     <p className="text-sm text-ink-soft mt-1 leading-relaxed">{r.reasons[0] || meta.oneLiner}</p>
                   </div>

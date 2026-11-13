@@ -4,7 +4,7 @@ import { useApp } from '../state/AppState';
 import { PROVINCES_DATA } from '../data/provinces';
 import {
   ArrowRight, MapPin, ListChecks, FileText, Sun, Sprout, Zap,
-  HelpCircle, CheckCircle2, PlayCircle, ChevronRight,
+  HelpCircle, CheckCircle2, PlayCircle, ChevronRight, TrendingUp,
 } from 'lucide-react';
 import { DisclaimerStrip, Reveal } from '../components/ui';
 import { useT } from '../i18n';
@@ -102,6 +102,23 @@ export default function Landing() {
             </span>
           </p>
         </div>
+      </section>
+
+      {/* Trends entry */}
+      <section className="max-w-4xl mx-auto px-4 sm:px-6 -mt-20 sm:-mt-28 relative z-10">
+        <Reveal>
+          <button onClick={() => navigate('/trends')}
+            className="card p-5 sm:p-6 w-full text-left flex items-center gap-4 hover:border-brand-400 hover:-translate-y-0.5 transition group shadow-lg shadow-brand-600/10">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-brand-600 to-electric-500 text-white flex items-center justify-center flex-shrink-0">
+              <TrendingUp className="w-6 h-6" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="font-bold text-base sm:text-lg">{t('Business trends this year')}</div>
+              <div className="text-sm text-ink-soft mt-0.5">{t('See what is gaining momentum on Thai land — energy and beyond')}</div>
+            </div>
+            <ArrowRight className="w-5 h-5 text-brand-600 group-hover:translate-x-1 transition flex-shrink-0" />
+          </button>
+        </Reveal>
       </section>
 
       {/* Why LandWatt */}

@@ -6,6 +6,7 @@ import { useApp } from './state/AppState';
 export const TH = {
   // Nav / footer / journey
   'Home': 'หน้าแรก',
+  'Trends': 'เทรนด์',
   'Analyze land': 'วิเคราะห์ที่ดิน',
   'My projects': 'แผนของฉัน',
   'How to use': 'วิธีใช้งาน',
@@ -213,6 +214,17 @@ export const TH = {
   'Back to options': 'กลับไปดูทางเลือก',
   'This is the plan LandWatt suggests for your land —': 'นี่คือแผนที่ LandWatt แนะนำสำหรับที่ดินของคุณ —',
   'On {loc} {rai} rai · feasibility:': 'ที่ {loc} {rai} ไร่ · ความเหมาะ:',
+
+  // Trends
+  'Business trends': 'เทรนด์ธุรกิจ',
+  'Business trends this year': 'เทรนด์ธุรกิจปีนี้',
+  'See what is gaining momentum on Thai land — energy and beyond': 'ดูว่าอะไรกำลังมาแรงบนที่ดินไทย — ทั้งพลังงานและธุรกิจอื่น',
+  'Six sectors gaining momentum on Thai land this year — digital, health, food, lifestyle, clean energy and logistics. General market context, not advice for a specific plot.':
+    'หกภาคที่กำลังมาแรงบนที่ดินไทยปีนี้ — ดิจิทัล สุขภาพ อาหาร ไลฟ์สไตล์ พลังงานสะอาด และโลจิสติกส์ บริบทตลาดทั่วไป ไม่ใช่คำแนะนำเฉพาะแปลง',
+  'Why now': 'ทำไมต้องตอนนี้',
+  'Fits land that is': 'ที่ดินที่เหมาะ',
+  'See which of these fits your land': 'ดูว่าอันไหนเหมาะกับที่ดินคุณ',
+  'The analyzer scores each option against your actual plot, budget and goals': 'ระบบวิเคราะห์ให้คะแนนแต่ละทางเลือกเทียบกับแปลงจริง งบ และเป้าหมายของคุณ',
   'the pinned land': 'ที่ดินที่ปักหมุด',
   'great fit': 'เหมาะมาก',
   'worth exploring': 'น่าสนใจ',

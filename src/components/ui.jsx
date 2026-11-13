@@ -5,6 +5,8 @@ import {
   CheckCircle2, AlertTriangle, Info, HelpCircle,
   Store, Snowflake, Package, Handshake, Server, Warehouse, Trees,
   Coffee, ShoppingCart, Boxes, Dumbbell, Tent, WashingMachine, Car,
+  HeartPulse, UtensilsCrossed, Sparkles, Truck, HeartHandshake,
+  Stethoscope, Leaf, PawPrint, Users, RadioTower,
 } from 'lucide-react';
 import { STATUS, PROJECT_FRIENDLY } from '../engine/recommend';
 import { useApp } from '../state/AppState';
@@ -33,6 +35,8 @@ export const ICONS = {
   TrendingUp, PiggyBank, Lightbulb, Store, Snowflake, Package,
   Handshake, Server, Warehouse, Trees,
   Coffee, ShoppingCart, Boxes, Dumbbell, Tent, WashingMachine, Car,
+  HeartPulse, UtensilsCrossed, Sparkles, Truck, HeartHandshake,
+  Stethoscope, Leaf, PawPrint, Users, RadioTower,
 };
 
 export function Reveal({ children, delay = 0, className = '' }) {

@@ -2,6 +2,7 @@ import React from 'react';
 import { AppStateProvider, useApp } from './state/AppState';
 import { useRoute, navigate } from './router';
 import Landing from './pages/Landing';
+import Trends from './pages/Trends';
 import Wizard from './pages/Wizard';
 import Results from './pages/Results';
 import PlanDetail from './pages/PlanDetail';
@@ -14,6 +15,7 @@ import { useT } from './i18n';
 
 const NAV_ITEMS = [
   { path: '', label: 'Home' },
+  { path: 'trends', label: 'Trends' },
   { path: 'start', label: 'Analyze land' },
   { path: 'projects', label: 'My projects' },
   { path: 'help', label: 'How to use' },
@@ -95,6 +97,7 @@ function RoutedApp() {
   let page;
   switch (path) {
     case '': page = <Landing />; break;
+    case 'trends': page = <Trends />; break;
     case 'start': page = <Wizard />; break;
     case 'results': page = <Results />; break;
     case 'plan': page = <PlanDetail projectId={param} />; break;
